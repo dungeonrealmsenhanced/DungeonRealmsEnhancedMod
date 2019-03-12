@@ -69,15 +69,17 @@ public class GuiDRSettingsCategory extends GuiScreen {
             new GuiButton(4334, 0, 0, "").playPressSound(Minecraft.getMinecraft().getSoundHandler());
             if (category == null) {
                 Minecraft.getMinecraft().displayGuiScreen(null);
+                return;
             } else {
                 new GuiDRSettingsCategory().display();
+                return;
             }
-            return;
         }
         checkCategories(mouseX, mouseY, mouseButton);
     }
 
     public void display() {
+        Minecraft.getMinecraft().player.closeScreen();
         FMLCommonHandler.instance().bus().register(this);
     }
 

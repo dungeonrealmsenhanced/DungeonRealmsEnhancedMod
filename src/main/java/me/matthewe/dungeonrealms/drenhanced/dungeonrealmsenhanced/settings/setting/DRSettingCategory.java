@@ -45,4 +45,14 @@ public enum DRSettingCategory {
     public boolean isSubCategory() {
         return Arrays.stream(values()).anyMatch(value -> value.hasSubCategories() && value.getSubCategoryList().contains(this));
     }
+
+    public DRSettingCategory getParentCategory() {
+        for (DRSettingCategory value : values()) {
+            if (!value.isSubCategory() && value.getSubCategoryList().contains(this)) {
+                return value;
+            }
+        }
+        return null;
+
+    }
 }

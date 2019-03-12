@@ -34,6 +34,9 @@ public class Settings {
     public void loadDefault() {
         this.categoryMap = new ConcurrentHashMap<>();
         for (DRSettingCategory value : DRSettingCategory.values()) {
+            if (value.hasSubCategories()){
+                continue;
+            }
             categoryMap.put(value, new SettingCategory(value));
         }
     }

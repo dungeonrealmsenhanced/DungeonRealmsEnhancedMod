@@ -104,7 +104,20 @@ public class GuiDRSettings extends GuiScreen {
         if (this.arrowSelected) {
             this.arrowSelected = false;
             new GuiButton(4334, 0, 0, "").playPressSound(Minecraft.getMinecraft().getSoundHandler());
-            new GuiDRSettingsCategory().display();
+            if (category.isSubCategory()) {
+                DRSettingCategory parentCategory = category.getParentCategory();
+                if (parentCategory != null) {
+
+                    GuiDRSettingsCategory guiDRSettingsCategory = new GuiDRSettingsCategory();
+                    guiDRSettingsCategory.setCategory(parentCategory);
+                    guiDRSettingsCategory.display();
+                    return;
+                } else {
+                    new GuiDRSettingsCategory().display();
+                }
+            } else {
+                new GuiDRSettingsCategory().display();
+            }
             return;
         }
         for (GuiTextField value : textMap.values()) {
@@ -121,7 +134,9 @@ public class GuiDRSettings extends GuiScreen {
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
+
     public void display() {
+        Minecraft.getMinecraft().player.closeScreen();
         FMLCommonHandler.instance().bus().register(this);
     }
 

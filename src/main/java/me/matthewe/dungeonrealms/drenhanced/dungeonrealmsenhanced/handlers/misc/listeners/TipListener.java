@@ -18,7 +18,7 @@ public class TipListener implements Listener {
     public void onClientChatReceived(ClientChatReceivedEvent event) {
         String unformattedText = event.getMessage().getUnformattedText();
         if (unformattedText.startsWith(">> TIP -")) {
-            String tipMessage = event.getMessage().getFormattedText().split(TextFormatting.YELLOW+TextFormatting.BOLD.toString()+">>" + TextFormatting.YELLOW+" TIP -")[1];
+            String tipMessage = event.getMessage().getFormattedText().split(TextFormatting.YELLOW+TextFormatting.BOLD.toString()+">>" + TextFormatting.YELLOW+" TIP "+TextFormatting.BOLD+"-")[1];
             if (tipMessage != null) {
                 tipMessage = tipMessage.trim();
                 TipReceiveEvent tipReceiveEvent = new TipReceiveEvent(tipMessage);

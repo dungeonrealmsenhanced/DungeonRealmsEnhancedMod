@@ -14,6 +14,8 @@ public enum DRSettings {
     GAMMA("Gamma", "Change brightness.", DRSettingCategory.MISC, 1.0D, double.class),
     TESTING("Testing", "Toggles testing.", DRSettingCategory.DEVELOPMENT, false, boolean.class),
     NEW_LORE("New Lore", "Toggles new lore.", DRSettingCategory.DEVELOPMENT, false, boolean.class),
+    INT_ONE("One", "Test", DRSettingCategory.DEVELOPMENT, 50.0D, double.class),
+    INT_TWO("Two", "Test", DRSettingCategory.DEVELOPMENT, 50.0D, double.class),
     GLOWING_RARITIES_COMMON("Common Overlay", new String[] {"Toggles gray overlay over common items."}, DRSettingCategory.ITEMS, false, boolean.class),
     GLOWING_RARITIES_UNCOMMON("Uncommon Overlay", new String[] {"Toggles green overlay over uncommon items."}, DRSettingCategory.ITEMS, true, boolean.class),
     GLOWING_RARITIES_RARE("Rare Overlay", new String[] {"Toggles aqua overlay over rare items."}, DRSettingCategory.ITEMS, true, boolean.class),

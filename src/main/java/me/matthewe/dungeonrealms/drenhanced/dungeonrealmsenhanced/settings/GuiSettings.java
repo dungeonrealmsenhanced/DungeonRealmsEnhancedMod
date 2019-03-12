@@ -2,6 +2,7 @@ package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings;
 
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.Module;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.Modules;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.treasurescroll.TreasureScrollModule;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.render.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -86,17 +87,22 @@ public class GuiSettings extends GuiScreen {
         boolean foundModule = false;
         boolean overButton = false;
         for (Module module : Modules.getModules()) {
-            int minX = module.posX;
-            int minY = module.posY;
-            int maxX = module.posX + module.getWidth() + 4;
-            int maxY = module.posY + 12;
-            if ((x >= minX) && (x <= maxX) && (y >= minY) && (y <= maxY)) {
-                this.dragging = true;
-                this.lastX = x;
-                selectedModule = module;
-                module.setEditing(true);
-                this.lastY = y;
-                foundModule = true;
+
+            if (module instanceof TreasureScrollModule) {
+                TreasureScrollModule treasureScrollModule = (TreasureScrollModule) module;
+                if (treasureScrollModule.isMouseWithin(x, y)) {
+                    selectModule(module,x,y);
+                    foundModule = true;
+                }
+            } else {
+                int minX = module.posX - 2;
+                int minY = module.posY - 2;
+                int maxX = module.getWidth() + 2;
+                int maxY = module.getHeight() + 2;
+                if ((x >= minX) && (x <= maxX) && (y >= minY) && (y <= maxY)) {
+                    selectModule(module, x, y);
+                    foundModule = true;
+                }
             }
         }
         for (GuiButton guiButton : buttonList) {
@@ -112,6 +118,14 @@ public class GuiSettings extends GuiScreen {
             toggleButton.visible = false;
         }
         super.mouseClicked(x, y, mouseButton);
+    }
+
+    private void selectModule(Module module, int x, int y) {
+        this.dragging = true;
+        this.lastX = x;
+        selectedModule = module;
+        module.setEditing(true);
+        this.lastY = y;
     }
 
 

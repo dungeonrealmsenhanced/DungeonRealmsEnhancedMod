@@ -25,7 +25,6 @@ public abstract class Module {
     public int defaultPosY;
     private boolean editing = false;
     protected List<Listener> listeners;
-
     protected Minecraft mc;
 
     public Module(String name) {

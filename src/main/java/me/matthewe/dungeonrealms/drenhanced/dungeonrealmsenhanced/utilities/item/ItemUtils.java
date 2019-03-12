@@ -1,6 +1,9 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -143,5 +146,31 @@ public class ItemUtils {
 
     public static Tier getTier(ItemStack itemStack) {
         return Tier.getByNumber(NbtTagUtils.getInt("tier", itemStack));
+    }
+
+    public static boolean hasClueScrolls() {
+        return getClueScrolls() != null;
+    }
+
+    public static List<ClueScroll> getClueScrolls() {
+        Minecraft minecraft = Minecraft.getMinecraft();
+        EntityPlayerSP player = minecraft.player;
+        if (player == null) {
+            return null;
+        }
+
+        List<ClueScroll> clueScrolls = new ArrayList<>();
+        for (Slot slot : player.inventoryContainer.inventorySlots) {
+            ItemStack itemStack = slot.getStack();
+
+            if ((itemStack.getItem() == Items.AIR) || (itemStack.getCount() == 0) || (!ItemType.isClueScroll(itemStack))) {
+                continue;
+            }
+            ClueScroll clueScroll = ClueScroll.of(itemStack);
+            if (clueScroll != null) {
+                clueScrolls.add(clueScroll);
+            }
+        }
+        return !clueScrolls.isEmpty() ? clueScrolls : null;
     }
 }

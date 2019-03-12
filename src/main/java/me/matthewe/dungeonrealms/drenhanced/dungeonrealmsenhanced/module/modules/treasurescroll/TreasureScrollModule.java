@@ -16,23 +16,23 @@ public class TreasureScrollModule extends Module {
 
     @Override
     public void renderEditing(ScaledResolution resolution, float partialTicks) {
+        Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Treasure Scroll", this.posX,this.posY, Tier.T1.getColor());
     }
 
     @Override
     public void update(ScaledResolution resolution, float partialTicks) {
-        //int[] ints = RenderUtils.getTextBoxDimentions(posX-2, posY-2, DRPlayer.drPlayer.getCPS() +" CPS");
         this.width = 200;
         this.height = 200;
     }
 
     @Override
     public void renderOutline(ScaledResolution scaledResolution, float particleTicks) {
-        RenderUtils.drawRectLines(posX - 2, posY - 2, this.width, this.height, 1140850688);
+        RenderUtils.drawRectLines(posX, posY, this.width, this.height, 1140850688);
     }
 
     @Override
     public void render(ScaledResolution scaledResolution, float particleTicks) {
-        Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Treasure Scroll", this.posX, this.posY, Tier.T2.getColor());
+        Minecraft.getMinecraft().fontRenderer.drawStringWithShadow("Treasure Scroll", this.posX,this.posY, Tier.T2.getColor());
     }
 
     @Override

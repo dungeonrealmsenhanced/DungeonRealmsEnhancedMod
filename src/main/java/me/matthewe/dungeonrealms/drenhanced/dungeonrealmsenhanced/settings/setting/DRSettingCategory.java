@@ -14,7 +14,7 @@ public enum DRSettingCategory {
 
     ITEMS_MISC("Items Misc"),
     ITEMS_OVERLAY("Items Overlay"),
-    ITEMS("Items", new DRSettingCategory[] {DRSettingCategory.ITEMS_OVERLAY, DRSettingCategory.ITEMS_MISC}),
+    ITEMS("Items", new DRSettingCategory[]{DRSettingCategory.ITEMS_OVERLAY, DRSettingCategory.ITEMS_MISC}),
 
 
     DEVELOPMENT("Development");
@@ -40,5 +40,9 @@ public enum DRSettingCategory {
 
     public String getName() {
         return name;
+    }
+
+    public boolean isSubCategory() {
+        return Arrays.stream(values()).anyMatch(value -> value.hasSubCategories() && value.getSubCategoryList().contains(this));
     }
 }

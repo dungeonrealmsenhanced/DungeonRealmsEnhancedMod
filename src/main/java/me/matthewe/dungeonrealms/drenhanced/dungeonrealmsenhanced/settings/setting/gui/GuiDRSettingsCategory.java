@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Matthew E on 12/31/2018 at 3:29 PM for the project DungeonRealmsDREnhanced
@@ -163,7 +164,7 @@ public class GuiDRSettingsCategory extends GuiScreen {
 
             int[] aaaaaaaaaas = RenderUtils.drawRectLines(xBox, yBox, "aaaaaaaaaaaaaaaaaaaaaa");
             if (RenderUtils.isMouseInside(x, y, xBox, yBox, aaaaaaaaaas[0], aaaaaaaaaas[1])) {
-                onCategoryClick(category);
+                onCategoryClick(drSettingCategory, category);
             }
 
             currentY += fontRenderer.FONT_HEIGHT + 4;
@@ -171,15 +172,20 @@ public class GuiDRSettingsCategory extends GuiScreen {
         }
     }
 
-    private void onCategoryClick(SettingCategory category) {
+    private void onCategoryClick(DRSettingCategory drSettingCategory, SettingCategory category) {
+        if (drSettingCategory.hasSubCategories()) {
+            GuiDRSettingsCategory guiDRSettingsCategory = new GuiDRSettingsCategory();
+            guiDRSettingsCategory.setCategory(drSettingCategory);
+            guiDRSettingsCategory.display();
+            return;
+        }
         new GuiDRSettings(category.getCategory()).display();
-//        mc.displayGuiScreen(new GuiDRSettings(category.getCategory()));
     }
 
     private List<DRSettingCategory> getCategories() {
         List<DRSettingCategory> drSettingCategories = new ArrayList<>();
         if (category == null) {
-            drSettingCategories.addAll(Arrays.asList(DRSettingCategory.values()));
+            drSettingCategories.addAll(Arrays.stream(DRSettingCategory.values()).filter(DRSettingCategory::isSubCategory).collect(Collectors.toList()));
         } else {
             drSettingCategories.addAll(category.getSubCategoryList());
         }

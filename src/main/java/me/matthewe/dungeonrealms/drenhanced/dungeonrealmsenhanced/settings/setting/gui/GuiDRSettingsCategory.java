@@ -185,7 +185,7 @@ public class GuiDRSettingsCategory extends GuiScreen {
     private List<DRSettingCategory> getCategories() {
         List<DRSettingCategory> drSettingCategories = new ArrayList<>();
         if (category == null) {
-            drSettingCategories.addAll(Arrays.stream(DRSettingCategory.values()).filter(DRSettingCategory::isSubCategory).collect(Collectors.toList()));
+            drSettingCategories.addAll(Arrays.stream(DRSettingCategory.values()).filter(drSettingCategory -> !drSettingCategory.isSubCategory()).collect(Collectors.toList()));
         } else {
             drSettingCategories.addAll(category.getSubCategoryList());
         }

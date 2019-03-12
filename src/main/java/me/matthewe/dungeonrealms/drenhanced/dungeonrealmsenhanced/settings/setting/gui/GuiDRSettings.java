@@ -262,7 +262,6 @@ public class GuiDRSettings extends GuiScreen {
     }
 
     private void drawTitle(int x, int y, float partialTicks) {
-        int centerX = (width / 2) - guiWidth / 2;
         int centerY = (height / 2) - guiHeight / 2;
 
         GlStateManager.pushMatrix();

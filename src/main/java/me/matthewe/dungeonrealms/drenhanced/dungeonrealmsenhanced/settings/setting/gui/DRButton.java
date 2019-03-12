@@ -6,7 +6,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 
 /**
- * Created by Matthew Eisenberg on 3/12/2019 at 3:42 PM for the project DungeonRealmsDREnhanced
+ * Created by Matthew E on 3/12/2019 at 3:42 PM for the project DungeonRealmsDREnhanced
  */
 public class DRButton {
     public int id;

@@ -7,10 +7,8 @@ import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setti
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.world.Location;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
-import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
@@ -83,13 +81,6 @@ public class StatisticListener {
 
     }
 
-    @SubscribeEvent
-    public void onRenderPlayer(RenderPlayerEvent event) {
-        EntityPlayer entityPlayer = event.getEntityPlayer();
-        System.out.println(entityPlayer.getDisplayName().getUnformattedText());
-
-
-    }
 
     @SubscribeEvent
     public void onPlayerLoggedOut(PlayerEvent.PlayerLoggedInEvent event) {

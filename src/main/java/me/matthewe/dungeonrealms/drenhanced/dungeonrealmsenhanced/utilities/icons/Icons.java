@@ -9,7 +9,8 @@ public enum Icons implements IIcon {
     ARROW_LEFT,
     CHECK,
     CROSS,
-    CROSS_SELECTED;
+    CROSS_SELECTED,
+    ARROW_LEFT_SELECTED;
 
     private static final ResourceLocation ICON_ASSET = new ResourceLocation("dungeonrealmsenhanced:textures/gui/icons.png");
 

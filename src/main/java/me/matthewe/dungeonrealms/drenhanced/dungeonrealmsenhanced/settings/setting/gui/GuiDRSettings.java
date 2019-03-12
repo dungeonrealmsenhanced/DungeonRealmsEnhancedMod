@@ -15,7 +15,9 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -67,6 +69,8 @@ public class GuiDRSettings extends GuiScreen {
                     value = DRPlayer.get().getSettings().getCategory(entry.getKey().getCategory()).getSettingValue(entry.getKey(), double.class);
                 }
                 DRPlayer.get().setSettingValue(entry.getKey(), value);
+            } else if (clazz == String.class) {
+                DRPlayer.get().setSettingValue(entry.getKey(), entry.getValue().getText());
             }
         }
     }
@@ -96,7 +100,7 @@ public class GuiDRSettings extends GuiScreen {
     }
 
     @Override
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+    public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         if (this.arrowSelected) {
             this.arrowSelected = false;
             new GuiButton(4334, 0, 0, "").playPressSound(Minecraft.getMinecraft().getSoundHandler());
@@ -130,17 +134,9 @@ public class GuiDRSettings extends GuiScreen {
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
-
     public void display() {
-        Minecraft.getMinecraft().player.closeScreen();
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                Minecraft.getMinecraft().displayGuiScreen(GuiDRSettings.this);
-                settingsOpened = true;
-                cancel();
-            }
-        }, 300L);
+        Minecraft.getMinecraft().displayGuiScreen(GuiDRSettings.this);
+        settingsOpened = true;
     }
 
     @Override
@@ -224,8 +220,7 @@ public class GuiDRSettings extends GuiScreen {
                 guiButton.displayString = drSettings.get(boolean.class).toString();
                 buttonMap.put(drSettings, guiButton);
                 currentButtonId++;
-            }
-            if (drSettings.getClazz() == double.class) {
+            } else if (drSettings.getClazz() == double.class) {
                 GuiTextField guiButton = new GuiTextField(currentGuiTextFieldId, fontRenderer, xBox + paddingLeft + fontRenderer.getStringWidth(drSettings.getName()), yBox, 60, 10);
                 guiButton.setText(drSettings.get(double.class).intValue() + "");
                 guiButton.setValidator(input -> {
@@ -242,6 +237,11 @@ public class GuiDRSettings extends GuiScreen {
                     }
                     return true;
                 });
+                textMap.put(drSettings, guiButton);
+                currentGuiTextFieldId++;
+            } else if (drSettings.getClazz() == String.class) {
+                GuiTextField guiButton = new GuiTextField(currentGuiTextFieldId, fontRenderer, xBox + paddingLeft + fontRenderer.getStringWidth(drSettings.getName()), yBox, 60, 10);
+                guiButton.setText(drSettings.get(String.class) + "");
                 textMap.put(drSettings, guiButton);
                 currentGuiTextFieldId++;
             }

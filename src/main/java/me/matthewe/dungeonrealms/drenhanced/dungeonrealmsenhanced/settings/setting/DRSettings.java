@@ -1,5 +1,7 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setting;
 
+import net.minecraft.util.text.TextFormatting;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +24,8 @@ public enum DRSettings {
     GLOWING_RARITIES_EPIC("Epic Overlay", new String[] {"Toggles purple overlay over epic items."}, DRSettingCategory.ITEMS_OVERLAY, true, boolean.class),
     GLOWING_RARITIES_LEGENDARY("Legendary Overlay", new String[] {"Toggles yellow overlay over legendary items."}, DRSettingCategory.ITEMS_OVERLAY, true, boolean.class),
     ORIGIN_NAME("Origin", new String[] {"Show an items origin in lore when you hold shift. "}, DRSettingCategory.ITEMS_MISC, true, boolean.class),
+    DURABILITY_PERCENTAGE("Durability Percent", new String[] {"Display durability " + TextFormatting.WHITE+"percent "+TextFormatting.GRAY+"of an item."}, DRSettingCategory.ITEMS_MISC, true, boolean.class),
+    DURABILITY_PERCENTAGE_FORMAT("Percent Format", new String[] {"Format of durability on an items display name."}, DRSettingCategory.ITEMS_MISC, "&8&l(&b&l%percent%%&8&l)", String.class),
     SEND_DATA("Data Collection",new String[]{ "This will allow data collection", "to help improve the mod."}, DRSettingCategory.MISC, true, boolean.class);
 
     private String name;

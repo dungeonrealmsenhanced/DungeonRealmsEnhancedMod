@@ -1,5 +1,7 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setting;
 
+import net.minecraft.util.text.TextFormatting;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,12 +18,14 @@ public enum DRSettings {
     NEW_LORE("New Lore", "Toggles new lore.", DRSettingCategory.DEVELOPMENT, false, boolean.class),
     INT_ONE("One", "Test", DRSettingCategory.DEVELOPMENT, 50.0D, double.class),
     INT_TWO("Two", "Test", DRSettingCategory.DEVELOPMENT, 50.0D, double.class),
-    GLOWING_RARITIES_COMMON("Common Overlay", new String[] {"Toggles gray overlay over common items."}, DRSettingCategory.ITEMS, false, boolean.class),
-    GLOWING_RARITIES_UNCOMMON("Uncommon Overlay", new String[] {"Toggles green overlay over uncommon items."}, DRSettingCategory.ITEMS, true, boolean.class),
-    GLOWING_RARITIES_RARE("Rare Overlay", new String[] {"Toggles aqua overlay over rare items."}, DRSettingCategory.ITEMS, true, boolean.class),
-    GLOWING_RARITIES_EPIC("Epic Overlay", new String[] {"Toggles purple overlay over epic items."}, DRSettingCategory.ITEMS, true, boolean.class),
-    GLOWING_RARITIES_LEGENDARY("Legendary Overlay", new String[] {"Toggles yellow overlay over legendary items."}, DRSettingCategory.ITEMS, true, boolean.class),
-    ORIGIN_NAME("Origin", new String[] {"Show an items origin in lore when you hold shift. "}, DRSettingCategory.ITEMS, true, boolean.class),
+    GLOWING_RARITIES_COMMON("Common Overlay", new String[] {"Toggles gray overlay over common items."}, DRSettingCategory.ITEMS_OVERLAY, false, boolean.class),
+    GLOWING_RARITIES_UNCOMMON("Uncommon Overlay", new String[] {"Toggles green overlay over uncommon items."}, DRSettingCategory.ITEMS_OVERLAY, true, boolean.class),
+    GLOWING_RARITIES_RARE("Rare Overlay", new String[] {"Toggles aqua overlay over rare items."}, DRSettingCategory.ITEMS_OVERLAY, true, boolean.class),
+    GLOWING_RARITIES_EPIC("Epic Overlay", new String[] {"Toggles purple overlay over epic items."}, DRSettingCategory.ITEMS_OVERLAY, true, boolean.class),
+    GLOWING_RARITIES_LEGENDARY("Legendary Overlay", new String[] {"Toggles yellow overlay over legendary items."}, DRSettingCategory.ITEMS_OVERLAY, true, boolean.class),
+    ORIGIN_NAME("Origin", new String[] {"Show an items origin in lore when you hold shift. "}, DRSettingCategory.ITEMS_MISC, true, boolean.class),
+    DURABILITY_PERCENTAGE("Durability Percent", new String[] {"Display durability " + TextFormatting.WHITE+"percent "+TextFormatting.GRAY+"of an item."}, DRSettingCategory.ITEMS_MISC, true, boolean.class),
+    DURABILITY_PERCENTAGE_FORMAT("Percent Format", new String[] {"Format of durability on an items display name."}, DRSettingCategory.ITEMS_MISC, "&8&l(&b&l%percent%%&8&l)", String.class),
     SEND_DATA("Data Collection",new String[]{ "This will allow data collection", "to help improve the mod."}, DRSettingCategory.MISC, true, boolean.class);
 
     private String name;

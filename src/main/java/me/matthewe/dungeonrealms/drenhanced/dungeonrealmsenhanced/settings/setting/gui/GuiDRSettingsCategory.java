@@ -11,13 +11,12 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Matthew E on 12/31/2018 at 3:29 PM for the project DungeonRealmsDREnhanced
@@ -32,11 +31,26 @@ public class GuiDRSettingsCategory extends GuiScreen {
     final double scale = 2;
 
     private String title = "Settings";
+    private boolean crossSelected = false;
+
+    private DRSettingCategory category;
 
     @Override
     public void initGui() {
         buttonList.clear();
         super.initGui();
+    }
+
+    public GuiDRSettingsCategory() {
+        settingsOpened = false;
+    }
+
+    public DRSettingCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(DRSettingCategory category) {
+        this.category = category;
     }
 
     @Override
@@ -52,11 +66,24 @@ public class GuiDRSettingsCategory extends GuiScreen {
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
-        checkCategories(mouseX,mouseY,mouseButton);
+        if (this.crossSelected) {
+            new GuiButton(4334, 0, 0, "").playPressSound(Minecraft.getMinecraft().getSoundHandler());
+            if (category == null) {
+                Minecraft.getMinecraft().displayGuiScreen(null);
+                return;
+            } else {
+                new GuiDRSettingsCategory().display();
+                return;
+            }
+        }
+        checkCategories(mouseX, mouseY, mouseButton);
     }
 
     public void display() {
-        FMLCommonHandler.instance().bus().register(this);
+//        Minecraft.getMinecraft().player.closeScreen();
+//        FMLCommonHandler.instance().bus().register(this);
+        settingsOpened = true;
+        Minecraft.getMinecraft().displayGuiScreen(this);
     }
 
     @Override
@@ -65,12 +92,11 @@ public class GuiDRSettingsCategory extends GuiScreen {
         settingsOpened = false;
     }
 
-    @SubscribeEvent
-    public void onClientTick(TickEvent.ClientTickEvent event) {
-        FMLCommonHandler.instance().bus().unregister(this);
-        Minecraft.getMinecraft().displayGuiScreen(this);
-
-    }
+//    @SubscribeEvent
+//    public void onClientTick(TickEvent.ClientTickEvent event) {
+//        FMLCommonHandler.instance().bus().unregister(this);
+//        Minecraft.getMinecraft().displayGuiScreen(this);
+//    }
 
     private double scaleX(int x) {
         return ((double) x * (double) width) / guiWidth;
@@ -95,9 +121,31 @@ public class GuiDRSettingsCategory extends GuiScreen {
             drawTexturedModalRect(centerX, centerY, 0, 0, guiWidth, guiHeight);
         }
         GlStateManager.popMatrix();
-        drawTitle(x, y, partialTicks);
-        drawIcon(Icons.CROSS, 160, 20);
 
+        if (this.category != null) {
+            this.title = category.getName();
+        }
+        drawTitle(x, y, partialTicks);
+        int padding = 8;
+        if (category == null) {
+
+//            Icons.CROSS.draw(mc, centerX + padding, centerY + padding);
+            if (RenderUtils.isMouseInside(x, y, centerX + padding, centerY + padding, centerX + padding + 10, centerY + padding + 10)) {
+                Icons.CROSS_SELECTED.draw(mc, centerX + padding, centerY + padding);
+                crossSelected = true;
+            } else {
+                Icons.CROSS.draw(mc, centerX + padding, centerY + padding);
+                crossSelected = false;
+            }
+        } else {
+            if (RenderUtils.isMouseInside(x, y, centerX + padding, centerY + padding, centerX + padding + 10, centerY + padding + 10)) {
+                Icons.ARROW_LEFT_SELECTED.draw(mc, centerX + padding, centerY + padding);
+                crossSelected = true;
+            } else {
+                Icons.ARROW_LEFT.draw(mc, centerX + padding, centerY + padding);
+                crossSelected = false;
+            }
+        }
 
         drawCategories(x, y, partialTicks);
         settingsOpened = true;
@@ -106,11 +154,11 @@ public class GuiDRSettingsCategory extends GuiScreen {
         super.drawScreen(x, y, partialTicks);
     }
 
-    private void checkCategories(int x, int y,int mouseButton) {
+    private void checkCategories(int x, int y, int mouseButton) {
         int centerY = (height / 2) - guiHeight / 2;
         int currentY = (centerY + 40) + fontRenderer.FONT_HEIGHT + 3;
 
-        for (DRSettingCategory drSettingCategory : DRSettingCategory.values()) {
+        for (DRSettingCategory drSettingCategory : getCategories()) {
             SettingCategory category = Settings.get().getCategory(drSettingCategory);
 
             int xBox = 0;
@@ -120,7 +168,7 @@ public class GuiDRSettingsCategory extends GuiScreen {
 
             int[] aaaaaaaaaas = RenderUtils.drawRectLines(xBox, yBox, "aaaaaaaaaaaaaaaaaaaaaa");
             if (RenderUtils.isMouseInside(x, y, xBox, yBox, aaaaaaaaaas[0], aaaaaaaaaas[1])) {
-                onCategoryClick(category);
+                onCategoryClick(drSettingCategory, category);
             }
 
             currentY += fontRenderer.FONT_HEIGHT + 4;
@@ -128,8 +176,26 @@ public class GuiDRSettingsCategory extends GuiScreen {
         }
     }
 
-    private void onCategoryClick(SettingCategory category) {
-        mc.displayGuiScreen(new GuiDRSettings(category.getCategory()));
+    private void onCategoryClick(DRSettingCategory drSettingCategory, SettingCategory category) {
+        if (drSettingCategory.hasSubCategories()) {
+            settingsOpened = false;
+            GuiDRSettingsCategory guiDRSettingsCategory = new GuiDRSettingsCategory();
+            guiDRSettingsCategory.setCategory(drSettingCategory);
+            guiDRSettingsCategory.display();
+            return;
+        }
+        settingsOpened = false;
+        new GuiDRSettings(category.getCategory()).display();
+    }
+
+    private List<DRSettingCategory> getCategories() {
+        List<DRSettingCategory> drSettingCategories = new ArrayList<>();
+        if (category == null) {
+            drSettingCategories.addAll(Arrays.stream(DRSettingCategory.values()).filter(drSettingCategory -> !drSettingCategory.isSubCategory()).collect(Collectors.toList()));
+        } else {
+            drSettingCategories.addAll(category.getSubCategoryList());
+        }
+        return drSettingCategories;
     }
 
     private void drawCategories(int x, int y, float partialTicks) {
@@ -138,7 +204,7 @@ public class GuiDRSettingsCategory extends GuiScreen {
 
         int currentY = (centerY + 40) + fontRenderer.FONT_HEIGHT + 3;
 
-        for (DRSettingCategory drSettingCategory : DRSettingCategory.values()) {
+        for (DRSettingCategory drSettingCategory : getCategories()) {
             SettingCategory category = Settings.get().getCategory(drSettingCategory);
 
             int xBox = 0;

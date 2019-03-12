@@ -81,7 +81,7 @@ public class TreasureScrollModule extends Module {
     @Override
     public void onLoad() {
         this.setEnabled(true);
-        this.posX = 0;
+        this.posX = 5;
         this.posY = 100;
 
     }

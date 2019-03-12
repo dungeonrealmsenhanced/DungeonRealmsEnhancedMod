@@ -11,6 +11,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHand;
 
 /**
  * Created by Matthew E on 3/12/2019 at 12:22 PM for the project DungeonRealmsDREnhanced
@@ -61,20 +62,20 @@ public class ProfessionModule extends Module {
 
     @Override
     public void render(ScaledResolution scaledResolution, float particleTicks) {
-        drawOutline();
+
         DRPlayer drPlayer = DRPlayer.get();
 
         EntityPlayerSP player = mc.player;
-        ItemStack itemStack = player.getActiveItemStack();
+        ItemStack itemStack = player.getHeldItem(EnumHand.MAIN_HAND);
         if ((itemStack.getItem() == Items.AIR) || (itemStack.getCount() == 0)) {
             return;
         }
         if ((drPlayer != null) && (player != null) && ItemType.isProfessionItem(itemStack)) {
             ProfessionItem professionItem = ProfessionItem.of(itemStack);
             if (professionItem != null) {
-
                 Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(itemStack.getDisplayName(), posX + 2, posY + 2, Tier.T5.getColor());
                 int y = posY + 5 + Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT;
+
                 for (String lore  :ItemUtils.getLore(itemStack)){
                     Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(lore , posX + 2, y, Tier.T5.getColor());
                     y += Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT + 1;
@@ -86,8 +87,8 @@ public class ProfessionModule extends Module {
     @Override
     public void onLoad() {
         this.setEnabled(true);
-        this.posX = 0;
-        this.posY = 100;
+        this.posX = 5;
+        this.posY = 190;
 
     }
 

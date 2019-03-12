@@ -33,6 +33,7 @@ public class GuiDRSettings extends GuiScreen {
     private int guiWidth = 175;
     private int guiHeight = 228;
 
+    private boolean arrowSelected = false;
     private DRSettingCategory category;
 
     final double scale = 2;
@@ -106,6 +107,12 @@ public class GuiDRSettings extends GuiScreen {
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+        if (this.arrowSelected) {
+            this.arrowSelected = false;
+            new GuiButton(4334, 0, 0, "").playPressSound(Minecraft.getMinecraft().getSoundHandler());
+            new GuiDRSettingsCategory().display();
+            return;
+        }
         for (GuiTextField value : textMap.values()) {
             value.mouseClicked(mouseX, mouseY, mouseButton);
 
@@ -153,6 +160,17 @@ public class GuiDRSettings extends GuiScreen {
         } else {
             drawIcon(Icons.ARROW_LEFT, 160, 20);
         }
+
+        int padding = 8;
+        Icons.CROSS.draw(mc, centerX + padding, centerY + padding);
+        if (RenderUtils.isMouseInside(x, y, centerX + padding, centerY + padding, centerX + padding + 10, centerY + padding + 10)) {
+            Icons.ARROW_LEFT_SELECTED.draw(mc, centerX + padding, centerY + padding);
+            arrowSelected = true;
+        } else {
+            Icons.ARROW_LEFT.draw(mc, centerX + padding, centerY + padding);
+            arrowSelected = false;
+        }
+
 
         for (Map.Entry<DRSettings, GuiButton> entry : buttonMap.entrySet()) {
             DRSettings key = entry.getKey();
@@ -245,12 +263,12 @@ public class GuiDRSettings extends GuiScreen {
             xBox = (width / 2) - 70;
             yBox = currentY;
 
-            fontRenderer.drawString(drSettings.getName(), xBox, yBox+3 , 0x3000);
+            fontRenderer.drawString(drSettings.getName(), xBox, yBox + 3, 0x3000);
 
             List<String> lines = new ArrayList<>();
-            lines.add(TextFormatting.GREEN+drSettings.getName());
+            lines.add(TextFormatting.GREEN + drSettings.getName());
             for (String s : drSettings.getDescription()) {
-                lines.add(TextFormatting.GRAY+s);
+                lines.add(TextFormatting.GRAY + s);
             }
 
             if (RenderUtils.isMouseInside(x, y, xBox, yBox, fontRenderer.getStringWidth(drSettings.getName()) + 2, fontRenderer.FONT_HEIGHT)) {

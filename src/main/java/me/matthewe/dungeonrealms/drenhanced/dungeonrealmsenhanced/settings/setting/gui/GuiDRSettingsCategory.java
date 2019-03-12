@@ -32,6 +32,7 @@ public class GuiDRSettingsCategory extends GuiScreen {
     final double scale = 2;
 
     private String title = "Settings";
+    private boolean crossSelected = false;
 
     @Override
     public void initGui() {
@@ -52,7 +53,11 @@ public class GuiDRSettingsCategory extends GuiScreen {
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
-        checkCategories(mouseX,mouseY,mouseButton);
+        if (this.crossSelected){
+            new GuiButton(4334, 0, 0, "").playPressSound(Minecraft.getMinecraft().getSoundHandler());
+            Minecraft.getMinecraft().displayGuiScreen(null);
+        }
+        checkCategories(mouseX, mouseY, mouseButton);
     }
 
     public void display() {
@@ -96,8 +101,15 @@ public class GuiDRSettingsCategory extends GuiScreen {
         }
         GlStateManager.popMatrix();
         drawTitle(x, y, partialTicks);
-        drawIcon(Icons.CROSS, 160, 20);
-
+        int padding = 8;
+        Icons.CROSS.draw(mc, centerX + padding, centerY + padding);
+        if (RenderUtils.isMouseInside(x, y, centerX + padding, centerY + padding, centerX + padding + 10, centerY + padding + 10)) {
+            Icons.CROSS_SELECTED.draw(mc, centerX + padding, centerY + padding);
+            crossSelected = true;
+        } else {
+            Icons.CROSS.draw(mc, centerX + padding, centerY + padding);
+            crossSelected = false;
+        }
 
         drawCategories(x, y, partialTicks);
         settingsOpened = true;
@@ -106,7 +118,7 @@ public class GuiDRSettingsCategory extends GuiScreen {
         super.drawScreen(x, y, partialTicks);
     }
 
-    private void checkCategories(int x, int y,int mouseButton) {
+    private void checkCategories(int x, int y, int mouseButton) {
         int centerY = (height / 2) - guiHeight / 2;
         int currentY = (centerY + 40) + fontRenderer.FONT_HEIGHT + 3;
 
@@ -129,7 +141,8 @@ public class GuiDRSettingsCategory extends GuiScreen {
     }
 
     private void onCategoryClick(SettingCategory category) {
-        mc.displayGuiScreen(new GuiDRSettings(category.getCategory()));
+        new GuiDRSettings(category.getCategory()).display();
+//        mc.displayGuiScreen(new GuiDRSettings(category.getCategory()));
     }
 
     private void drawCategories(int x, int y, float partialTicks) {

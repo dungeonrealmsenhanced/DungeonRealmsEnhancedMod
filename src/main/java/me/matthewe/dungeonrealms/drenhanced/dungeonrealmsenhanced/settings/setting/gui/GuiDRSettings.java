@@ -112,7 +112,7 @@ public class GuiDRSettings extends GuiScreen {
 
         }
         for (Map.Entry<DRSettings, DRButton> entry : buttonMap.entrySet()) {
-            if (entry.getValue().selected) {
+            if (entry.getValue().hovered) {
                 if (entry.getKey().getClazz() == boolean.class) {
                     DRPlayer.get().setSettingValue(entry.getKey(), !DRPlayer.get().getSettings().getCategory(entry.getKey().getCategory()).getSettingValue(entry.getKey(), boolean.class));
                 }
@@ -171,7 +171,7 @@ public class GuiDRSettings extends GuiScreen {
             DRButton value = entry.getValue();
             value.displayString = DRPlayer.get().getSettings().getCategory(key.getCategory()).getSettingValue(key, boolean.class).toString();
             value.visible = true;
-            value.drawButton(mc, guiHeight, x, y, partialTicks);
+            value.drawButton(mc,this, x, y, partialTicks);
         }
 
         for (GuiTextField value : textMap.values()) {
@@ -244,7 +244,7 @@ public class GuiDRSettings extends GuiScreen {
         for (DRSettings drSettings : DRSettings.getByCategory(category)) {
             int xBox = 0;
             int yBox = 0;
-            xBox = (width / 2) - 70;
+            xBox = (width / 2) - 80;
             yBox = currentY;
 
             fontRenderer.drawString(drSettings.getName(), xBox, yBox + 3, 0x3000);
@@ -256,7 +256,7 @@ public class GuiDRSettings extends GuiScreen {
             }
 
             if (RenderUtils.isMouseInside(x, y, xBox+3, yBox+3, xBox+fontRenderer.getStringWidth(drSettings.getName()) + 3, yBox+3+fontRenderer.FONT_HEIGHT)) {
-                drawHoveringText(lines, xBox-x, yBox-y);
+                drawHoveringText(lines, x,y);
             }
             currentY += fontRenderer.FONT_HEIGHT + 8;
         }

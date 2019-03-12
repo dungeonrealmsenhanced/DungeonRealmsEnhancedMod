@@ -1,8 +1,9 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setting.gui;
 
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.Tier;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.render.RenderUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.ResourceLocation;
 
 /**
  * Created by Matthew Eisenberg on 3/12/2019 at 3:42 PM for the project DungeonRealmsDREnhanced
@@ -14,8 +15,9 @@ public class DRButton {
     public String displayString;
     public int width;
     public int height;
-    public boolean selected;
+    public boolean hovered;
     public boolean visible;
+    protected static final ResourceLocation BUTTON_TEXTURES = new ResourceLocation("textures/gui/widgets.png");
 
     public DRButton(int id, int x, int y, String displayString, int width, int height, boolean visible) {
         this.id = id;
@@ -26,27 +28,42 @@ public class DRButton {
         this.height = height;
         this.visible = visible;
     }
+    protected int getHoverState(boolean mouseOver) {
+        int i = 1;
 
-    public void drawButton(Minecraft mc, int guiHeight, int mouseX, int mouseY, float partialTicks) {
-        int centerY = (height / 2) - guiHeight / 2;
-        int currentY = (centerY + 40) + mc.fontRenderer.FONT_HEIGHT + 3;
-
-        RenderUtils.drawRectLines(this.x, this.y, this.width, this.height, 1140850688);
-        RenderUtils.drawText(this.x, this.y, this.displayString, Tier.T1.getColor());
-        int xBox = 0;
-        int yBox = 0;
-        xBox = (width / 2) - 70;
-        yBox = currentY;
-
-        int[] aaaaaaaaaas = RenderUtils.drawRectLines(xBox, yBox, "aaaaaaaaaaaaaaaaaaaaaa");
-        if (RenderUtils.isMouseInside(x, y, xBox, yBox, aaaaaaaaaas[0], aaaaaaaaaas[1])) {
-            mc.fontRenderer.drawString(displayString, xBox + 2, yBox + 2, 0xffff);
-            this.selected = true;
-        } else {
-            mc.fontRenderer.drawString(displayString, xBox + 2, yBox + 2, 0x0000);
-            this.selected = false;
-
+        if (mouseOver) {
+            i = 2;
         }
-        currentY += mc.fontRenderer.FONT_HEIGHT + 4;
+
+        return i;
+    }
+    public void drawButton(Minecraft mc, GuiDRSettings guiDRSettings, int mouseX, int mouseY, float partialTicks) {
+        if (this.visible) {
+            FontRenderer fontrenderer = mc.fontRenderer;
+            mc.getTextureManager().bindTexture(BUTTON_TEXTURES);
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+            int i = this.getHoverState(this.hovered);
+            GlStateManager.enableBlend();
+            GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+            GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+            guiDRSettings.drawTexturedModalRect(this.x, this.y, 0, 46 + i * 20, this.width / 2, this.height);
+            guiDRSettings.drawTexturedModalRect(this.x + this.width / 2, this.y, 200 - this.width / 2, 46 + i * 20, this.width / 2, this.height);
+//            this.mouseDragged(mc, mouseX, mouseY);
+            int j = 14737632;
+
+         /*   if (packedFGColour != 0) {
+                j = packedFGColour;
+            } else if (!this.enabled) {
+                j = 10526880;
+            } else if (this.hovered) {
+                j = 16777120;
+            }*/
+            if (this.hovered) {
+                j = 16777120;
+            }
+            guiDRSettings.drawCenteredString(fontrenderer, this.displayString, this.x + this.width / 2, this.y + (this.height - 8) / 2, j);
+//            this.drawCenteredString(fontrenderer, this.displa/**/yString, this.x + this.width / 2, this.y + (this.height - 8) / 2, j);
+        }
     }
 }

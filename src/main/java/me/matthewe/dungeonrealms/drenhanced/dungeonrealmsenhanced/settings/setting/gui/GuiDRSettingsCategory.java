@@ -11,9 +11,6 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,6 +39,10 @@ public class GuiDRSettingsCategory extends GuiScreen {
     public void initGui() {
         buttonList.clear();
         super.initGui();
+    }
+
+    public GuiDRSettingsCategory() {
+        settingsOpened = false;
     }
 
     public DRSettingCategory getCategory() {
@@ -79,8 +80,10 @@ public class GuiDRSettingsCategory extends GuiScreen {
     }
 
     public void display() {
-        Minecraft.getMinecraft().player.closeScreen();
-        FMLCommonHandler.instance().bus().register(this);
+//        Minecraft.getMinecraft().player.closeScreen();
+//        FMLCommonHandler.instance().bus().register(this);
+        settingsOpened = true;
+        Minecraft.getMinecraft().displayGuiScreen(this);
     }
 
     @Override
@@ -89,12 +92,11 @@ public class GuiDRSettingsCategory extends GuiScreen {
         settingsOpened = false;
     }
 
-    @SubscribeEvent
-    public void onClientTick(TickEvent.ClientTickEvent event) {
-        FMLCommonHandler.instance().bus().unregister(this);
-        Minecraft.getMinecraft().displayGuiScreen(this);
-
-    }
+//    @SubscribeEvent
+//    public void onClientTick(TickEvent.ClientTickEvent event) {
+//        FMLCommonHandler.instance().bus().unregister(this);
+//        Minecraft.getMinecraft().displayGuiScreen(this);
+//    }
 
     private double scaleX(int x) {
         return ((double) x * (double) width) / guiWidth;
@@ -176,11 +178,13 @@ public class GuiDRSettingsCategory extends GuiScreen {
 
     private void onCategoryClick(DRSettingCategory drSettingCategory, SettingCategory category) {
         if (drSettingCategory.hasSubCategories()) {
+            settingsOpened = false;
             GuiDRSettingsCategory guiDRSettingsCategory = new GuiDRSettingsCategory();
             guiDRSettingsCategory.setCategory(drSettingCategory);
             guiDRSettingsCategory.display();
             return;
         }
+        settingsOpened = false;
         new GuiDRSettings(category.getCategory()).display();
     }
 

@@ -13,14 +13,9 @@ import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -43,6 +38,7 @@ public class GuiDRSettings extends GuiScreen {
 
     public GuiDRSettings(DRSettingCategory category) {
         this.category = category;
+        settingsOpened = false;
     }
 
     public DRButton getButton(DRSettings settings) {
@@ -137,7 +133,14 @@ public class GuiDRSettings extends GuiScreen {
 
     public void display() {
         Minecraft.getMinecraft().player.closeScreen();
-        FMLCommonHandler.instance().bus().register(this);
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Minecraft.getMinecraft().displayGuiScreen(GuiDRSettings.this);
+                settingsOpened = true;
+                cancel();
+            }
+        }, 300L);
     }
 
     @Override
@@ -146,13 +149,13 @@ public class GuiDRSettings extends GuiScreen {
         super.onGuiClosed();
         settingsOpened = false;
     }
-
-    @SubscribeEvent
-    public void onClientTick(TickEvent.ClientTickEvent event) {
-        FMLCommonHandler.instance().bus().unregister(this);
-        Minecraft.getMinecraft().displayGuiScreen(this);
-
-    }
+//
+//    @SubscribeEvent
+//    public void onClientTick(TickEvent.ClientTickEvent event) {
+//        FMLCommonHandler.instance().bus().unregister(this);
+//        Minecraft.getMinecraft().displayGuiScreen(this);
+//
+//    }
 
     @Override
     public void drawScreen(int x, int y, float partialTicks) {

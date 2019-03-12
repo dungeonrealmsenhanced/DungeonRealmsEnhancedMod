@@ -38,14 +38,14 @@ public class GuiDRSettings extends GuiScreen {
 
     final double scale = 2;
 
-    private Map<DRSettings, GuiButton> buttonMap = new ConcurrentHashMap<>();
+    private Map<DRSettings, DRButton> buttonMap = new ConcurrentHashMap<>();
     private Map<DRSettings, GuiTextField> textMap = new ConcurrentHashMap<>();
 
     public GuiDRSettings(DRSettingCategory category) {
         this.category = category;
     }
 
-    public GuiButton getButton(DRSettings settings) {
+    public DRButton getButton(DRSettings settings) {
         return buttonMap.get(settings);
     }
 
@@ -84,13 +84,7 @@ public class GuiDRSettings extends GuiScreen {
 
     @Override
     protected void actionPerformed(GuiButton button) throws IOException {
-        for (Map.Entry<DRSettings, GuiButton> entry : buttonMap.entrySet()) {
-            if (entry.getValue().id == button.id) {
-                if (entry.getKey().getClazz() == boolean.class) {
-                    DRPlayer.get().setSettingValue(entry.getKey(), !DRPlayer.get().getSettings().getCategory(entry.getKey().getCategory()).getSettingValue(entry.getKey(), boolean.class));
-                }
-            }
-        }
+
         super.actionPerformed(button);
     }
 
@@ -116,6 +110,13 @@ public class GuiDRSettings extends GuiScreen {
         for (GuiTextField value : textMap.values()) {
             value.mouseClicked(mouseX, mouseY, mouseButton);
 
+        }
+        for (Map.Entry<DRSettings, DRButton> entry : buttonMap.entrySet()) {
+            if (entry.getValue().selected) {
+                if (entry.getKey().getClazz() == boolean.class) {
+                    DRPlayer.get().setSettingValue(entry.getKey(), !DRPlayer.get().getSettings().getCategory(entry.getKey().getCategory()).getSettingValue(entry.getKey(), boolean.class));
+                }
+            }
         }
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }
@@ -154,15 +155,7 @@ public class GuiDRSettings extends GuiScreen {
         }
         GlStateManager.popMatrix();
         drawTitle(x, y, partialTicks);
-        if (RenderUtils.isMouseInside(x, y, 160, 20, 10, 10)) {
-            drawIcon(Icons.CROSS_SELECTED, 160, 20);
-
-        } else {
-            drawIcon(Icons.ARROW_LEFT, 160, 20);
-        }
-
         int padding = 8;
-        Icons.CROSS.draw(mc, centerX + padding, centerY + padding);
         if (RenderUtils.isMouseInside(x, y, centerX + padding, centerY + padding, centerX + padding + 10, centerY + padding + 10)) {
             Icons.ARROW_LEFT_SELECTED.draw(mc, centerX + padding, centerY + padding);
             arrowSelected = true;
@@ -172,13 +165,13 @@ public class GuiDRSettings extends GuiScreen {
         }
 
 
-        for (Map.Entry<DRSettings, GuiButton> entry : buttonMap.entrySet()) {
+        for (Map.Entry<DRSettings, DRButton> entry : buttonMap.entrySet()) {
             DRSettings key = entry.getKey();
 
-            GuiButton value = entry.getValue();
+            DRButton value = entry.getValue();
             value.displayString = DRPlayer.get().getSettings().getCategory(key.getCategory()).getSettingValue(key, boolean.class).toString();
             value.visible = true;
-            value.drawButton(mc, x, y, partialTicks);
+            value.drawButton(mc, guiHeight, x, y, partialTicks);
         }
 
         for (GuiTextField value : textMap.values()) {
@@ -210,13 +203,13 @@ public class GuiDRSettings extends GuiScreen {
             yBox = currentY;
 
             if (drSettings.getClazz() == boolean.class) {
-                GuiButton guiButton = new GuiButton(currentButtonId, xBox + 2 + fontRenderer.getStringWidth(drSettings.getName()), yBox, 60, 10, drSettings.get(boolean.class) ? "Disable" : "Enable");
-                guiButton.enabled = true;
+
+                DRButton guiButton = new DRButton(currentButtonId, xBox + 2 + fontRenderer.getStringWidth(drSettings.getName()), yBox, drSettings.get(boolean.class) ? "Disable" : "Enable", 60, 10, true);
                 guiButton.visible = true;
 
                 guiButton.displayString = drSettings.get(boolean.class).toString();
                 buttonMap.put(drSettings, guiButton);
-                buttonList.add(guiButton);
+//                buttonList.add(guiButton);
                 currentButtonId++;
             }
             if (drSettings.getClazz() == double.class) {
@@ -239,25 +232,16 @@ public class GuiDRSettings extends GuiScreen {
                 textMap.put(drSettings, guiButton);
                 currentGuiTextFieldId++;
             }
-
-
             currentY += fontRenderer.FONT_HEIGHT + 10;
-
         }
     }
 
     private void drawSettings(int x, int y, float partialTicks) {
         int centerX = (width / 2) - guiWidth / 2;
         int centerY = (height / 2) - guiHeight / 2;
-
         int currentY = (centerY + 40) + fontRenderer.FONT_HEIGHT + 3;
 
         for (DRSettings drSettings : DRSettings.getByCategory(category)) {
-
-
-            if (drSettings.getClazz() == Integer.class) {
-
-            }
             int xBox = 0;
             int yBox = 0;
             xBox = (width / 2) - 70;
@@ -271,11 +255,10 @@ public class GuiDRSettings extends GuiScreen {
                 lines.add(TextFormatting.GRAY + s);
             }
 
-            if (RenderUtils.isMouseInside(x, y, xBox, yBox, fontRenderer.getStringWidth(drSettings.getName()) + 2, fontRenderer.FONT_HEIGHT)) {
-                drawHoveringText(lines, x, y);
+            if (RenderUtils.isMouseInside(x, y, xBox+3, yBox+3, xBox+fontRenderer.getStringWidth(drSettings.getName()) + 3, yBox+3+fontRenderer.FONT_HEIGHT)) {
+                drawHoveringText(lines, xBox-x, yBox-y);
             }
             currentY += fontRenderer.FONT_HEIGHT + 8;
-
         }
     }
 

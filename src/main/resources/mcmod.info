@@ -1,0 +1,16 @@
+[
+    {
+        "modid": "dungeonrealmsenhanced",
+        "name": "DREnhanced",
+        "description": "DREnhanced",
+        "version": "${version}",
+        "mcversion": "${mcversion}",
+        "url": "",
+        "updateUrl": "",
+        "authorList": ["MatthewE"],
+        "credits": "",
+        "logoFile": "",
+        "screenshots": [],
+        "dependencies": [""]
+    }
+]

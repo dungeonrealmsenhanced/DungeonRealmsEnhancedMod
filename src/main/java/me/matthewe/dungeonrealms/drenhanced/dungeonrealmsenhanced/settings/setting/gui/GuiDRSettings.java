@@ -171,7 +171,7 @@ public class GuiDRSettings extends GuiScreen {
             DRButton value = entry.getValue();
             value.displayString = DRPlayer.get().getSettings().getCategory(key.getCategory()).getSettingValue(key, boolean.class).toString();
             value.visible = true;
-            value.drawButton(mc,this, x, y, partialTicks);
+            value.drawButton(mc, this, x, y, partialTicks);
         }
 
         for (GuiTextField value : textMap.values()) {
@@ -187,33 +187,28 @@ public class GuiDRSettings extends GuiScreen {
 
 
     private void initSettings() {
-        int centerX = (width / 2) - guiWidth / 2;
         int centerY = (height / 2) - guiHeight / 2;
-
         int currentY = (centerY + 40) + fontRenderer.FONT_HEIGHT + 3;
 
+        final int paddingLeft = 3;
         int currentButtonId = 5;
         int currentGuiTextFieldId = 50;
+
         for (DRSettings drSettings : DRSettings.getByCategory(category)) {
-
-
             int xBox = 0;
             int yBox = 0;
-            xBox = (width / 2) - 70;
+            xBox = (width / 2) - 80;
             yBox = currentY;
 
             if (drSettings.getClazz() == boolean.class) {
-
-                DRButton guiButton = new DRButton(currentButtonId, xBox + 2 + fontRenderer.getStringWidth(drSettings.getName()), yBox, drSettings.get(boolean.class) ? "Disable" : "Enable", 60, 10, true);
+                DRButton guiButton = new DRButton(currentButtonId, xBox + paddingLeft + fontRenderer.getStringWidth(drSettings.getName()), yBox, drSettings.get(boolean.class) ? "Disable" : "Enable", 50, 10, true);
                 guiButton.visible = true;
-
                 guiButton.displayString = drSettings.get(boolean.class).toString();
                 buttonMap.put(drSettings, guiButton);
-//                buttonList.add(guiButton);
                 currentButtonId++;
             }
             if (drSettings.getClazz() == double.class) {
-                GuiTextField guiButton = new GuiTextField(currentGuiTextFieldId, fontRenderer, xBox + 2 + fontRenderer.getStringWidth(drSettings.getName()), yBox, 60, 10);
+                GuiTextField guiButton = new GuiTextField(currentGuiTextFieldId, fontRenderer, xBox + paddingLeft + fontRenderer.getStringWidth(drSettings.getName()), yBox, 60, 10);
                 guiButton.setText(drSettings.get(double.class).intValue() + "");
                 guiButton.setValidator(input -> {
                     if (input == null) {
@@ -232,7 +227,7 @@ public class GuiDRSettings extends GuiScreen {
                 textMap.put(drSettings, guiButton);
                 currentGuiTextFieldId++;
             }
-            currentY += fontRenderer.FONT_HEIGHT + 10;
+            currentY += fontRenderer.FONT_HEIGHT + 8;
         }
     }
 
@@ -255,8 +250,8 @@ public class GuiDRSettings extends GuiScreen {
                 lines.add(TextFormatting.GRAY + s);
             }
 
-            if (RenderUtils.isMouseInside(x, y, xBox+3, yBox+3, xBox+fontRenderer.getStringWidth(drSettings.getName()) + 3, yBox+3+fontRenderer.FONT_HEIGHT)) {
-                drawHoveringText(lines, x,y);
+            if (RenderUtils.isMouseInside(x, y, xBox + 3, yBox + 3, xBox + fontRenderer.getStringWidth(drSettings.getName()) + 3, yBox + 3 + fontRenderer.FONT_HEIGHT)) {
+                drawHoveringText(lines, x, y);
             }
             currentY += fontRenderer.FONT_HEIGHT + 8;
         }

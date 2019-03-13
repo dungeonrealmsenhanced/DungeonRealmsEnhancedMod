@@ -17,12 +17,12 @@ import net.minecraft.util.EnumHand;
  * Created by Matthew E on 3/12/2019 at 12:22 PM for the project DungeonRealmsDREnhanced
  */
 public class ProfessionModule extends Module {
+    private int textX = 0;
+    private int textY = 0;
+
     public ProfessionModule() {
         super("Profession");
     }
-
-    private int textX = 0;
-    private int textY = 0;
 
     @Override
     public void renderEditing(ScaledResolution resolution, float partialTicks) {
@@ -73,11 +73,13 @@ public class ProfessionModule extends Module {
         if ((drPlayer != null) && (player != null) && ItemType.isProfessionItem(itemStack)) {
             ProfessionItem professionItem = ProfessionItem.of(itemStack);
             if (professionItem != null) {
+                renderOutline(scaledResolution, particleTicks);
                 Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(itemStack.getDisplayName(), posX + 2, posY + 2, Tier.T5.getColor());
                 int y = posY + 5 + Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT;
 
-                for (String lore  :ItemUtils.getLore(itemStack)){
-                    Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(lore , posX + 2, y, Tier.T5.getColor());
+
+                for (String lore : ItemUtils.getLore(itemStack)) {
+                    Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(lore, posX + 2, y, Tier.T5.getColor());
                     y += Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT + 1;
                 }
             }

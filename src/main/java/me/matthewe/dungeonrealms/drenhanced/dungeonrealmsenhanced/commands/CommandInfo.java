@@ -1,6 +1,8 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.commands;
 
 
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.mining.MiningHandler;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.profession.mining.MiningRequestType;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -15,14 +17,19 @@ public class CommandInfo extends CommandBase {
     }
 
     @Override
+    public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
+        return true;
+    }
+
+    @Override
     public String getName() {
-        return "info";
+        return "info1";
 
     }
 
     @Override
     public String getUsage(ICommandSender sender) {
-        return "/info (player)";
+        return "/info1 (player)";
     }
 
     @Override
@@ -32,6 +39,8 @@ public class CommandInfo extends CommandBase {
             return;
         }
         String player = args[0];
-
+        MiningHandler.getMiningThread().request(MiningRequestType.ORE_REMAINING, o -> {
+            sender.sendMessage(new TextComponentString((String.valueOf(o))));
+        });
     }
 }

@@ -24,7 +24,6 @@ public class RarityOverlayListener {
             float r;
             float g;
             float b;
-
             if ((itemStack.getItem() == Items.AIR) || (itemStack.getCount() == 0)) {
                 continue;
             }
@@ -36,9 +35,7 @@ public class RarityOverlayListener {
                 renderItemOverlay(r, g, b, slot.xPos, slot.yPos);
             }
         }
-
     }
-
 
     private void renderItemOverlay( float r, float g, float b, int xPos, int yPos) {
         ScreenRenderer.beginGL(0, 0);

@@ -2,6 +2,7 @@ package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers;
 
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handler.Handler;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.keybinds.KeyBindHandler;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.mining.MiningHandler;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.misc.MiscHandler;
 
 import java.util.ArrayList;
@@ -41,5 +42,6 @@ public class Handlers {
     public static void init() {
         addHandler(new MiscHandler());
         addHandler(new KeyBindHandler());
+        addHandler(new MiningHandler());
     }
 }

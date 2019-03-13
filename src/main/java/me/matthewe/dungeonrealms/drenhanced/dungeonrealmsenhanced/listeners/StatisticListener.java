@@ -64,8 +64,6 @@ public class StatisticListener {
                 for (Integer i = 0; i < DRSettings.DEBUG_SPACING.get(double.class); i++) {
                     spacing += " ";
                 }
-
-
                 event.setCanceled(true);
                 Minecraft.getMinecraft().player.sendMessage(new TextComponentString("").appendText(spacing).appendSibling(event.getMessage().createCopy()));
                 event.setMessage(new TextComponentString("").appendText(spacing).appendSibling(event.getMessage().createCopy()));
@@ -74,20 +72,16 @@ public class StatisticListener {
             try {
                 int damage = Integer.parseInt(trim);
                 DRPlayer.drPlayer.addDamage(damage);
-            } catch (Exception e) {
-                return;
+            } catch (Exception ignored) {
             }
         }
-
     }
-
 
     @SubscribeEvent
     public void onPlayerLoggedOut(PlayerEvent.PlayerLoggedInEvent event) {
         DRPlayer.drPlayer.setLoaded(false);
         DRPlayer.drPlayer.setUuid(event.player.getUniqueID());
         playing = true;
-
     }
 
     public boolean isPlaying() {
@@ -127,9 +121,7 @@ public class StatisticListener {
             } catch (Exception e) {
                 return false;
             }
-            if (string.startsWith(trim + " DMG ->")) {
-                return true;
-            }
+            return string.startsWith(trim + " DMG ->");
         }
         return false;
     }

@@ -55,4 +55,9 @@ public enum OreTier {
 
     public int getRandomExperience() {
         return randomExperience;
-    }}
+    }
+    public int getNextTierLevel() {
+        return Math.min(((getLevel() / 20) + 1) * 20, 100);
+    }
+
+}

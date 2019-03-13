@@ -4,5 +4,5 @@ package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.profes
  * Created by Matthew E on 3/13/2019 at 9:28 AM for the project DungeonRealmsDREnhanced
  */
 public enum MiningRequestType {
-    ORE_REMAINING;
+    MINING_STATS;
 }

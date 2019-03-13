@@ -1,7 +1,7 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.profession.mining;
 
 /**
- * Created by Matthew Eisenberg on 3/13/2019 at 10:26 AM for the project DungeonRealmsDREnhanced
+ * Created by Matthew E on 3/13/2019 at 10:26 AM for the project DungeonRealmsDREnhanced
  */
 public class MiningDataResult {
     private int currentTierOreRemaining;
@@ -12,13 +12,18 @@ public class MiningDataResult {
     private int lowerTierFailCount;
     private int lowerTierSuccessCount;
 
-    public MiningDataResult(int currentTierOreRemaining, int currentTierFailCount, int currentTierSuccessCount, int lowerTierOreRemaining, int lowerTierFailCount, int lowerTierSuccessCount) {
+    private int averageCurrentExperience;
+    private int averageLowerExperience;
+
+    public MiningDataResult(int currentTierOreRemaining, int currentTierFailCount, int currentTierSuccessCount, int lowerTierOreRemaining, int lowerTierFailCount, int lowerTierSuccessCount, int averageCurrentExperience, int averageLowerExperience) {
         this.currentTierOreRemaining = currentTierOreRemaining;
         this.currentTierFailCount = currentTierFailCount;
         this.currentTierSuccessCount = currentTierSuccessCount;
         this.lowerTierOreRemaining = lowerTierOreRemaining;
         this.lowerTierFailCount = lowerTierFailCount;
         this.lowerTierSuccessCount = lowerTierSuccessCount;
+        this.averageCurrentExperience = averageCurrentExperience;
+        this.averageLowerExperience = averageLowerExperience;
     }
 
     private MiningDataResult(Builder builder) {
@@ -28,10 +33,20 @@ public class MiningDataResult {
         lowerTierOreRemaining = builder.lowerTierOreRemaining;
         lowerTierFailCount = builder.lowerTierFailCount;
         lowerTierSuccessCount = builder.lowerTierSuccessCount;
+        this.averageCurrentExperience = builder.averageCurrentExperience;
+        this.averageLowerExperience = builder.averageLowerExperience;
     }
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public int getAverageCurrentExperience() {
+        return averageCurrentExperience;
+    }
+
+    public int getAverageLowerExperience() {
+        return averageLowerExperience;
     }
 
     public static Builder builder(MiningDataResult copy) {
@@ -42,6 +57,8 @@ public class MiningDataResult {
         builder.lowerTierOreRemaining = copy.getLowerTierOreRemaining();
         builder.lowerTierFailCount = copy.getLowerTierFailCount();
         builder.lowerTierSuccessCount = copy.getLowerTierSuccessCount();
+        builder.averageLowerExperience = copy.getAverageLowerExperience();
+        builder.averageCurrentExperience = copy.getAverageCurrentExperience();
         return builder;
     }
 
@@ -80,6 +97,8 @@ public class MiningDataResult {
         private int lowerTierOreRemaining;
         private int lowerTierFailCount;
         private int lowerTierSuccessCount;
+        private int averageCurrentExperience;
+        private int averageLowerExperience;
 
         private Builder() {
         }
@@ -92,6 +111,16 @@ public class MiningDataResult {
          */
         public Builder currentTierOreRemaining(int currentTierOreRemaining) {
             this.currentTierOreRemaining = currentTierOreRemaining;
+            return this;
+        }
+
+        public Builder averageCurrentExperience(int averageCurrentExperience) {
+            this.averageCurrentExperience = averageCurrentExperience;
+            return this;
+        }
+
+        public Builder averageLowerExperience(int averageLowerExperience) {
+            this.averageLowerExperience = averageLowerExperience;
             return this;
         }
 

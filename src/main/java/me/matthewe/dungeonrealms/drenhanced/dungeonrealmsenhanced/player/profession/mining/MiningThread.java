@@ -1,14 +1,13 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.profession.mining;
 
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.profession.ProfessionItem;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.NumberUtils;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.Tier;
 
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Random;
+import java.util.*;
 
 /**
- * Created by Matthew Eisenberg on 3/13/2019 at 9:26 AM for the project DungeonRealmsDREnhanced
+ * Created by Matthew E on 3/13/2019 at 9:26 AM for the project DungeonRealmsDREnhanced
  */
 public class MiningThread extends Thread {
 
@@ -68,9 +67,9 @@ public class MiningThread extends Thread {
                     case MINING_STATS:
 
 
-                        int neededExperience = professionItem.getNeededExperience(professionItem.getLevel() + 1);
-                        int remainingExperience = neededExperience - professionItem.getExperience();
-                        final int startRemainingExperience = neededExperience - professionItem.getExperience();
+                        final int neededExperience = professionItem.getNeededExperience(professionItem.getLevel() + 1);
+                        int remainingExperience = professionItem.getExperience();
+                        final int startRemainingExperience = professionItem.getExperience();
 
                         MiningDataResult.Builder builder = MiningDataResult.builder();
                         OreTier byTier = OreTier.getByTier(professionItem.getTier());
@@ -79,7 +78,8 @@ public class MiningThread extends Thread {
                             int failCount = 0;
                             int workCount = 0;
                             int ore = 0;
-                            while (remainingExperience > 0) {
+                            List<Integer> expList = new ArrayList<>();
+                            while (remainingExperience < neededExperience) {
                                 int spotTier = professionItem.getTier().getNumber();
 //                                if (spotTier >= 2) {
 //                                    spotTier--;
@@ -99,22 +99,28 @@ public class MiningThread extends Thread {
                                 } else {
                                     workCount++;
 
-                                    remainingExperience -= byTier.getRandomExperience();
+                                    int exp = byTier.getExperience();
+                                    expList.add(exp);
+
+                                    remainingExperience += exp;
                                 }
                                 ore++;
 
                             }
-                            builder.currentTierFailCount(failCount).currentTierSuccessCount(workCount).currentTierOreRemaining(ore);
+                            builder.averageCurrentExperience(NumberUtils.getAverage(expList)).currentTierFailCount(failCount).currentTierSuccessCount(workCount).currentTierOreRemaining(ore);
 
                             int secondOre = 0;
                             int secondFailCount = 0;
                             int secondWorkCount = 0;
+                            List<Integer> secondExpList = new ArrayList<>();
                             remainingExperience = startRemainingExperience;
-                            while (remainingExperience > 0) {
-                                int spotTier = professionItem.getTier().getNumber();
-                                if (spotTier >= 2) {
-                                    spotTier--;
-                                }
+                            int spotTier = professionItem.getTier().getNumber();
+                            if (spotTier >= 2) {
+                                spotTier--;
+
+                            }
+                            byTier = OreTier.byNumber(spotTier);
+                            while (remainingExperience < neededExperience) {
                                 int successRate = professionItem.getTier().getNumber() > spotTier ? (professionItem.getTier().getNumber() - spotTier) * 20 + 20 : 0;
 
                                 if (professionItem.getTier().getNumber() == spotTier)
@@ -129,13 +135,16 @@ public class MiningThread extends Thread {
 
                                 } else {
                                     secondWorkCount++;
+                                    int exp = byTier.getExperience();
+                                    secondExpList.add(exp);
 
-                                    remainingExperience -= byTier.getRandomExperience();
+                                    remainingExperience += exp;
+
                                 }
                                 secondOre++;
 
                             }
-                            builder.lowerTierFailCount(secondFailCount).lowerTierOreRemaining(secondOre).lowerTierSuccessCount(secondWorkCount);
+                            builder.averageLowerExperience(NumberUtils.getAverage(secondExpList)).lowerTierFailCount(secondFailCount).lowerTierOreRemaining(secondOre).lowerTierSuccessCount(secondWorkCount);
                             miningRequest.getResult().onResult(builder.build());
                         }
                         break;

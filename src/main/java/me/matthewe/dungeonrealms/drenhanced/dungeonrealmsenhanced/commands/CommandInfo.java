@@ -53,17 +53,22 @@ public class CommandInfo extends CommandBase {
                 ProfessionItem professionItem = ProfessionItem.get();
                 if (professionItem != null) {
                     sender.sendMessage(new TextComponentString(TextFormatting.GRAY + "Level" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + professionItem.getLevel()));
-                    TextComponentString components = new TextComponentString(TextFormatting.GRAY + "Next Level" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + professionItem.getLevel());
+                    TextComponentString components = new TextComponentString(TextFormatting.GRAY + "Next Level" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + ((professionItem.getLevel()+1)));
                     List<String> lines = new ArrayList<>();
+                    lines.add("&bTier&f: "+professionItem.getTier().getChatFormatting()+professionItem.getTier().getName());
+                    lines.add("&7"+professionItem.getExperience()+"&f/&7"+professionItem.getNeededExperience(professionItem.getLevel()+1));
+                    lines.add(" ");
                     lines.add("&b&lCurrent Tier Ore&f&l:");
                     lines.add(" &bOre Remaining&f: &7"+miningDataResult.getCurrentTierOreRemaining());
                     lines.add(" &cFail Ore&f: &7"+miningDataResult.getCurrentTierFailCount());
                     lines.add(" &aSuccessful Ore&f: &7"+miningDataResult.getCurrentTierSuccessCount());
+                    lines.add(" &bAverage Experience&f: &e"+miningDataResult.getAverageCurrentExperience());
                     lines.add(" ");
                     lines.add("&b&lLower Tier Ore&f&l:");
                     lines.add(" &bOre Remaining&f: &7"+miningDataResult.getLowerTierOreRemaining());
                     lines.add(" &cFail Ore&f: &7"+miningDataResult.getLowerTierFailCount());
                     lines.add(" &aSuccessful Ore&f: &7"+miningDataResult.getLowerTierSuccessCount());
+                    lines.add(" &bAverage Experience&f: &e"+miningDataResult.getAverageLowerExperience());
                     String lineString = "";
                     for (String line : lines) {
                         lineString += line.replaceAll("&","\u00a7") + "\n";
@@ -78,5 +83,7 @@ public class CommandInfo extends CommandBase {
                 }
             }
         });
+
     }
+
 }

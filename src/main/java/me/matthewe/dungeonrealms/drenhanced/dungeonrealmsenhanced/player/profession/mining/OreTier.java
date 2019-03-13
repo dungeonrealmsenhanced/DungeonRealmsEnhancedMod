@@ -41,6 +41,22 @@ public enum OreTier {
         return null;
     }
 
+    public static OreTier byNumber(int number) {
+        switch (number) {
+            case 1:
+                return TIER_1;
+            case 2:
+                return TIER_2;
+            case 3:
+                return TIER_3;
+            case 4:
+                return TIER_4;
+            case 5:
+                return TIER_5;
+        }
+        return null;
+    }
+
     public int getExperience() {
         return baseExperience + ThreadLocalRandom.current().nextInt(randomExperience);
     }
@@ -56,6 +72,7 @@ public enum OreTier {
     public int getRandomExperience() {
         return randomExperience;
     }
+
     public int getNextTierLevel() {
         return Math.min(((getLevel() / 20) + 1) * 20, 100);
     }

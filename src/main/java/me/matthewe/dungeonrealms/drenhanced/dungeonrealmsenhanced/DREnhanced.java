@@ -1,28 +1,23 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced;
 
 import com.google.gson.GsonBuilder;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.commands.CommandInfo;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners.MenuReplacerListener;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.Handlers;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners.ItemCheckerListener;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners.RarityOverlayListener;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners.StatisticListener;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.Module;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.Modules;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.DRPlayer;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.proxy.IProxy;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.DREnhancedConfig;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.texture.DRTextures;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.texture.ImageUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
-import net.minecraftforge.client.ClientCommandHandler;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import org.apache.commons.io.FileUtils;
 import org.lwjgl.opengl.Display;
 
@@ -39,11 +34,29 @@ import java.util.Date;
         version = DREnhanced.VERSION
 )
 public class DREnhanced {
-
+    @SidedProxy(
+            clientSide = "me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.proxy.ClientProxy",
+            serverSide = "me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.proxy.ServerProxy"
+    )
+    public static IProxy proxy;
     public static final String MOD_ID = "dungeonrealmsenhanced";
     public static final String MOD_NAME = "DREnhanced";
     public static final String VERSION = "1.0.0";
 
+
+    public static final String[] DEVELOPERS = new String[]{
+            "1d48bd80-4cd0-4874-ba65-94284bc24ecc",
+            "56a838cd-afd8-4e30-a34f-822e936eb949"
+    };
+
+    public static boolean isDeveloper() {
+        for (String developer : DEVELOPERS) {
+            if (Minecraft.getMinecraft().player != null && Minecraft.getMinecraft().player.getUniqueID().toString().equalsIgnoreCase(developer)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * This is the instance of your mod as created by Forge. It will never be null.
@@ -89,26 +102,10 @@ public class DREnhanced {
                 }
             }
         }
+        proxy.preInit(event);
 
-        Modules.init();
-        Modules.loadModules();
-
-        loadModuleSettings();
-
-        Modules.registerListeners();
-
-        this.registerEvents();
-
-        Handlers.init();
-        Handlers.enableHandlers();
     }
 
-    private void registerEvents() {
-        MinecraftForge.EVENT_BUS.register(new StatisticListener());
-        MinecraftForge.EVENT_BUS.register(new ItemCheckerListener());
-        MinecraftForge.EVENT_BUS.register(new RarityOverlayListener());
-        MinecraftForge.EVENT_BUS.register(new MenuReplacerListener());
-    }
 
     private void shutdown() {
         saveModuleSettings();
@@ -116,9 +113,13 @@ public class DREnhanced {
         Handlers.disableHandlers();
     }
 
+    @Mod.EventHandler
+    public void onFMLServerStarting(FMLServerStartingEvent event) {
+        proxy.serverStarting(event);
+    }
 
-    public void loadModuleSettings() {
-        File file = new File(folderLocation + "module_save.json");
+    public static void loadModuleSettings() {
+        File file = new File(DREnhanced.INSTANCE.folderLocation + "module_save.json");
         if (file.exists()) {
             try {
                 String readFileToString = FileUtils.readFileToString(file, Charset.forName("UTF-8"));
@@ -145,8 +146,8 @@ public class DREnhanced {
 
     }
 
-    public void saveModuleSettings() {
-        File file = new File(folderLocation + "module_save.json");
+    public static void saveModuleSettings() {
+        File file = new File(DREnhanced.INSTANCE.folderLocation + "module_save.json");
         if (file.exists()) {
             try {
                 FileUtils.forceDelete(file);
@@ -155,7 +156,7 @@ public class DREnhanced {
                 return;
             }
         }
-        file = new File(folderLocation + "module_save.json");
+        file = new File(DREnhanced.INSTANCE.folderLocation + "module_save.json");
 
         try {
             file.createNewFile();
@@ -186,6 +187,7 @@ public class DREnhanced {
      */
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
+        proxy.init(event);
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
 
     }
@@ -195,8 +197,6 @@ public class DREnhanced {
      */
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
-        ClientCommandHandler.instance.registerCommand(new CommandInfo());
-
-        DRTextures.loadTextures();
+        proxy.postInit(event);
     }
 }

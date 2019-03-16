@@ -11,6 +11,7 @@ import net.minecraftforge.common.MinecraftForge;
 import java.io.IOException;
 import java.util.List;
 
+
 public class ChestReplacer extends GuiChest {
 
     IInventory lowerInv;

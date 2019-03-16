@@ -11,6 +11,9 @@ public enum DRSettingCategory {
     MISC("Misc"),
     CHAT("Chat"),
     DEBUG("Debug"),
+    TOGGLES("Toggles"),
+    TAB_LIST("Tab List"),
+    NOSTALGIA("Nostalgia", new DRSettingCategory[]{DRSettingCategory.DEBUG, DRSettingCategory.TOGGLES, DRSettingCategory.TAB_LIST}),
 
     ITEMS_MISC("Items Misc"),
     ITEMS_OVERLAY("Items Overlay"),

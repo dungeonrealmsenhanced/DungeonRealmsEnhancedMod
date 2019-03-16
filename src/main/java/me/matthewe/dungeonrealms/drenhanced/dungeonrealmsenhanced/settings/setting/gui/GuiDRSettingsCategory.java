@@ -195,7 +195,11 @@ public class GuiDRSettingsCategory extends GuiScreen {
         } else {
             drSettingCategories.addAll(category.getSubCategoryList());
         }
+        if (!DREnhanced.isDeveloper() && drSettingCategories.contains(DRSettingCategory.DEVELOPMENT)) {
+            drSettingCategories.remove(DRSettingCategory.DEVELOPMENT);
+        }
         return drSettingCategories;
+
     }
 
     private void drawCategories(int x, int y, float partialTicks) {

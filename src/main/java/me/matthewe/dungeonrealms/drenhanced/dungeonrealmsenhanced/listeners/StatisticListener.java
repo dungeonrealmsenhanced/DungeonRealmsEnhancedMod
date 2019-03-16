@@ -9,7 +9,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
-import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -48,10 +47,6 @@ public class StatisticListener {
         }
         if (!playing) {
             playing = true;
-        }
-        if (!DRPlayer.get().isLoaded() && DRSettings.DISABLE_CLEAR_CHAT.get(boolean.class)) {
-            event.setCanceled(true);
-            return;
         }
         final String unformattedText = event.getMessage().getUnformattedText();
 
@@ -104,14 +99,14 @@ public class StatisticListener {
 
         DREnhanced.INSTANCE.saveModuleSettings();
     }
-
-    @SubscribeEvent
-    public void onCommand(CommandEvent event) {
-        if (event.getCommand().getName().startsWith("/debug")) {
-            event.setCanceled(true);
-            Minecraft.getMinecraft().player.sendChatMessage("/toggledebug");
-        }
-    }
+//
+//    @SubscribeEvent
+//    public void onCommand(CommandEvent event) {
+//        if (event.getCommand().getName().startsWith("/debug")) {
+//            event.setCanceled(true);
+//            Minecraft.getMinecraft().player.sendChatMessage("/toggledebug");
+//        }
+//    }
 
     private boolean isDebugText(String string) {
         if (string.contains(" ")) {

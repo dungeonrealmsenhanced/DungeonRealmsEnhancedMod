@@ -5,6 +5,7 @@ import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.minin
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.profession.ProfessionItem;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.profession.mining.MiningDataResult;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.profession.mining.MiningRequestType;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setting.DRSettings;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -46,6 +47,9 @@ public class CommandInfo extends CommandBase {
             return;
         }
         String player = args[0];
+        if (!DRSettings.TESTING.get(boolean.class)){
+            return;
+        }
         MiningHandler.getMiningThread().request(MiningRequestType.MINING_STATS, o -> {
 
             if (o instanceof MiningDataResult) {

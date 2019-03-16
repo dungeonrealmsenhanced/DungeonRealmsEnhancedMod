@@ -19,7 +19,7 @@ public class MiscHandler extends Handler {
         this.registerListener(new ItemOriginListener());
         this.registerListener(new PauseMenuButtonListener());
         this.registerListener(new TipListener());
-      //  this.registerListener(new NewLoreListener());
+        this.registerListener(new NewLoreListener());
         this.registerListener(new DurabilityListener());
     }
 

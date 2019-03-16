@@ -240,7 +240,9 @@ public class GuiDRSettings extends GuiScreen {
                 textMap.put(drSettings, guiButton);
                 currentGuiTextFieldId++;
             } else if (drSettings.getClazz() == String.class) {
-                GuiTextField guiButton = new GuiTextField(currentGuiTextFieldId, fontRenderer, xBox + paddingLeft + fontRenderer.getStringWidth(drSettings.getName()), yBox, 60, 10);
+
+                int width = fontRenderer.getStringWidth(drSettings.get(String.class))+10;
+                GuiTextField guiButton = new GuiTextField(currentGuiTextFieldId, fontRenderer, xBox + paddingLeft + fontRenderer.getStringWidth(drSettings.getName()), yBox, width, 10);
                 guiButton.setText(drSettings.get(String.class) + "");
                 textMap.put(drSettings, guiButton);
                 currentGuiTextFieldId++;

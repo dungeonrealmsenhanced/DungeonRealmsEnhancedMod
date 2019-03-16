@@ -11,9 +11,10 @@ public enum DRSettingCategory {
     MISC("Misc"),
     CHAT("Chat"),
     DEBUG("Debug"),
-    TOGGLES("Toggles"),
-    TAB_LIST("Tab List"),
-    NOSTALGIA("Nostalgia", new DRSettingCategory[]{DRSettingCategory.DEBUG, DRSettingCategory.TOGGLES, DRSettingCategory.TAB_LIST}),
+    NOSTALGIA_TOGGLES("Toggles"),
+    NOSTALGIA_TAB_LIST("Tab List"),
+    NOSTALGIA_SOUNDS("Sounds"),
+    NOSTALGIA("Nostalgia", new DRSettingCategory[]{DRSettingCategory.DEBUG, DRSettingCategory.NOSTALGIA_TOGGLES, DRSettingCategory.NOSTALGIA_TAB_LIST, DRSettingCategory.NOSTALGIA_SOUNDS}),
 
     ITEMS_MISC("Items Misc"),
     ITEMS_OVERLAY("Items Overlay"),

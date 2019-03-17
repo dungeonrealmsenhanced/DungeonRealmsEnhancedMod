@@ -4,11 +4,9 @@ import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DREnhanced;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.events.DungeonRealmsJoinEvent;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.DRPlayer;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.StatisticTracker;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setting.DRSettings;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.world.Location;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -62,23 +60,6 @@ public class StatisticListener {
         if (event.getMessage().getUnformattedText().trim().contains("https://www.dungeonrealms.net/")) {
             DRPlayer.get().setLoaded(true);
         }
-        if (isDebugText(unformattedText)) {
-            if (DRSettings.DEBUG_SPACING_ENABLE.get(boolean.class) && DRSettings.DEBUG_SPACING.get(double.class) > 0) {
-                String spacing = "";
-                for (Integer i = 0; i < DRSettings.DEBUG_SPACING.get(double.class); i++) {
-                    spacing += " ";
-                }
-                event.setCanceled(true);
-                Minecraft.getMinecraft().player.sendMessage(new TextComponentString("").appendText(spacing).appendSibling(event.getMessage().createCopy()));
-                event.setMessage(new TextComponentString("").appendText(spacing).appendSibling(event.getMessage().createCopy()));
-            }
-            String trim = unformattedText.split(" ")[0].trim();
-            try {
-                int damage = Integer.parseInt(trim);
-                DRPlayer.drPlayer.addDamage(damage);
-            } catch (Exception ignored) {
-            }
-        }
     }
 
     @SubscribeEvent
@@ -108,25 +89,5 @@ public class StatisticListener {
 
         DREnhanced.INSTANCE.saveModuleSettings();
     }
-//
-//    @SubscribeEvent
-//    public void onCommand(CommandEvent event) {
-//        if (event.getCommand().getName().startsWith("/debug")) {
-//            event.setCanceled(true);
-//            Minecraft.getMinecraft().player.sendChatMessage("/toggledebug");
-//        }
-//    }
 
-    private boolean isDebugText(String string) {
-        if (string.contains(" ")) {
-            String trim = string.split(" ")[0].trim();
-            try {
-                Double.parseDouble(trim);
-            } catch (Exception e) {
-                return false;
-            }
-            return string.startsWith(trim + " DMG ->");
-        }
-        return false;
-    }
 }

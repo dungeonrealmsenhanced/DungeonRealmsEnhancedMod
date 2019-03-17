@@ -1,6 +1,7 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.proxy;
 
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.commands.CommandInfo;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.commands.ZoneCommand;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.Handlers;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners.ItemCheckerListener;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners.MenuReplacerListener;
@@ -9,6 +10,7 @@ import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners.Stat
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.Modules;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.texture.DRTextures;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -45,12 +47,12 @@ public class ClientProxy implements IProxy {
 
     @Override
     public void postInit(FMLPostInitializationEvent event) {
-
+        ClientCommandHandler.instance.registerCommand(new CommandInfo());
+        ClientCommandHandler.instance.registerCommand(new ZoneCommand());
     }
 
     @Override
     public void serverStarting(FMLServerStartingEvent event) {
-        event.registerServerCommand(new CommandInfo());
     }
 
     @Override

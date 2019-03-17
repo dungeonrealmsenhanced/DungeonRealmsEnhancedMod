@@ -4,6 +4,7 @@ import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handler.Handle
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.keybinds.KeyBindHandler;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.mining.MiningHandler;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.misc.MiscHandler;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.nostalgia.NostalgiaHandler;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.restful.RestfulHandler;
 
 import java.util.ArrayList;
@@ -45,5 +46,6 @@ public class Handlers {
         addHandler(new KeyBindHandler());
         addHandler(new MiningHandler());
         addHandler(new RestfulHandler());
+        addHandler(new NostalgiaHandler());
     }
 }

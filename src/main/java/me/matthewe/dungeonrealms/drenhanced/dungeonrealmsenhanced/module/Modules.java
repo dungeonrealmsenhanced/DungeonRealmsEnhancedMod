@@ -3,7 +3,6 @@ package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module;
 
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DREnhanced;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.CoordsModule;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.cps.CPSModule;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.treasurescroll.TreasureScrollModule;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -35,8 +34,9 @@ public class Modules {
 
     public static void init() {
         addModule(new CoordsModule());
-        addModule(new CPSModule());
+//        addModule(new CPSModule());
         addModule(new TreasureScrollModule());
+//        addModule(new ProfessionModule());
     }
 
     public static void loadModules() {

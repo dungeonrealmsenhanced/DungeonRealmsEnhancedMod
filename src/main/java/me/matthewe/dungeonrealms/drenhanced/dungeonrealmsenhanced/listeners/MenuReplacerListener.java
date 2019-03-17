@@ -29,6 +29,7 @@ public class MenuReplacerListener implements Listener {
                 return;
             }
             event.setGui(new ChestReplacer(Minecraft.getMinecraft().player.inventory, (IInventory) ReflectionField.GUI_CHEST_LOWER_CHEST_INVENTORY.getValue(gui)));
+//            event.setGui(new ChestReplacer(Minecraft.getMinecraft().player.inventory, (IInventory)gui.loower));
         } else if (gui instanceof GuiIngameMenu) {
             if (gui instanceof IngameMenuReplacer) {
                 return;

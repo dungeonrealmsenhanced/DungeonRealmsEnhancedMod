@@ -13,6 +13,15 @@ public class Settings {
 
     public Settings(Map<DRSettingCategory, SettingCategory> categoryMap) {
         this.categoryMap = categoryMap;
+
+        for (DRSettingCategory value : DRSettingCategory.values()) {
+            if (value.hasSubCategories()){
+                continue;
+            }
+            if (!categoryMap.containsKey(value)) {
+                categoryMap.put(value, new SettingCategory(value));
+            }
+        }
     }
 
     public Map<DRSettingCategory, SettingCategory> getCategoryMap() {

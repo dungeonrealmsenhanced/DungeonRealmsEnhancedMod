@@ -8,6 +8,7 @@ import java.lang.reflect.Field;
 public enum ReflectionField {
 
     GUI_CHEST_LOWER_CHEST_INVENTORY(GuiChest.class, "lowerChestInventory", "field_147015_w");
+//    GUI_CHEST_LOWER_CHEST_INVENTORY(GuiChest.class, "lowerChestInventory", "field_147015_w");
 
     final Field field;
 

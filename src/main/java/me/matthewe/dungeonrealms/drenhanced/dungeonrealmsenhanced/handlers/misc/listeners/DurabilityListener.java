@@ -15,6 +15,7 @@ import java.util.List;
  * Created by Matthew E on 3/12/2019 at 5:45 PM for the project DungeonRealmsDREnhanced
  */
 public class DurabilityListener implements Listener {
+
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onItemTooltip(ItemTooltipEvent event) {
         ItemStack itemStack = event.getItemStack();

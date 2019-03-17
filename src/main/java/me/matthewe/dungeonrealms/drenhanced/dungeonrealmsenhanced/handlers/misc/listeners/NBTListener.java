@@ -1,5 +1,6 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.misc.listeners;
 
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DREnhanced;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.Listener;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
@@ -18,7 +19,7 @@ public class NBTListener implements Listener {
     @SubscribeEvent(priority = EventPriority.LOW)
     public void onItemTooltip(ItemTooltipEvent event) {
         ItemStack itemStack = event.getItemStack();
-        if (itemStack.hasTagCompound() && GuiScreen.isAltKeyDown()) {
+        if (itemStack.hasTagCompound() && GuiScreen.isAltKeyDown() && DREnhanced.isDeveloper()) {
             List<String> toolTip = new ArrayList<>();
             toolTip.add(" ");
             NBTTagCompound tagCompound = itemStack.getTagCompound();

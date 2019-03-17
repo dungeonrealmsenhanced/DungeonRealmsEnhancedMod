@@ -20,6 +20,7 @@ public class InventoryReplacer extends GuiInventory {
         this.player = player;
     }
 
+
     public EntityPlayer getPlayer() {
         return player;
     }

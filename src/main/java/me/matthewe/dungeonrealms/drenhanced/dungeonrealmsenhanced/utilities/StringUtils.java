@@ -8,6 +8,19 @@ public class StringUtils {
         return shard.replaceAll("US", "US-").replaceAll("SUB", "SUB-").replaceAll("BS", "BS-");
     }
 
+    public static String formatTime(int seconds) {
+        long minutes = 0;
+        long hours = 0;
+        while (seconds >= 60) {
+            seconds -= 60;
+            minutes++;
+        }
+        while (minutes >= 60) {
+            minutes -= 60;
+            hours++;
+        }
+        return hours + "h " + minutes + "m " + seconds + "s";
+    }
     public static String formatEnum(String s) {
         String returnString = "";
         if (s.contains("_")) {

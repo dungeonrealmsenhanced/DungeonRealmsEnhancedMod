@@ -25,7 +25,7 @@ public class DebugListener implements Listener {
 
         String unformattedText = event.getMessage().getUnformattedText();
 
-        if (DebugPatterns.DEBUG_PATTERN.matcher(unformattedText).matches() || DebugPatterns.DEBUG_DAMAGE_TAKEN_PATTERN.matcher(unformattedText).matches()) {
+        if (DebugPatterns.DEBUG_PATTERN.matcher(unformattedText).matches() || DebugPatterns.DEBUG_DAMAGE_TAKEN_PATTERN.matcher(unformattedText).matches() || unformattedText.contains("(THORNS)")) {
             if (DRSettings.DEBUG_SPACING_ENABLE.get(boolean.class) && DRSettings.DEBUG_SPACING.get(double.class) > 0) {
                 String spacing = "";
                 for (Integer i = 0; i < DRSettings.DEBUG_SPACING.get(double.class); i++) {
@@ -36,7 +36,6 @@ public class DebugListener implements Listener {
                 event.setMessage(new TextComponentString("").appendText(spacing).appendSibling(event.getMessage().createCopy()));
             }
         }
-
         if (isDebugText(unformattedText)) {
             String trim = unformattedText.split(" ")[0].trim();
             try {

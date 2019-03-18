@@ -1,6 +1,7 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.keybinds.listeners;
 
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.keybinds.KeyBindHandler;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.restful.guis.ChangelogGui;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.GuiSettings;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setting.gui.GuiDRSettingsCategory;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.Listener;
@@ -23,6 +24,8 @@ public class KeyBindListener implements Listener {
             new GuiSettings().display();
         } else if (keyBindHandler.keyBinds.OPEN_DR_SETTINGS.isPressed()) {
             new GuiDRSettingsCategory().display();
+        }  else if (keyBindHandler.keyBinds.CHANGE_LOGS.isPressed()) {
+            new ChangelogGui().display();
         }
     }
 }

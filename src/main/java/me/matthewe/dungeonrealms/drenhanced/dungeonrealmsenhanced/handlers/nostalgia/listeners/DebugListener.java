@@ -8,6 +8,7 @@ import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.List
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 /**
@@ -20,7 +21,7 @@ public class DebugListener implements Listener {
         this.nostalgiaHandler = nostalgiaHandler;
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.NORMAL)
     public void onClientChatReceived(ClientChatReceivedEvent event) {
 
         String unformattedText = event.getMessage().getUnformattedText();
@@ -47,15 +48,19 @@ public class DebugListener implements Listener {
     }
 
     private boolean isDebugText(String string) {
-        if (string.contains(" ")) {
-            String trim = string.split(" ")[0].trim();
-            try {
-                Double.parseDouble(trim);
-            } catch (Exception e) {
-                return false;
-            }
-            return string.startsWith(trim + " DMG ->");
-        }
-        return false;
+       try {
+           if (string.contains(" ")) {
+               String trim = string.split(" ")[0].trim();
+               try {
+                   Double.parseDouble(trim);
+               } catch (Exception e) {
+                   return false;
+               }
+               return string.startsWith(trim + " DMG ->");
+           }
+           return false;
+       } catch ( Exception e) {
+           return false;
+       }
     }
 }

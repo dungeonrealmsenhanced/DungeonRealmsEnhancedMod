@@ -2,7 +2,6 @@ package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.commands;
 
 
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.restful.RestfulHandler;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.restful.guis.ChangelogGui;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -25,19 +24,18 @@ public class ChangelogCommand extends CommandBase {
 
     @Override
     public String getName() {
-        return "changelog";
+        return "changelogs";
 
     }
 
     @Override
     public String getUsage(ICommandSender sender) {
-        return "/changelog";
+        return "/changelogs";
     }
 
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 
-        new ChangelogGui(restfulHandler).display();
 
     }
 

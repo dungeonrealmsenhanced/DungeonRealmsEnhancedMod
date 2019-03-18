@@ -1,6 +1,7 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.restful.guis;
 
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DREnhanced;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.Handlers;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.restful.RestfulHandler;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.icons.Icons;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.render.RenderUtils;
@@ -20,8 +21,8 @@ public class ChangelogGui extends GuiScreen {
     public static boolean changelogsOpened = false;
 
     private final ResourceLocation texture = new ResourceLocation(DREnhanced.MOD_ID, "textures/gui/book.png");
+    private final RestfulHandler restfulHandler;
     private int guiWidth = 175;
-    private RestfulHandler restfulHandler;
     private int guiHeight = 228;
 
     final double scale = 2;
@@ -36,9 +37,9 @@ public class ChangelogGui extends GuiScreen {
         super.initGui();
     }
 
-    public ChangelogGui(RestfulHandler restfulHandler) {
-        this.restfulHandler = restfulHandler;
+    public ChangelogGui() {
         changelogsOpened = false;
+        this.restfulHandler = Handlers.get(RestfulHandler.class);
     }
 
 
@@ -96,7 +97,7 @@ public class ChangelogGui extends GuiScreen {
         }
         GlStateManager.popMatrix();
 
-        if (restfulHandler.getDrEnhancedRestful().getInformation()!=null&&restfulHandler.getDrEnhancedRestful().getInformation().getChangelog()!=null) {
+        if (restfulHandler.getDrEnhancedRestful().getInformation() != null && restfulHandler.getDrEnhancedRestful().getInformation().getChangelog() != null) {
             this.title = restfulHandler.getDrEnhancedRestful().getInformation().getChangelog().getVersion();
         }
         drawTitle(x, y, partialTicks);
@@ -117,6 +118,7 @@ public class ChangelogGui extends GuiScreen {
 
 
     private List<Change> getChanges() {
+//        return new ArrayList<>();
         return ((restfulHandler.getDrEnhancedRestful() != null) && (restfulHandler.getDrEnhancedRestful().getInformation() != null) && (restfulHandler.getDrEnhancedRestful().getInformation().getChangelog() != null)) ? restfulHandler.getDrEnhancedRestful().getInformation().getChangelog().getChanges() : new ArrayList<>();
     }
 
@@ -133,23 +135,43 @@ public class ChangelogGui extends GuiScreen {
             xBox = (width / 2) - 70;
             yBox = currentY;
 
-            int[] aaaaaaaaaas = RenderUtils.drawRectLines(xBox, yBox, "aaaaaaaaaaaaaaaaaaaaaa");
-            if (RenderUtils.isMouseInside(x, y, xBox, yBox, aaaaaaaaaas[0], aaaaaaaaaas[1])) {
-                fontRenderer.drawString(change.getTitle(), xBox + 2, yBox + 2, 0xffff);
+            int[] dimentions = null;
+            int[] aaaaaaaaaas = null;
+            if (change.getTitle().length() > "aaaaaaaaaaaaaaaaaaaaaa".length()) {
+                dimentions = RenderUtils.getTextBoxDimentions(xBox, yBox, change.getTitle());
+
             } else {
-                fontRenderer.drawString(change.getTitle(), xBox + 2, yBox + 2, 0x0000);
-
+                dimentions = RenderUtils.getTextBoxDimentions(xBox, yBox, "aaaaaaaaaaaaaaaaaaaaaa");
             }
-
             List<String> lines = new ArrayList<>();
             lines.add(TextFormatting.WHITE.toString() + TextFormatting.BOLD.toString() + change.getTitle());
             for (String s : change.getDescription()) {
                 lines.add(TextFormatting.GRAY + s);
             }
 
-            if (RenderUtils.isMouseInside(x, y, xBox, yBox, aaaaaaaaaas[0], aaaaaaaaaas[1])) {
-                drawHoveringText(lines, x, y);
+            if (RenderUtils.isMouseInside(x, y, xBox, yBox, dimentions[0], dimentions[1])) {
+
+                fontRenderer.drawString(change.getTitle(), xBox + 2, yBox + 2, 0xffff);
+            } else {
+                fontRenderer.drawString(change.getTitle(), xBox + 2, yBox + 2, 0x0000);
             }
+
+            if (change.getTitle().length() > "aaaaaaaaaaaaaaaaaaaaaa".length()) {
+                aaaaaaaaaas = RenderUtils.drawRectLines(xBox, yBox, change.getTitle());
+
+            } else {
+                aaaaaaaaaas = RenderUtils.drawRectLines(xBox, yBox, "aaaaaaaaaaaaaaaaaaaaaa");
+            }
+            if (!RenderUtils.isMouseInside(x, y, xBox, yBox, dimentions[0], dimentions[1])) {
+                fontRenderer.drawString(change.getTitle(), xBox + 2, yBox + 2, 0x0000);
+            }
+            if (RenderUtils.isMouseInside(x, y, xBox, yBox, dimentions[0], dimentions[1])) {
+
+                fontRenderer.drawString(change.getTitle(), xBox + 2, yBox + 2, 0xffff);
+                drawHoveringText(lines,x,y);
+            }
+
+
             currentY += fontRenderer.FONT_HEIGHT + 4;
 
         }

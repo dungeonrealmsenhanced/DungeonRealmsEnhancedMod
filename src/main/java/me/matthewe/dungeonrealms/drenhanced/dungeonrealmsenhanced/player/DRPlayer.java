@@ -1,5 +1,6 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player;
 
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DREnhanced;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.profession.mining.Mining;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setting.DRSettings;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setting.SettingCategory;
@@ -23,19 +24,19 @@ public class DRPlayer {
     private Settings settings = new Settings();
     private DRPlayerType drPlayerType;
     private Map<Long, Integer> damages = new ConcurrentHashMap<>();
-
+    private String version;
     private Mining mining = new Mining();
     private boolean loaded;
     public List<Drop> drops = new ArrayList<>();
     private List<String> friends = new ArrayList<>();
     private List<Long> clicks = new ArrayList<>();
 
-    public static DRPlayer drPlayer = new DRPlayer(UUID.randomUUID(), Statistics.getDefaultStatistics(), new ArrayList<>(), new Settings(), DRPlayerType.REAL, new Mining());
+    public static DRPlayer drPlayer = new DRPlayer(UUID.randomUUID(), Statistics.getDefaultStatistics(), new ArrayList<>(), new Settings(), DRPlayerType.REAL, new Mining(), DREnhanced.VERSION);
 
 
     public static DRPlayer get() {
         if (drPlayer == null) {
-            drPlayer = new DRPlayer(UUID.randomUUID(), Statistics.getDefaultStatistics(), new ArrayList<>(), new Settings(), DRPlayerType.REAL, new Mining());
+            drPlayer = new DRPlayer(UUID.randomUUID(), Statistics.getDefaultStatistics(), new ArrayList<>(), new Settings(), DRPlayerType.REAL, new Mining(), DREnhanced.VERSION);
         }
         return drPlayer;
     }
@@ -127,13 +128,15 @@ public class DRPlayer {
         return drPlayerType;
     }
 
-    public DRPlayer(UUID uuid, Statistics statistics, List<Drop> drops, Settings settings, DRPlayerType drPlayerType, Mining mining) {
+    public DRPlayer(UUID uuid, Statistics statistics, List<Drop> drops, Settings settings, DRPlayerType drPlayerType, Mining mining, String version) {
         this.uuid = uuid;
         this.statistics = statistics;
         this.drops = drops;
         this.settings = settings;
         this.drPlayerType = drPlayerType;
         this.mining = mining;
+        this.version = version;
+
     }
 
     public UUID getUuid() {
@@ -207,6 +210,14 @@ public class DRPlayer {
         for (Tier tier : resetDryStreakList) {
             statistics.setDryStreak(tier, 0);
         }
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     public static class Statistics {

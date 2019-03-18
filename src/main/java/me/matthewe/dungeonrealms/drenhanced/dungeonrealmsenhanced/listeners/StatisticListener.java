@@ -9,6 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -39,9 +40,9 @@ public class StatisticListener {
             DRPlayer.get().update();
             DRPlayer.get().setLocation(new Location(player.posX, player.posY, player.posZ, player.cameraYaw, player.cameraPitch));
         }
-    }
 
-    @SubscribeEvent
+}
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onClientChatReceived(ClientChatReceivedEvent event) {
         if (!started) {
             this.statisticTracker.start();

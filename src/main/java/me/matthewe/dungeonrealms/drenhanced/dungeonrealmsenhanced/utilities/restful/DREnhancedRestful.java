@@ -1,12 +1,16 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.restful;
 
 
-import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DREnhanced;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.restful.change.Change;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.restful.change.Changelog;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public class DREnhancedRestful {
@@ -30,7 +34,7 @@ public class DREnhancedRestful {
                 }
                 JsonObject jsonObject = null;
                 try {
-                    jsonObject = new GsonBuilder().setPrettyPrinting().create().fromJson(content, JsonObject.class);
+                    jsonObject = DREnhanced.gsonBuilder.setPrettyPrinting().create().fromJson(content, JsonObject.class);
 
                 } catch (Exception e) {
                     consumer.accept(null);
@@ -58,8 +62,31 @@ public class DREnhancedRestful {
                         }
                     }
                 }
-                if ((source != null) && (version != null)) {
-                    information = new DREnhancedInformation(version, developers.toArray(new DREnhancedInformation.Developer[0]), source);
+                Changelog changelog = null;
+                if (jsonObject.has("changelog")) {
+                    JsonObject changelog1 = (JsonObject) jsonObject.get("changelog");
+                    long date = changelog1.has("date")?changelog1.get("date").getAsLong():-1L;
+
+                    List<Change> changes = new ArrayList<>();
+
+
+                    if (changelog1.has("changes")) {
+                        for (Map.Entry<String, JsonElement> entry : changelog1.getAsJsonObject("changes").entrySet()) {
+                            JsonArray changeDescription = (JsonArray) entry.getValue();
+
+                            List<String> descriptionStringList = new ArrayList<>();
+                            for (JsonElement jsonElement : changeDescription) {
+                                descriptionStringList.add(jsonElement.getAsString());
+                            }
+
+                            changes.add(new Change(entry.getKey(), descriptionStringList.toArray(new String[0])));
+                        }
+                    }
+                    changelog = new Changelog(version, date, changes);
+                }
+                if ((source != null) && (version != null) && (changelog != null)) {
+                    System.out.println(changelog.getVersion());
+                    information = new DREnhancedInformation(version, developers.toArray(new DREnhancedInformation.Developer[0]), source, changelog);
                     System.out.println("Updated information.");
                     consumer.accept(information);
                 }

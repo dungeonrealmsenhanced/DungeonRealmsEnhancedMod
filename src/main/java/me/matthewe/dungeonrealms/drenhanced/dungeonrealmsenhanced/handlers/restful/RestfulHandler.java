@@ -1,5 +1,6 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.restful;
 
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.commands.ChangelogCommand;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handler.Handler;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.restful.listeners.RestfulListener;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.restful.DREnhancedRestful;
@@ -19,6 +20,7 @@ public class RestfulHandler extends Handler {
 
         this.drEnhancedRestful = new DREnhancedRestful();
         registerListener(new RestfulListener(this));
+        registerCommand(new ChangelogCommand(this));
     }
 
     public DREnhancedRestful getDrEnhancedRestful() {

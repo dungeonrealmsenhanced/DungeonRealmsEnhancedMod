@@ -1,9 +1,10 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.restful;
 
 
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DREnhanced;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.restful.change.Changelog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +31,7 @@ public class DREnhancedRestful {
                 }
                 JsonObject jsonObject = null;
                 try {
-                    jsonObject = new GsonBuilder().setPrettyPrinting().create().fromJson(content, JsonObject.class);
+                    jsonObject = DREnhanced.gsonBuilder.setPrettyPrinting().create().fromJson(content, JsonObject.class);
 
                 } catch (Exception e) {
                     consumer.accept(null);
@@ -58,8 +59,12 @@ public class DREnhancedRestful {
                         }
                     }
                 }
+                Changelog changelog = null;
+                if (jsonObject.has("changelog")) {
+                    changelog = DREnhanced.gsonBuilder.create().fromJson(jsonObject.get("changelog"), Changelog.class);
+                }
                 if ((source != null) && (version != null)) {
-                    information = new DREnhancedInformation(version, developers.toArray(new DREnhancedInformation.Developer[0]), source);
+                    information = new DREnhancedInformation(version, developers.toArray(new DREnhancedInformation.Developer[0]), source, changelog);
                     System.out.println("Updated information.");
                     consumer.accept(information);
                 }

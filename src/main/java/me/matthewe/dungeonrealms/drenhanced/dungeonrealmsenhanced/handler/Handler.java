@@ -4,6 +4,8 @@ import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handler.logger
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.Listener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.command.CommandBase;
+import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.MinecraftForge;
 
 import java.util.ArrayList;
@@ -52,6 +54,11 @@ public abstract class Handler {
             logger.info("Unregistered listener %s.", listener.getClass().getSimpleName());
         });
         this.listenerList.clear();
+    }
+
+    public void registerCommand(CommandBase command) {
+        ClientCommandHandler.instance.registerCommand(command);
+        logger.info("Registered command /%s", command.getName() + ".");
     }
 
     public boolean isEnabled() {

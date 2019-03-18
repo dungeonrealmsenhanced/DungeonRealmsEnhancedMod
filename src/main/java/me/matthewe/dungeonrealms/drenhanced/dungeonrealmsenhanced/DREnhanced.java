@@ -7,6 +7,9 @@ import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.Modules
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.DRPlayer;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.proxy.IProxy;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.DREnhancedConfig;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.restful.change.Changelog;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.restful.change.ChangelogJsonDeserializer;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.restful.change.ChangelogJsonSerializer;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.texture.ImageUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
@@ -41,7 +44,10 @@ public class DREnhanced {
     public static IProxy proxy;
     public static final String MOD_ID = "dungeonrealmsenhanced";
     public static final String MOD_NAME = "DREnhanced";
-    public static final String VERSION = "1.0.2";
+    public static final String VERSION = "1.0.3";
+    public static  GsonBuilder gsonBuilder = new GsonBuilder().setPrettyPrinting()
+            .registerTypeAdapter(Changelog.class,new ChangelogJsonSerializer())
+            .registerTypeAdapter(Changelog.class,new ChangelogJsonDeserializer());
 
 
     public static final String[] DEVELOPERS = new String[]{
@@ -125,7 +131,7 @@ public class DREnhanced {
         if (file.exists()) {
             try {
                 String readFileToString = FileUtils.readFileToString(file, Charset.forName("UTF-8"));
-                DREnhancedConfig drEnhancedConfig = new GsonBuilder().setPrettyPrinting().create().fromJson(readFileToString, DREnhancedConfig.class);
+                DREnhancedConfig drEnhancedConfig = gsonBuilder.setPrettyPrinting().create().fromJson(readFileToString, DREnhancedConfig.class);
                 for (Module module : Modules.getModules()) {
                     Integer[] coords = drEnhancedConfig.getCoords(module.getName());
                     if (coords != null) {
@@ -172,7 +178,7 @@ public class DREnhanced {
             drEnhancedConfig.setCoords(module.getName(), module.posX, module.posY, module.isEnabled());
         }
         try {
-            FileUtils.writeStringToFile(file, new GsonBuilder().setPrettyPrinting().create().toJson(drEnhancedConfig), Charset.forName("UTF-8"));
+            FileUtils.writeStringToFile(file, gsonBuilder.create().toJson(drEnhancedConfig), Charset.forName("UTF-8"));
         } catch (IOException e) {
             e.printStackTrace();
         }

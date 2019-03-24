@@ -44,7 +44,7 @@ public class DREnhanced {
     public static IProxy proxy;
     public static final String MOD_ID = "dungeonrealmsenhanced";
     public static final String MOD_NAME = "DREnhanced";
-    public static final String VERSION = "1.0.3";
+    public static final String VERSION = "1.0.5";
     public static  GsonBuilder gsonBuilder = new GsonBuilder().setPrettyPrinting()
             .registerTypeAdapter(Changelog.class,new ChangelogJsonSerializer())
             .registerTypeAdapter(Changelog.class,new ChangelogJsonDeserializer());

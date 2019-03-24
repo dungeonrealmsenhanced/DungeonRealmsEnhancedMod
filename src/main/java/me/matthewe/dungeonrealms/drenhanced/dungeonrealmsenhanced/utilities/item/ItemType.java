@@ -1,5 +1,6 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item;
 
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.StringUtils;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -47,5 +48,9 @@ public enum ItemType {
     public static boolean isArmor(ItemStack itemStack) {
         ItemType fromItemStack = getFromItemStack(itemStack);
         return fromItemStack != null && fromItemStack == ARMOR;
+    }
+
+    public String getName() {
+        return StringUtils.formatEnum(this.toString());
     }
 }

@@ -3,7 +3,6 @@ package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.module
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.Module;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.DRPlayer;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemType;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemUtils;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.Tier;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.render.RenderUtils;
 import net.minecraft.client.Minecraft;
@@ -12,6 +11,10 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.text.TextFormatting;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Matthew E on 3/12/2019 at 12:22 PM for the project DungeonRealmsDREnhanced
@@ -74,12 +77,22 @@ public class ProfessionModule extends Module {
             ProfessionItem professionItem = ProfessionItem.of(itemStack);
             if (professionItem != null) {
                 renderOutline(scaledResolution, particleTicks);
-                Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(itemStack.getDisplayName(), posX + 2, posY + 2, Tier.T5.getColor());
+                Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(ItemType.getFromItemStack(itemStack).getName()+" Information", posX + 2, posY + 2, professionItem.getTier().getColor());
                 int y = posY + 5 + Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT;
 
+                List<String> lines = new ArrayList<>();
+                int experiencePerMinute = drPlayer.getMining().getExperiencePerMinute();
+                int secondsUntilNextLevel = drPlayer.getMining().getSecondsUntilNextLevel(professionItem.getNeededExperience(professionItem.getLevel()), professionItem.getExperience());
 
-                for (String lore : ItemUtils.getLore(itemStack)) {
-                    Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(lore, posX + 2, y, Tier.T5.getColor());
+                if (experiencePerMinute >= 1) {
+                    lines.add(TextFormatting.YELLOW.toString() + experiencePerMinute + " " + TextFormatting.BOLD.toString() + "EXP/m");
+                }
+                if (secondsUntilNextLevel >= 1) {
+                    lines.add(TextFormatting.YELLOW + "Next Level" + TextFormatting.WHITE + ": " + TextFormatting.YELLOW.toString() + secondsUntilNextLevel + TextFormatting.BOLD.toString() + "s");
+                }
+
+                for (String line : lines) {
+                    Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(line, posX + 2, y, Tier.T5.getColor());
                     y += Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT + 1;
                 }
             }

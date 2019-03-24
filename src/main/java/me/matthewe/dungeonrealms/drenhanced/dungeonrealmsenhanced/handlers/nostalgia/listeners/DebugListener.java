@@ -21,12 +21,12 @@ public class DebugListener implements Listener {
         this.nostalgiaHandler = nostalgiaHandler;
     }
 
-    @SubscribeEvent(priority = EventPriority.NORMAL)
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onClientChatReceived(ClientChatReceivedEvent event) {
 
         String unformattedText = event.getMessage().getUnformattedText();
 
-        if (DebugPatterns.DEBUG_PATTERN.matcher(unformattedText).matches() || DebugPatterns.DEBUG_DAMAGE_TAKEN_PATTERN.matcher(unformattedText).matches() || unformattedText.contains("(THORNS)")) {
+        if (DebugPatterns.DEBUG_PATTERN.matcher(unformattedText).matches() || DebugPatterns.DEBUG_DAMAGE_TAKEN_PATTERN.matcher(unformattedText).matches() ||(unformattedText.contains("(Life Steal)"))||unformattedText.contains("DMG ->")||(unformattedText.contains("HP [")) ||unformattedText.contains("(THORNS)")) {
             if (DRSettings.DEBUG_SPACING_ENABLE.get(boolean.class) && DRSettings.DEBUG_SPACING.get(double.class) > 0) {
                 String spacing = "";
                 for (Integer i = 0; i < DRSettings.DEBUG_SPACING.get(double.class); i++) {
@@ -34,7 +34,7 @@ public class DebugListener implements Listener {
                 }
                 event.setCanceled(true);
                 Minecraft.getMinecraft().player.sendMessage(new TextComponentString("").appendText(spacing).appendSibling(event.getMessage().createCopy()));
-                event.setMessage(new TextComponentString("").appendText(spacing).appendSibling(event.getMessage().createCopy()));
+//                event.setMessage(new TextComponentString("").appendText(spacing).appendSibling(event.getMessage().createCopy()));
             }
         }
         if (isDebugText(unformattedText)) {

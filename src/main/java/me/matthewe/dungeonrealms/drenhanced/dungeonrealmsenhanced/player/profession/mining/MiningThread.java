@@ -64,6 +64,9 @@ public class MiningThread extends Thread {
             }
             if (miningRequest != null) {
                 switch (miningRequest.getMiningRequestType()) {
+                    case XP_PER_MINUTE:
+
+                        break;
                     case MINING_STATS:
 
 

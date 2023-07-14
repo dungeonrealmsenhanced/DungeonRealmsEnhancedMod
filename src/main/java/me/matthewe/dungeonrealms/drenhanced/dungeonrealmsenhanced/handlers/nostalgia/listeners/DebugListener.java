@@ -25,11 +25,27 @@ public class DebugListener implements Listener {
     public void onClientChatReceived(ClientChatReceivedEvent event) {
 
         String unformattedText = event.getMessage().getUnformattedText();
-
-        if (DebugPatterns.DEBUG_PATTERN.matcher(unformattedText).matches() || DebugPatterns.DEBUG_DAMAGE_TAKEN_PATTERN.matcher(unformattedText).matches() ||(unformattedText.contains("(Life Steal)"))||unformattedText.contains("DMG ->")||(unformattedText.contains("HP [")) ||unformattedText.contains("(THORNS)")) {
+        if (unformattedText.trim().equalsIgnoreCase("You examine your catch...") && DRSettings.YOU_EXAMINE_YOUR_CATCH_MESSAGE.get(boolean.class)) {
+            event.setCanceled(true);
+            return;
+        }
+        if (unformattedText.toLowerCase().trim().startsWith("... you caught some") && DRSettings.YOU_CAUGHT.get(boolean.class)) {
+            event.setCanceled(true);
+            return;
+        }
+        if (DebugPatterns.DEBUG_PATTERN.matcher(unformattedText).matches() || DebugPatterns.DEBUG_DAMAGE_TAKEN_PATTERN.matcher(unformattedText).matches() || (unformattedText.contains("(Life Steal)")) || unformattedText.contains("DMG ->") || (unformattedText.contains("HP [")) || unformattedText.contains("(THORNS)")) {
             if (DRSettings.DEBUG_SPACING_ENABLE.get(boolean.class) && DRSettings.DEBUG_SPACING.get(double.class) > 0) {
                 String spacing = "";
-                for (Integer i = 0; i < DRSettings.DEBUG_SPACING.get(double.class); i++) {
+                double amount = DRSettings.DEBUG_SPACING.get(double.class);
+                if (DebugPatterns.DEBUG_DAMAGE_TAKEN_PATTERN.matcher(unformattedText).matches()) {
+                    if (amount - 1 < 0) {
+                        amount = 0;
+                    } else {
+                        amount--;
+
+                    }
+                }
+                for (int i = 0; i < amount; i++) {
                     spacing += " ";
                 }
                 event.setCanceled(true);
@@ -48,19 +64,19 @@ public class DebugListener implements Listener {
     }
 
     private boolean isDebugText(String string) {
-       try {
-           if (string.contains(" ")) {
-               String trim = string.split(" ")[0].trim();
-               try {
-                   Double.parseDouble(trim);
-               } catch (Exception e) {
-                   return false;
-               }
-               return string.startsWith(trim + " DMG ->");
-           }
-           return false;
-       } catch ( Exception e) {
-           return false;
-       }
+        try {
+            if (string.contains(" ")) {
+                String trim = string.split(" ")[0].trim();
+                try {
+                    Double.parseDouble(trim);
+                } catch (Exception e) {
+                    return false;
+                }
+                return string.startsWith(trim + " DMG ->");
+            }
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

@@ -1,7 +1,9 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.misc.listeners;
 
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.profession.ProfessionItem;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setting.DRSettings;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.Listener;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.Percent;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -19,7 +21,7 @@ public class DurabilityListener implements Listener {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onItemTooltip(ItemTooltipEvent event) {
         ItemStack itemStack = event.getItemStack();
-        if (itemStack.hasTagCompound() && DRSettings.DURABILITY_PERCENTAGE.get(boolean.class) && ((ItemType.isArmor(itemStack) || ItemType.isWeapon(itemStack)))) {
+        if (itemStack.hasTagCompound() && DRSettings.DURABILITY_PERCENTAGE.get(boolean.class) && ((ItemType.isArmor(itemStack) || ItemType.isWeapon(itemStack)|| ProfessionItem.of(itemStack)!=null))) {
             String format = new String(DRSettings.DURABILITY_PERCENTAGE_FORMAT.get(String.class));
             List<String> toolTip = event.getToolTip();
             if (toolTip == null || toolTip.isEmpty()) {
@@ -32,9 +34,10 @@ public class DurabilityListener implements Listener {
             if (tagCompound.hasKey("RepairCost")) {
                 int repairCost = tagCompound.getInteger("RepairCost");
 
-                double percentage = ((double) repairCost * 100.0D) / 1500.0D;
+                double percentage = ((double) repairCost * 100.0D) / 2500.0D;
                 String displayNameToolTip = toolTip.get(0);
-                displayNameToolTip += " " + format.replaceAll("&", "\u00a7").replaceAll("%percent%", String.valueOf((int) percentage));
+
+                displayNameToolTip += " " + format.replaceAll("%color%", new Percent(percentage).getDurabilityColor().toString()).replaceAll("&", "\u00a7").replaceAll("%percent%", String.valueOf((int) percentage));
 
 
                 toolTip.set(0, displayNameToolTip);

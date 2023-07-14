@@ -71,6 +71,22 @@ public class GuiDRSettings extends GuiScreen {
                 DRPlayer.get().setSettingValue(entry.getKey(), value);
             } else if (clazz == String.class) {
                 DRPlayer.get().setSettingValue(entry.getKey(), entry.getValue().getText());
+            } else if (clazz == long.class) {
+                long value = 0;
+                try {
+                    value = Long.parseLong(entry.getValue().getText());
+                } catch (Exception e) {
+                    value = DRPlayer.get().getSettings().getCategory(entry.getKey().getCategory()).getSettingValue(entry.getKey(), long.class);
+                }
+                DRPlayer.get().setSettingValue(entry.getKey(), value);
+            }else if (clazz == int.class) {
+                int value = 0;
+                try {
+                    value = Integer.parseInt(entry.getValue().getText());
+                } catch (Exception e) {
+                    value = DRPlayer.get().getSettings().getCategory(entry.getKey().getCategory()).getSettingValue(entry.getKey(), int.class);
+                }
+                DRPlayer.get().setSettingValue(entry.getKey(), value);
             }
         }
     }
@@ -185,16 +201,21 @@ public class GuiDRSettings extends GuiScreen {
             DRButton value = entry.getValue();
             value.displayString = DRPlayer.get().getSettings().getCategory(key.getCategory()).getSettingValue(key, boolean.class).toString();
             value.visible = true;
+
             value.drawButton(mc, this, x, y, partialTicks);
+            if (!hovering) {
+            }
         }
 
         for (GuiTextField value : textMap.values()) {
             value.setVisible(true);
             value.setEnabled(true);
             value.drawTextBox();
+            if (!hovering){
+            }
         }
-
         drawSettings(x, y, partialTicks);
+
         settingsOpened = true;
         super.drawScreen(x, y, partialTicks);
     }
@@ -239,11 +260,31 @@ public class GuiDRSettings extends GuiScreen {
                 });
                 textMap.put(drSettings, guiButton);
                 currentGuiTextFieldId++;
+            }else if (drSettings.getClazz() == long.class) {
+                GuiTextField guiButton = new GuiTextField(currentGuiTextFieldId, fontRenderer, xBox + paddingLeft + fontRenderer.getStringWidth(drSettings.getName()), yBox, 60, 10);
+                guiButton.setText(drSettings.get(long.class) + "");
+                guiButton.setValidator(input -> {
+                    if (input == null) {
+                        return false;
+                    }
+                    if (input.isEmpty()) {
+                        return true;
+                    }
+                    try {
+                        Long.parseLong(input);
+                    } catch (Exception e) {
+                        return false;
+                    }
+                    return true;
+                });
+                textMap.put(drSettings, guiButton);
+                currentGuiTextFieldId++;
             } else if (drSettings.getClazz() == String.class) {
 
                 int width = fontRenderer.getStringWidth(drSettings.get(String.class))+10;
                 GuiTextField guiButton = new GuiTextField(currentGuiTextFieldId, fontRenderer, xBox + paddingLeft + fontRenderer.getStringWidth(drSettings.getName()), yBox, width, 10);
                 guiButton.setText(drSettings.get(String.class) + "");
+
                 textMap.put(drSettings, guiButton);
                 currentGuiTextFieldId++;
             }
@@ -263,7 +304,8 @@ public class GuiDRSettings extends GuiScreen {
             yBox = currentY;
 
             fontRenderer.drawString(drSettings.getName(), xBox, yBox + 3, 0x3000);
-
+            if (!hovering) {
+            }
             List<String> lines = new ArrayList<>();
             lines.add(TextFormatting.GREEN + drSettings.getName());
             for (String s : drSettings.getDescription()) {
@@ -271,11 +313,21 @@ public class GuiDRSettings extends GuiScreen {
             }
 
             if (RenderUtils.isMouseInside(x, y, xBox + 3, yBox + 3, xBox + fontRenderer.getStringWidth(drSettings.getName()) + 3, yBox + 3 + fontRenderer.FONT_HEIGHT)) {
-                drawHoveringText(lines, x, y);
+                hovering = true;
+                GlStateManager.pushMatrix();
+                {
+                    drawHoveringText(lines, x, y, fontRenderer);
+                }
+                GlStateManager.popMatrix();
+
+
+            } else {
+                hovering = false;
             }
             currentY += fontRenderer.FONT_HEIGHT + 8;
         }
     }
+    boolean hovering = false;
 
     private void drawIcon(Icons icons, int x, int y) {
         icons.draw(mc, x, y);

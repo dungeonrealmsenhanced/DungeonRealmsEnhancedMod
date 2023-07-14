@@ -1,6 +1,7 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module;
 
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.Listener;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.render.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraftforge.common.MinecraftForge;
@@ -36,6 +37,9 @@ public abstract class Module {
         this.height = 0;
         this.mc = Minecraft.getMinecraft();
         this.listeners = new ArrayList<>();
+    }
+    public boolean isMouseWithin(int mouseX, int mouseY) {
+        return RenderUtils.isMouseWithin(mouseX, mouseY, posX, posY, width, height);
     }
 
     public void onRender(ScaledResolution scaledResolution, float particleTicks) {

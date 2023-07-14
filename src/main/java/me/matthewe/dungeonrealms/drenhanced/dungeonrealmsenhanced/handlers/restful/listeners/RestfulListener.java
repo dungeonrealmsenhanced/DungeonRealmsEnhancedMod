@@ -25,6 +25,10 @@ public class RestfulListener implements Listener {
 
     @SubscribeEvent
     public void onDungeonRealmsJoin(DungeonRealmsJoinEvent event) {
+        DRPlayer drPlayer = DRPlayer.get();
+        if (drPlayer!=null){
+            drPlayer.resetMining();
+        }
         restfulHandler.getDrEnhancedRestful().update(information -> {
             if (information==null){
                 return;

@@ -1,5 +1,6 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.nostalgia.listeners;
 
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.profession.ProfessionItem;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setting.DRSettings;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.Listener;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.world.Zone;
@@ -28,6 +29,9 @@ public class HealthBarListener implements Listener {
         BossInfoClient bossInfo = event.getBossInfo();
         String unformattedText = bossInfo.getName().getUnformattedText();
         if (unformattedText.contains("- HP ")) {
+            String hp = unformattedText.split("- HP ")[0].trim();
+
+
             String trim = unformattedText.split("- HP ")[1].trim();
             if (trim.contains(" - XP")) {
                 String healthString = trim.split(" - XP")[0].trim();
@@ -54,10 +58,14 @@ public class HealthBarListener implements Listener {
                 }
             }
         }
+        if (ProfessionItem.has()){
+          System.out.println(bossInfo.getPercent());
+        }
         if (DRSettings.OLD_BOSS_BAR.get(boolean.class)) {
             bossInfo.setName(new TextComponentString(TextFormatting.LIGHT_PURPLE + TextFormatting.BOLD.toString() + "HP " + TextFormatting.LIGHT_PURPLE + getHealth() + " " + TextFormatting.BOLD + "/" + TextFormatting.LIGHT_PURPLE + " " + getMaxHealth()));
             bossInfo.setColor(BossInfo.Color.PINK);
             bossInfo.setOverlay(BossInfo.Overlay.PROGRESS);
+
         } else {
             if (DRSettings.LEVEL_HEALTH.get(boolean.class)) {
                 event.setCanceled(true);

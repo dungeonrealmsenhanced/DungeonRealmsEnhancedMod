@@ -25,6 +25,7 @@ public class ProfessionItem {
     private int trinketLevel;
     private ItemType itemType;
 
+
     public ProfessionItem(int level, int experience, Map<String, Integer> enchants, String trinket, int trinketLevel, ItemType itemType) {
         this.level = level;
         this.experience = experience;
@@ -33,7 +34,16 @@ public class ProfessionItem {
         this.trinketLevel = trinketLevel;
         this.itemType = itemType;
     }
+    public static int getNeededXP(int level) {
+        if (level <= 1)
+            return 176;
 
+        if (level == 100)
+            return 0;
+
+        int lastLevel = level - 1;
+        return (int) (Math.pow(lastLevel, 2) + (lastLevel * 20) + 150 + (lastLevel * 4) + getNeededXP(lastLevel));
+    }
     public int getNeededExperience(int level) {
         if (level <= 1)
             return 176;
@@ -126,5 +136,12 @@ public class ProfessionItem {
             return Tier.T5;
         }
         return null;
+    }
+
+    public boolean isFishingRod() {
+        return itemType != null && itemType == ItemType.FISHING_ROD;
+    }
+    public boolean isPickaxe() {
+        return itemType != null && itemType == ItemType.PICKAXE;
     }
 }

@@ -4,6 +4,7 @@ import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiPlayerTabOverlay;
 import net.minecraft.client.network.NetworkPlayerInfo;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 
 import java.util.ArrayList;
@@ -78,9 +79,23 @@ public class StatisticTracker extends Thread {
             if ((playerName == null) || playerName.isEmpty()) {
                 continue;
             }
+
+            playerName = playerName.trim();
             boolean guild = true;
+            if (playerName.startsWith("Ore Mined: ")){
+                int oreMined = Integer.parseInt(playerName.split("Ore Mined: ")[1].trim());
+                DRPlayer.drPlayer.getStatistics().setOreMined(oreMined);
+            }
             if (playerName.startsWith("Bank Gems: ")) {
+                System.out.println(playerName);
                 DRPlayer.drPlayer.getStatistics().setBankGems((long) Integer.parseInt(playerName.split("Bank Gems: ")[1].trim()));
+            }
+            if (playerName.startsWith("Player Kills: ")) {
+                String[] playerKillsAndDeaths = playerName.split("Player Kills: ")[1].trim().split(" ");
+                int playerKills = Integer.parseInt(playerKillsAndDeaths[0].trim());
+                int deaths = Integer.parseInt(playerKillsAndDeaths[2].trim());
+                DRPlayer.drPlayer.getStatistics().setDeaths(deaths);
+                DRPlayer.drPlayer.getStatistics().setPlayerKills(playerKills);
             }
             if (playerName.startsWith("Playtime: ")) {
 
@@ -118,65 +133,87 @@ public class StatisticTracker extends Thread {
                 }
                 DRPlayer.get().getStatistics().setPlayTime(time);
             }
-            if (playerName.startsWith("Player Kills: ")) {
-                DRPlayer.drPlayer.getStatistics().setPlayerKills(Integer.parseInt(playerName.split("Player Kills: ")[1].trim()));
-            }
-            if (playerName.startsWith("Deaths: ")) {
-                DRPlayer.drPlayer.getStatistics().setDeaths(Integer.parseInt(playerName.split("Deaths: ")[1].trim()));
-            }
+//            if (playerName.startsWith("Player Kills: ")) {
+//                DRPlayer.drPlayer.getStatistics().setPlayerKills(Integer.parseInt(playerName.split("Player Kills: ")[1].trim()));
+//            }
+//            if (playerName.startsWith("Deaths: ")) {
+//                DRPlayer.drPlayer.getStatistics().setDeaths(Integer.parseInt(playerName.split("Deaths: ")[1].trim()));
+//            }
             if (playerName.startsWith("Fish Caught: ")) {
                 DRPlayer.drPlayer.getStatistics().setFishCaught(Integer.parseInt(playerName.split("Fish Caught: ")[1].trim()));
-            }
-            if (playerName.startsWith("Ore Mined: ")) {
-                DRPlayer.drPlayer.getStatistics().setOreMined(Integer.parseInt(playerName.split("Ore Mined: ")[1].trim()));
             }
             if (playerName.startsWith("Loot Opened: ")) {
                 DRPlayer.drPlayer.getStatistics().setLootOpened(Integer.parseInt(playerName.split("Loot Opened: ")[1].trim()));
             }
-            if (playerName.startsWith("T1 Mob Kills: ")) {
-                if (playerName.toLowerCase().contains("dry:")) {
-                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T1, (long) Integer.parseInt(playerName.split("T1 Mob Kills: ")[1].trim().split(" Dry:")[0].trim()));
-                } else {
-                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T1, (long) Integer.parseInt(playerName.split("T1 Mob Kills: ")[1].trim()));
-                }
-            }
-            if (playerName.startsWith("T2 Mob Kills: ")) {
-                if (playerName.toLowerCase().contains("dry:")) {
-                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T2, (long) Integer.parseInt(playerName.split("T2 Mob Kills: ")[1].trim().split(" Dry:")[0].trim()));
-                } else {
-                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T2, (long) Integer.parseInt(playerName.split("T2 Mob Kills: ")[1].trim()));
-                }
-            }
-            if (playerName.startsWith("T3 Mob Kills: ")) {
-                if (playerName.toLowerCase().contains("dry:")) {
-                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T3, (long) Integer.parseInt(playerName.split("T3 Mob Kills: ")[1].trim().split(" Dry:")[0].trim()));
-                } else {
-                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T3, (long) Integer.parseInt(playerName.split("T3 Mob Kills: ")[1].trim()));
-                }
-            }
-            if (playerName.startsWith("T4 Mob Kills: ")) {
-                if (playerName.toLowerCase().contains("dry:")) {
-                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T4, (long) Integer.parseInt(playerName.split("T4 Mob Kills: ")[1].trim().split(" Dry:")[0].trim()));
-                } else {
-                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T4, (long) Integer.parseInt(playerName.split("T4 Mob Kills: ")[1].trim()));
-                }
-            }
-            if (playerName.startsWith("T5 Mob Kills: ")) {
-                if (playerName.toLowerCase().contains("dry:")) {
-                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T5, (long) Integer.parseInt(playerName.split("T5 Mob Kills: ")[1].trim().split(" Dry:")[0].trim()));
-                } else {
-                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T5, (long) Integer.parseInt(playerName.split("T5 Mob Kills: ")[1].trim()));
-                }
-            }
-            if (playerName.startsWith("Level ➜")) {
-                DRPlayer.drPlayer.getStatistics().setLevel(Integer.parseInt(playerName.split("Level ➜")[1].trim()));
-            }
-            if (playerName.toLowerCase().contains("please visit the guild")) {
-                guild = false;
-            }
-            DRPlayer.drPlayer.setUuid(Minecraft.getMinecraft().player.getUniqueID());
-            DRPlayer.drPlayer.getStatistics().setInGuild(guild);
+//            if (playerName.startsWith("Ore Mined: ")) {
+//                DRPlayer.drPlayer.getStatistics().setOreMined(Integer.parseInt(playerName.split("Ore Mined: ")[1].trim()));
+//            }
+//            if (playerName.startsWith("T1 Kills: ")) {
+//                int kills = Integer.parseInt(playerName.split("T1 Kills: ")[1].trim().split(" Dry:")[0].trim());
+//                int dry = Integer.parseInt(playerName.split("T1 Kills: ")[1].trim().split(" Dry:")[1].trim());
+//                DRPlayer.drPlayer.getStatistics().setDryStreak(Tier.T1, dry);
+//                DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T1, kills);
+//            }
+//            if (playerName.startsWith("2 Kills: ")) {
+//                int kills = Integer.parseInt(playerName.split("T2 Kills: ")[1].trim().split(" Dry:")[0].trim());
+//                int dry = Integer.parseInt(playerName.split("T2 Kills: ")[1].trim().split(" Dry:")[1].trim());
+//                DRPlayer.drPlayer.getStatistics().setDryStreak(Tier.T2, dry);
+//                DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T2, kills);
+//            }
+//            if (playerName.startsWith("T3 Kills: ")) {
+//                int kills = Integer.parseInt(playerName.split("T3 Kills: ")[1].trim().split(" Dry:")[0].trim());
+//                int dry = Integer.parseInt(playerName.split("T3 Kills: ")[1].trim().split(" Dry:")[1].trim());
+//                DRPlayer.drPlayer.getStatistics().setDryStreak(Tier.T3, dry);
+//                DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T3, kills);
+//            }
+//            if (playerName.startsWith("T4 Kills: ")) {
+//                int kills = Integer.parseInt(playerName.split("T4 Kills: ")[1].trim().split(" Dry:")[0].trim());
+//                int dry = Integer.parseInt(playerName.split("T4 Kills: ")[1].trim().split(" Dry:")[1].trim());
+//                DRPlayer.drPlayer.getStatistics().setDryStreak(Tier.T4, dry);
+//                DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T4, kills);
+//            }
+//            if (playerName.startsWith("T5 Kills: ")) {
+//                int kills = Integer.parseInt(playerName.split("T5 Kills: ")[1].trim().split(" Dry:")[0].trim());
+//                int dry = Integer.parseInt(playerName.split("T5 Kills: ")[1].trim().split(" Dry:")[1].trim());
+//                DRPlayer.drPlayer.getStatistics().setDryStreak(Tier.T5, dry);
+//                DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T5, kills);
+//            }
+//            if (playerName.startsWith("T2 Mob Kills: ")) {
+//                if (playerName.toLowerCase().contains("dry:")) {
+//                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T2, (long) Integer.parseInt(playerName.split("T2 Mob Kills: ")[1].trim().split(" Dry:")[0].trim()));
+//                } else {
+//                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T2, (long) Integer.parseInt(playerName.split("T2 Mob Kills: ")[1].trim()));
+//                }
+//            }
+//            if (playerName.startsWith("T3 Mob Kills: ")) {
+//                if (playerName.toLowerCase().contains("dry:")) {
+//                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T3, (long) Integer.parseInt(playerName.split("T3 Mob Kills: ")[1].trim().split(" Dry:")[0].trim()));
+//                } else {
+//                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T3, (long) Integer.parseInt(playerName.split("T3 Mob Kills: ")[1].trim()));
+//                }
+//            }
+//            if (playerName.startsWith("T4 Mob Kills: ")) {
+//                if (playerName.toLowerCase().contains("dry:")) {
+//                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T4, (long) Integer.parseInt(playerName.split("T4 Mob Kills: ")[1].trim().split(" Dry:")[0].trim()));
+//                } else {
+//                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T4, (long) Integer.parseInt(playerName.split("T4 Mob Kills: ")[1].trim()));
+//                }
+//            }
+//            if (playerName.startsWith("T5 Mob Kills: ")) {
+//                if (playerName.toLowerCase().contains("dry:")) {
+//                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T5, (long) Integer.parseInt(playerName.split("T5 Mob Kills: ")[1].trim().split(" Dry:")[0].trim()));
+//                } else {
+//                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T5, (long) Integer.parseInt(playerName.split("T5 Mob Kills: ")[1].trim()));
+//                }
+//            }
+//            if (playerName.startsWith("Level ➜")) {
+//                DRPlayer.drPlayer.getStatistics().setLevel(Integer.parseInt(playerName.split("Level ➜")[1].trim()));
+//            }
+//            if (playerName.toLowerCase().contains("please visit the guild")) {
+//                guild = false;
+//            }
 
         }
+        DRPlayer.drPlayer.setUuid(Minecraft.getMinecraft().player.getUniqueID());
     }
 }

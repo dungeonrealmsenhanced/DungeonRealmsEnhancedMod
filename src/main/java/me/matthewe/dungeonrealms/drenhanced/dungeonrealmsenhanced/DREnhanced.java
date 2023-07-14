@@ -7,10 +7,14 @@ import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.Modules
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.DRPlayer;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.proxy.IProxy;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.DREnhancedConfig;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setting.Settings;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.LocationJsonAdapter;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.json.SettingsJsonAdapter;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.restful.change.Changelog;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.restful.change.ChangelogJsonDeserializer;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.restful.change.ChangelogJsonSerializer;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.texture.ImageUtils;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.world.Location;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Util;
@@ -44,10 +48,13 @@ public class DREnhanced {
     public static IProxy proxy;
     public static final String MOD_ID = "dungeonrealmsenhanced";
     public static final String MOD_NAME = "DREnhanced";
-    public static final String VERSION = "1.0.5";
-    public static  GsonBuilder gsonBuilder = new GsonBuilder().setPrettyPrinting()
-            .registerTypeAdapter(Changelog.class,new ChangelogJsonSerializer())
-            .registerTypeAdapter(Changelog.class,new ChangelogJsonDeserializer());
+    public static final String VERSION = "1.0.6";
+    public static GsonBuilder gsonBuilder = new GsonBuilder().setPrettyPrinting()
+            .disableHtmlEscaping()
+            .registerTypeAdapter(Changelog.class, new ChangelogJsonSerializer())
+            .registerTypeAdapter(Location.class, new LocationJsonAdapter())
+            .registerTypeAdapter(Settings.class, new SettingsJsonAdapter())
+            .registerTypeAdapter(Changelog.class, new ChangelogJsonDeserializer());
 
 
     public static final String[] DEVELOPERS = new String[]{
@@ -131,7 +138,7 @@ public class DREnhanced {
         if (file.exists()) {
             try {
                 String readFileToString = FileUtils.readFileToString(file, Charset.forName("UTF-8"));
-                DREnhancedConfig drEnhancedConfig = gsonBuilder.setPrettyPrinting().create().fromJson(readFileToString, DREnhancedConfig.class);
+                DREnhancedConfig drEnhancedConfig = gsonBuilder.create().fromJson(readFileToString, DREnhancedConfig.class);
                 for (Module module : Modules.getModules()) {
                     Integer[] coords = drEnhancedConfig.getCoords(module.getName());
                     if (coords != null) {
@@ -155,6 +162,9 @@ public class DREnhanced {
     }
 
     public static void saveModuleSettings() {
+        if (DRPlayer.drPlayer!=null) {
+            DRPlayer.drPlayer.clearToSave();
+        }
         File file = new File(DREnhanced.INSTANCE.folderLocation + "module_save.json");
         if (file.exists()) {
             try {

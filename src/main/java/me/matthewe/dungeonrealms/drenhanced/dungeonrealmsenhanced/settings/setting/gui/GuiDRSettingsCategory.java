@@ -126,7 +126,10 @@ public class GuiDRSettingsCategory extends GuiScreen {
             this.title = category.getName();
         }
         drawTitle(x, y, partialTicks);
+
+
         int padding = 8;
+
         if (category == null) {
 
 //            Icons.CROSS.draw(mc, centerX + padding, centerY + padding);
@@ -145,6 +148,7 @@ public class GuiDRSettingsCategory extends GuiScreen {
                 Icons.ARROW_LEFT.draw(mc, centerX + padding, centerY + padding);
                 crossSelected = false;
             }
+
         }
 
         drawCategories(x, y, partialTicks);
@@ -207,7 +211,7 @@ public class GuiDRSettingsCategory extends GuiScreen {
         int centerY = (height / 2) - guiHeight / 2;
 
         int currentY = (centerY + 40) + fontRenderer.FONT_HEIGHT + 3;
-
+        boolean stopDraw = false;
         for (DRSettingCategory drSettingCategory : getCategories()) {
             SettingCategory category = Settings.get().getCategory(drSettingCategory);
 
@@ -217,19 +221,31 @@ public class GuiDRSettingsCategory extends GuiScreen {
             yBox = currentY;
 
             int[] aaaaaaaaaas = RenderUtils.drawRectLines(xBox, yBox, "aaaaaaaaaaaaaaaaaaaaaa");
-            if (RenderUtils.isMouseInside(x, y, xBox, yBox, aaaaaaaaaas[0], aaaaaaaaaas[1])) {
-                fontRenderer.drawString(category.getCategory().getName(), xBox + 2, yBox + 2, 0xffff);
-            } else {
-                fontRenderer.drawString(category.getCategory().getName(), xBox + 2, yBox + 2, 0x0000);
-
-            }
-
+            int padding = 8;
             List<String> lines = new ArrayList<>();
             lines.add(category.getCategory().getName());
 
+
             if (RenderUtils.isMouseInside(x, y, xBox, yBox, aaaaaaaaaas[0], aaaaaaaaaas[1])) {
-                drawHoveringText(lines, x, y);
+                drawHoveringText(lines, x+4, y+4);
+                stopDraw=true;
+
+            } else {
+                stopDraw=false;
             }
+            if (RenderUtils.isMouseInside(x, y, xBox, yBox, aaaaaaaaaas[0], aaaaaaaaaas[1])) {
+//            if (RenderUtils.isMouseInside(x, y, centerX + padding, centerY + padding, centerX + padding + 10, centerY + padding + 10)) {
+                fontRenderer.drawString(category.getCategory().getName(), xBox + 2, yBox + 2, 0xffff);
+            } else {
+                fontRenderer.drawString(category.getCategory().getName(), xBox + 2, yBox + 2, 0x0000);
+//                if (!stopDraw){
+//                    fontRenderer.drawString("6", xBox + 5, yBox + 2, 0x0000);
+
+//                }
+
+            }
+
+
             currentY += fontRenderer.FONT_HEIGHT + 4;
 
         }

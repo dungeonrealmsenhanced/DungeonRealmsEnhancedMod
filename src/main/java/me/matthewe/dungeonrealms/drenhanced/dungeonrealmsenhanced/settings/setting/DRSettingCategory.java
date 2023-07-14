@@ -9,18 +9,20 @@ import java.util.List;
  */
 public enum DRSettingCategory {
     MISC("Misc"),
-    CHAT("Chat"),
+    CHAT_FISHING("Chat Fishing"),
+    CHAT_MINING("Chat Mining"),
+    CHAT("Chat", DRSettingCategory.CHAT_FISHING,CHAT_MINING),
     DEBUG("Debug"),
     BOSS_BAR("Bossbar"),
-//    NOSTALGIA_TOGGLES("Toggles"),
+    //    NOSTALGIA_TOGGLES("Toggles"),
 //    NOSTALGIA_TAB_LIST("Tab List"),
 //    NOSTALGIA_SOUNDS("Sounds"),
-    NOSTALGIA("Nostalgia", new DRSettingCategory[]{DRSettingCategory.DEBUG,BOSS_BAR}),
+    NOSTALGIA("Nostalgia", DRSettingCategory.DEBUG, BOSS_BAR),
 //        DRSettingCategory.NOSTALGIA_TOGGLES, DRSettingCategory.NOSTALGIA_TAB_LIST, DRSettingCategory.NOSTALGIA_SOUNDS}),
 
     ITEMS_MISC("Items Misc"),
     ITEMS_OVERLAY("Items Overlay"),
-    ITEMS("Items", new DRSettingCategory[]{DRSettingCategory.ITEMS_OVERLAY, DRSettingCategory.ITEMS_MISC}),
+    ITEMS("Items", DRSettingCategory.ITEMS_OVERLAY, DRSettingCategory.ITEMS_MISC),
 
 
     DEVELOPMENT("Development");
@@ -34,6 +36,15 @@ public enum DRSettingCategory {
         if ((drSettingCategories != null) && (drSettingCategories.length > 0)) {
             subCategoryList.addAll(Arrays.asList(drSettingCategories));
         }
+    }
+
+    public static DRSettingCategory getByString(String key) {
+        for (DRSettingCategory value : values()) {
+            if (value.toString().equalsIgnoreCase(key)) {
+                return value;
+            }
+        }
+        return null;
     }
 
     public boolean hasSubCategories() {

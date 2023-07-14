@@ -1,6 +1,10 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player;
 
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DREnhanced;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners.buff.BuffListener;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners.buff.BuffRequest;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners.buff.BuffRequestReturn;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.profession.ProfessionItem;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.profession.mining.Mining;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setting.DRSettings;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setting.SettingCategory;
@@ -10,6 +14,7 @@ import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.world.Location;
 import net.minecraft.client.Minecraft;
 
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -182,14 +187,45 @@ public class DRPlayer {
         }
     }
 
+    private String percentFormat = "###.##";
+
     public void update() {
         this.updateGamma();
+        this.updatePercentFormat();
+//        BuffListener.requestActiveBuffs(); Temp Disabled
+
+    }
+
+    public void setPercentFormat(String percentFormat) {
+        this.percentFormat = percentFormat;
+    }
+
+    public String getPercentFormat() {
+        return percentFormat;
+    }
+
+    private void updatePercentFormat() {
+        boolean error = false;
+        try {
+
+            new DecimalFormat(DRSettings.MISC_PERCENT_FORMAT.get(String.class)).format(344.3223);
+            error = false;
+        } catch (Exception e) {
+            this.percentFormat = "###.##";
+            DRPlayer.get().setSettingValue(DRSettings.MISC_PERCENT_FORMAT, this.percentFormat);
+            error = true;
+
+        }
+        if (!error) {
+            this.percentFormat = DRSettings.MISC_PERCENT_FORMAT.get(String.class);
+        }
+
     }
 
     private void updateGamma() {
         if (DRSettings.GAMMA.get(double.class) != Minecraft.getMinecraft().gameSettings.gammaSetting) {
             if (DRSettings.GAMMA.get(double.class) <= 1) {
-                Minecraft.getMinecraft().gameSettings.gammaSetting = 1;
+//                Minecraft.getMinecraft().gameSettings.gammaSetting = 1;
             } else {
                 Minecraft.getMinecraft().gameSettings.gammaSetting = DRSettings.GAMMA.get(double.class).floatValue();
             }
@@ -219,6 +255,18 @@ public class DRPlayer {
     public void setVersion(String version) {
         this.version = version;
     }
+
+    public void clearToSave() {
+        this.clicks.clear();
+        this.damages.clear();
+    }
+
+    public void resetMining() {
+        mining =new Mining();
+
+    }
+
+
 
     public static class Statistics {
         private int playerKills = 0;

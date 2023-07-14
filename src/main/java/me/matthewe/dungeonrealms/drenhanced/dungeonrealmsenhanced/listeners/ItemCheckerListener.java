@@ -16,13 +16,20 @@ import net.minecraft.entity.monster.EntitySkeleton;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.PlayerDropsEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+import java.util.EventListener;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -181,4 +188,21 @@ public class ItemCheckerListener {
         }
 
     }
+
+//    @SubscribeEvent
+//    public static void onEntity( PlayerInteractEvent.EntityInteract event) {
+//
+//        ItemStack itemStack = event.getEntityPlayer().getHeldItem(EnumHand.MAIN_HAND);
+//        if ((itemStack.getItem() == Items.AIR) || (itemStack.getCount() == 0)) {
+//            return;
+//        }
+//        event.getEntityPlayer().sendMessage(new TextComponentString("LOW "));
+//        if (event.getEntityPlayer().experience <= 0.3){
+//            event.getEntityPlayer().sendMessage(new TextComponentString("LOW EXP"));
+//            event.setCanceled(true);
+//
+//        }
+//
+
+//    }
 }

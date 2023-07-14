@@ -2,6 +2,10 @@ package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.module
 
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.Module;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.DRPlayer;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.profession.mining.Mining;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.MiningUtils;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.Percent;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.TimeUtils;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemType;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.Tier;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.render.RenderUtils;
@@ -13,6 +17,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.text.TextFormatting;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +27,7 @@ import java.util.List;
 public class ProfessionModule extends Module {
     private int textX = 0;
     private int textY = 0;
+
 
     public ProfessionModule() {
         super("Profession");
@@ -58,6 +64,7 @@ public class ProfessionModule extends Module {
         this.height = 85;
     }
 
+
     @Override
     public void renderOutline(ScaledResolution scaledResolution, float particleTicks) {
         drawOutline();
@@ -74,22 +81,83 @@ public class ProfessionModule extends Module {
             return;
         }
         if ((drPlayer != null) && (player != null) && ItemType.isProfessionItem(itemStack)) {
+            if (!drPlayer.isLoaded()){
+               return;
+            }
             ProfessionItem professionItem = ProfessionItem.of(itemStack);
             if (professionItem != null) {
-                renderOutline(scaledResolution, particleTicks);
-                Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(ItemType.getFromItemStack(itemStack).getName()+" Information", posX + 2, posY + 2, professionItem.getTier().getColor());
-                int y = posY + 5 + Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT;
-
                 List<String> lines = new ArrayList<>();
-                int experiencePerMinute = drPlayer.getMining().getExperiencePerMinute();
-                int secondsUntilNextLevel = drPlayer.getMining().getSecondsUntilNextLevel(professionItem.getNeededExperience(professionItem.getLevel()), professionItem.getExperience());
+                Mining mining = drPlayer.getMining();
+                if (mining==null){
+                    return;
+                }
+                if (professionItem.getTier()==null){
+                    return;
+                }
+                int experiencePerMinute = mining.getExperiencePer5Minutes();
+                if (experiencePerMinute<10){
+                    return;
+                }
 
+                long neededExperience = MiningUtils.getNeededExperience(professionItem.getLevel());
+                if (neededExperience<1){
+                    return;
+                }
+                long secondsUntilNextLevel = mining.getSecondsUntilNextLevel(professionItem);
+                if (secondsUntilNextLevel<1){
+                    return;
+                }
+
+                double percentage = ((double) professionItem.getExperience() * 100.0D) / (double) neededExperience;
+                if (percentage > 100.0D) {
+                    percentage = 100.0D;
+                }
                 if (experiencePerMinute >= 1) {
-                    lines.add(TextFormatting.YELLOW.toString() + experiencePerMinute + " " + TextFormatting.BOLD.toString() + "EXP/m");
+                    lines.add(TextFormatting.YELLOW.toString() + (((double)experiencePerMinute)/5.0D) + " " + TextFormatting.BOLD.toString() + "EXP/m");
                 }
                 if (secondsUntilNextLevel >= 1) {
-                    lines.add(TextFormatting.YELLOW + "Next Level" + TextFormatting.WHITE + ": " + TextFormatting.YELLOW.toString() + secondsUntilNextLevel + TextFormatting.BOLD.toString() + "s");
+                    String timeFormat = TimeUtils.formatTimeToHHMMSS(secondsUntilNextLevel * 1000L, TextFormatting.YELLOW, TextFormatting.YELLOW, true);
+                    lines.add(TextFormatting.YELLOW + "Next Level" + TextFormatting.WHITE + ": " + timeFormat);
+                    lines.add(TextFormatting.WHITE + "(" + new Percent(percentage).getColor() + new DecimalFormat(drPlayer.getPercentFormat()).format(percentage) + TextFormatting.BOLD + "%" + TextFormatting.WHITE + ")");
+
                 }
+
+                if (lines.size() >= 2) {
+
+                    if( professionItem.getLevel()<1||professionItem.getExperience()<0){
+                        return;
+                    }
+                    lines.add(" ");
+
+                    long remainingExperienceForNextTier = mining.getRemainingExperienceForNextTier(professionItem);
+                    if (remainingExperienceForNextTier<1){
+                        return;
+                    }
+                    long maxXPForTier = mining.getStartingNeededXPForWholeTier(professionItem.getTier());
+                    long secondsUntilNextTier = mining.getSecondsUntilNextTier(professionItem);
+                    if ((remainingExperienceForNextTier > 0) && (maxXPForTier > 0) && secondsUntilNextTier > 0) {
+                        if (professionItem.isFishingRod()) {
+                            double percent = (100.0D - ((double) remainingExperienceForNextTier * 100.0D) / (double) maxXPForTier);
+                            String timeFormat = TimeUtils.formatTimeToHHMMSS(secondsUntilNextTier * 1000L, TextFormatting.YELLOW, TextFormatting.YELLOW, true);
+                            lines.add(TextFormatting.YELLOW + "Next Tier" + TextFormatting.WHITE + ": " + new Percent(percent).getColor() + new DecimalFormat(drPlayer.getPercentFormat()).format(percent) + TextFormatting.BOLD + "%");
+                            lines.add(timeFormat);
+
+                        } else if(professionItem.isPickaxe()){
+                            double percent = (100.0D - ((double) remainingExperienceForNextTier * 100.0D) / (double) maxXPForTier);
+                            String timeFormat = TimeUtils.formatTimeToHHMMSS(secondsUntilNextTier * 1000L, TextFormatting.YELLOW, TextFormatting.YELLOW, true);
+                            lines.add(TextFormatting.YELLOW + "Next Tier" + TextFormatting.WHITE + ": " + new Percent(percent).getColor() + new DecimalFormat(drPlayer.getPercentFormat()).format(percent) + TextFormatting.BOLD + "%");
+                            lines.add(timeFormat);
+
+                        }
+                    }
+                }
+                if (lines.size() <2) {
+                    return;
+                }
+                renderOutline(scaledResolution, particleTicks);
+                Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(ItemType.getFromItemStack(itemStack).getName() + " Information", posX + 2, posY + 2, professionItem.getTier().getColor());
+                int y = posY + 5 + Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT;
+
 
                 for (String line : lines) {
                     Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(line, posX + 2, y, Tier.T5.getColor());
@@ -102,6 +170,7 @@ public class ProfessionModule extends Module {
     @Override
     public void onLoad() {
         this.setEnabled(true);
+
         this.posX = 5;
         this.posY = 190;
 

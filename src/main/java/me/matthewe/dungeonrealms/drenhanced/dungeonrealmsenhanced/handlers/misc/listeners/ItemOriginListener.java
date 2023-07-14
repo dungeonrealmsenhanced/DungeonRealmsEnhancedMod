@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Matthew E on 3/12/2019 at 11:10 AM for the project DungeonRealmsDREnhanced
@@ -36,21 +37,27 @@ public class ItemOriginListener implements Listener  {
                     toolTip.add(TextFormatting.AQUA + TextFormatting.BOLD.toString() + "Monster Drop");
                     toolTip.add(TextFormatting.GRAY + " Killer" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + trim.split("/")[0].trim());
                     Date date = new Date(Long.parseLong(trim.split("/")[1].trim()));
-                    String dateString = new SimpleDateFormat("MM/dd/yyyy h:mm a").format(date);
+                    String dateString = new SimpleDateFormat("M/d/yyyy h:mm a").format(date);
                     toolTip.add(TextFormatting.GRAY + " Date" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + dateString);
                     displayToolTip = true;
                 } else if (origin.startsWith("Altar")) {
-                    String trim = origin.split("Altar \\(")[1].trim().split("\\)")[0].trim();
+//                    String trim = origin.split("Altar \\(")[1].trim().split("\\)")[0].trim();
 
                     toolTip.add(TextFormatting.AQUA + TextFormatting.BOLD.toString() + "Altar");
-                    toolTip.add(TextFormatting.GRAY + " Player" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + trim.split(", ")[1].trim());
-                    toolTip.add(TextFormatting.GRAY + " Location" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + trim.split(",")[0].trim());
+                    toolTip.add(TextFormatting.RED + TextFormatting.BOLD.toString() + "DISABLED");
+                    toolTip.add(origin);
+//                    toolTip.add(TextFormatting.GRAY + " Player" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + trim.split(", ")[0].trim());
+//                    toolTip.add(TextFormatting.GRAY + " Location" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + trim.split(",")[1].trim());
                     displayToolTip = true;
                 } else if (origin.startsWith("Merchant")) {
                     String trim = origin.split("Merchant \\(")[1].trim().split("\\)")[0].trim();
 
                     toolTip.add(TextFormatting.AQUA + TextFormatting.BOLD.toString() + "Merchant");
-                    toolTip.add(TextFormatting.GRAY + " Player" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + trim);
+                    String playerName = trim.split("/")[0].trim();
+                    Date date = new Date(Long.parseLong(trim.split("/")[1].trim()));
+                    String dateString = new SimpleDateFormat("M/d/yyyy h:mm a").format(date);
+                    toolTip.add(TextFormatting.GRAY + " Player" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + playerName);
+                    toolTip.add(TextFormatting.GRAY + " Date" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + dateString);
                     displayToolTip = true;
                 } else if (origin.startsWith("Vote Crate")) {
                     String trim = origin.split("Vote Crate \\(")[1].trim().split("\\)")[0].trim();
@@ -59,10 +66,11 @@ public class ItemOriginListener implements Listener  {
                     toolTip.add(TextFormatting.GRAY + " Player" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + trim);
                     displayToolTip = true;
                 } else if (origin.startsWith("Mining Treasure Find")) {
-                    String trim = origin.split("Mining Treasure Find -")[1].trim();
-
-                    toolTip.add(TextFormatting.AQUA + TextFormatting.BOLD.toString() + "Mining Treasure Find");
-                    toolTip.add(TextFormatting.GRAY + " Player" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + trim);
+//                    String trim = origin.split("Mining Treasure Find -")[1].trim();
+//
+//                    toolTip.add(TextFormatting.AQUA + TextFormatting.BOLD.toString() + "Mining Treasure Find");
+//                    toolTip.add(TextFormatting.GRAY + " Player" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + trim);
+                    toolTip.add(TextFormatting.GRAY + origin);
                     displayToolTip = true;
                 }else if (origin.startsWith("Fishing Treasure Find")) {
                     String trim = origin.split("Fishing Treasure Find -")[1].trim();

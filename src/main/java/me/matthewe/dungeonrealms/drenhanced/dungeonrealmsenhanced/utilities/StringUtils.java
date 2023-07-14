@@ -5,7 +5,7 @@ package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities;
  */
 public class StringUtils {
     public static String formatShard(String shard) {
-        return shard.replaceAll("US", "US-").replaceAll("SUB", "SUB-").replaceAll("BS", "BS-");
+        return shard.toUpperCase().replaceAll("US", "US-").replaceAll("SUB", "SUB-").replaceAll("BS", "BS-");
     }
 
     public static String formatTime(int seconds) {

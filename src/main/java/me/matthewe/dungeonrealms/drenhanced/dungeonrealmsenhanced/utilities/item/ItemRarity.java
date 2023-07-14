@@ -12,7 +12,8 @@ public enum ItemRarity {
     UNCOMMON("Uncommon", 0x5FF55, TextFormatting.GREEN, new RGBAColor(0, 1, 0)),
     RARE("Rare", 0x55FFFF, TextFormatting.AQUA, new RGBAColor(0, 1, 1)),
     EPIC("Epic", 0xAA00AA, TextFormatting.DARK_PURPLE, new RGBAColor(0.3f, 0, 0.3f)),
-    LEGENDARY("Legendary", 0xFFFF55, TextFormatting.YELLOW, new RGBAColor(1, 1, 0));
+    LEGENDARY("Legendary", 0xFFFF55, TextFormatting.YELLOW, new RGBAColor(1, 1, 0)),
+    MYTHIC("Mythic", 0xFFAA00, TextFormatting.GOLD, new RGBAColor(1, 0.6666667f, 0.0f));
 
     private String name;
     private int color;

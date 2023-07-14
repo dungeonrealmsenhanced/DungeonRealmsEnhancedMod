@@ -113,6 +113,80 @@ public class ItemUtils {
         return false;
     }
 
+
+    public static boolean isHelmet(Item item) {
+        if (item == Items.DIAMOND_HELMET) return true;
+        if (item == Items.GOLDEN_HELMET) return true;
+        if (item == Items.LEATHER_HELMET) return true;
+        if (item == Items.CHAINMAIL_HELMET) return true;
+        if (item == Items.IRON_HELMET) return true;
+        return false;
+    }
+
+    public static boolean isChestplate(Item item) {
+        if (item == Items.DIAMOND_CHESTPLATE) return true;
+        if (item == Items.GOLDEN_CHESTPLATE) return true;
+        if (item == Items.LEATHER_CHESTPLATE) return true;
+        if (item == Items.CHAINMAIL_CHESTPLATE) return true;
+        if (item == Items.IRON_CHESTPLATE) return true;
+        return false;
+    }
+
+    public static boolean isLeggings(Item item) {
+        if (item == Items.DIAMOND_LEGGINGS) return true;
+        if (item == Items.GOLDEN_LEGGINGS) return true;
+        if (item == Items.LEATHER_LEGGINGS) return true;
+        if (item == Items.CHAINMAIL_LEGGINGS) return true;
+        if (item == Items.IRON_LEGGINGS) return true;
+        return false;
+    }
+    public static boolean isBoots(Item item) {
+        if (item == Items.DIAMOND_BOOTS) return true;
+        if (item == Items.GOLDEN_BOOTS) return true;
+        if (item == Items.LEATHER_BOOTS) return true;
+        if (item == Items.CHAINMAIL_BOOTS) return true;
+        if (item == Items.IRON_BOOTS) return true;
+        return false;
+    }
+
+    public static boolean isAxe(Item item) {
+        if (item == Items.DIAMOND_AXE) return true;
+        if (item == Items.GOLDEN_AXE) return true;
+        if (item == Items.WOODEN_AXE) return true;
+
+        if (item == Items.STONE_AXE) return true;
+        if (item == Items.IRON_AXE) return true;
+        return false;
+    }
+
+    public static boolean isClub(Item item) {
+        if (item == Items.DIAMOND_SHOVEL) return true;
+        if (item == Items.GOLDEN_SHOVEL) return true;
+        if (item == Items.WOODEN_SHOVEL) return true;
+
+        if (item == Items.STONE_SHOVEL) return true;
+        if (item == Items.IRON_SHOVEL) return true;
+        return false;
+    }
+    public static boolean isScythe(Item item) {
+        if (item == Items.DIAMOND_HOE) return true;
+        if (item == Items.GOLDEN_HOE) return true;
+        if (item == Items.WOODEN_HOE) return true;
+
+        if (item == Items.STONE_HOE) return true;
+        if (item == Items.IRON_HOE) return true;
+        return false;
+    }
+    public static boolean isSword(Item item) {
+        if (item == Items.DIAMOND_SWORD) return true;
+        if (item == Items.GOLDEN_SWORD) return true;
+        if (item == Items.WOODEN_SWORD) return true;
+
+        if (item == Items.STONE_SWORD) return true;
+        if (item == Items.IRON_SWORD) return true;
+        return false;
+    }
+
     public static boolean isArmor(Item item) {
         if (item == Items.DIAMOND_HELMET) return true;
         if (item == Items.DIAMOND_CHESTPLATE) return true;
@@ -172,5 +246,16 @@ public class ItemUtils {
             }
         }
         return !clueScrolls.isEmpty() ? clueScrolls : null;
+    }
+
+    public static boolean isMythic(ItemStack itemStack) {
+        if ((itemStack.getItem() != Items.AIR) && itemStack.hasDisplayName() && itemStack.hasTagCompound()) {
+            NBTTagCompound tagCompound = itemStack.getTagCompound();
+            if (tagCompound == null) {
+                return false;
+            }
+            return tagCompound.hasKey("mythic") && tagCompound.getBoolean("mythic");
+        }
+        return false;
     }
 }

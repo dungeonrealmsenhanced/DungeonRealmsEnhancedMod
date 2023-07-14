@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DREnhanced;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.restful.change.Change;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.restful.change.Changelog;
+import net.minecraft.client.Minecraft;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ public class DREnhancedRestful {
 
         (new Thread(() -> {
             try {
-                String content = HttpUtils.getStringFromUrl("http://202.5.31.117:4569/drenhanced/info");
+                String content = HttpUtils.getStringFromUrl("http://202.5.31.117:4569/drenhanced/info/"+ Minecraft.getMinecraft().player.getName());
                 if (content == null) {
                     consumer.accept(null);
                     return;

@@ -4,6 +4,7 @@ import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DREnhanced;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.events.DungeonRealmsJoinEvent;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.DRPlayer;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.StatisticTracker;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setting.DRSettings;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.world.Location;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -41,7 +42,10 @@ public class StatisticListener {
             DRPlayer.get().setLocation(new Location(player.posX, player.posY, player.posZ, player.cameraYaw, player.cameraPitch));
         }
 
-}
+    }
+
+    int test = 0;
+
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onClientChatReceived(ClientChatReceivedEvent event) {
         if (!started) {
@@ -59,7 +63,15 @@ public class StatisticListener {
         final String unformattedText = event.getMessage().getUnformattedText();
 
         if (event.getMessage().getUnformattedText().trim().contains("https://www.dungeonrealms.net/")) {
+           test++;
+        }
+        if (event.getMessage().getUnformattedText().trim().contains("You are on the ")){
+            test++;
+        }
+        if (test>=2){
             DRPlayer.get().setLoaded(true);
+            DREnhanced.log("LOADED");
+
         }
     }
 

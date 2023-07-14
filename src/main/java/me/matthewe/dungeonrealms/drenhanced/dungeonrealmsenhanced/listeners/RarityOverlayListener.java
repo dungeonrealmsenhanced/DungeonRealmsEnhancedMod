@@ -5,6 +5,7 @@ import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setti
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.color.RGBAColor;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemRarity;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemType;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemUtils;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.render.ScreenRenderer;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.texture.DRTextures;
 import net.minecraft.client.Minecraft;
@@ -24,6 +25,8 @@ import java.util.List;
  * Created by Matthew E on 3/11/2019 at 8:59 AM for the project DungeonRealmsDREnhanced
  */
 public class RarityOverlayListener {
+
+    public static int inventoryGems = 0;
 
     @SubscribeEvent
     public void onPlayerInventory(GuiOverlapEvent.InventoryOverlap.DrawGuiContainerForegroundLayer event) {
@@ -49,6 +52,7 @@ public class RarityOverlayListener {
                 gems += itemStack.getTagCompound().getInteger("gemValue");
             }
         }
+        inventoryGems= gems;
         return gems;
     }
 
@@ -61,7 +65,7 @@ public class RarityOverlayListener {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1F);
         int x = 130;
         int gems = getGems();
-        int y = (int) ((Minecraft.getMinecraft().player.inventory.mainInventory.size() / 9) * 19.7)-3;
+        int y = (int) ((Minecraft.getMinecraft().player.inventory.mainInventory.size() / 9) * 19.7) - 3;
         ScreenRenderer.beginGL(0, 0);
         {
             ScreenRenderer.scale(0.9f);
@@ -90,39 +94,52 @@ public class RarityOverlayListener {
                 continue;
             }
             ItemRarity itemRarity = ItemRarity.getByItemStack(itemStack);
-            if (itemRarity != null) {
-                switch (itemRarity) {
-                    case COMMON:
-                        if (!DRSettings.GLOWING_RARITIES_COMMON.get(boolean.class)) {
-                            continue;
-                        }
-                        break;
-                    case UNCOMMON:
-                        if (!DRSettings.GLOWING_RARITIES_UNCOMMON.get(boolean.class)) {
-                            continue;
-                        }
-                        break;
-                    case RARE:
-                        if (!DRSettings.GLOWING_RARITIES_RARE.get(boolean.class)) {
-                            continue;
-                        }
-                        break;
-                    case EPIC:
-                        if (!DRSettings.GLOWING_RARITIES_EPIC.get(boolean.class)) {
-                            continue;
-                        }
-                        break;
-                    case LEGENDARY:
-                        if (!DRSettings.GLOWING_RARITIES_LEGENDARY.get(boolean.class)) {
-                            continue;
-                        }
-                        break;
+            boolean mythic = ItemUtils.isMythic(itemStack);
+
+            if (itemRarity != null || mythic) {
+                if (itemRarity != null) {
+                    switch (itemRarity) {
+                        case COMMON:
+                            if (!DRSettings.GLOWING_RARITIES_COMMON.get(boolean.class)) {
+                                continue;
+                            }
+                            break;
+                        case UNCOMMON:
+                            if (!DRSettings.GLOWING_RARITIES_UNCOMMON.get(boolean.class)) {
+                                continue;
+                            }
+                            break;
+                        case RARE:
+                            if (!DRSettings.GLOWING_RARITIES_RARE.get(boolean.class)) {
+                                continue;
+                            }
+                            break;
+                        case EPIC:
+                            if (!DRSettings.GLOWING_RARITIES_EPIC.get(boolean.class)) {
+                                continue;
+                            }
+                            break;
+                        case LEGENDARY:
+                            if (!DRSettings.GLOWING_RARITIES_LEGENDARY.get(boolean.class)) {
+                                continue;
+                            }
+                            break;
+                    }
                 }
 
-                r = itemRarity.getRgbaColor().r;
-                g = itemRarity.getRgbaColor().g;
-                b = itemRarity.getRgbaColor().b;
-                renderItemOverlay(r, g, b, slot.xPos, slot.yPos);
+                if (mythic) {
+                    if (!DRSettings.GLOWING_RARITIES_MYTHIC.get(boolean.class)) {
+                        itemRarity = null;
+                    } else {
+                        itemRarity = ItemRarity.MYTHIC;
+                    }
+                }
+                if (itemRarity != null) {
+                    r = itemRarity.getRgbaColor().r;
+                    g = itemRarity.getRgbaColor().g;
+                    b = itemRarity.getRgbaColor().b;
+                    renderItemOverlay(r, g, b, slot.xPos, slot.yPos);
+                }
             }
         }
     }

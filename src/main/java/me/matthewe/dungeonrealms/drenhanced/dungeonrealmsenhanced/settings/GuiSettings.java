@@ -2,6 +2,7 @@ package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings;
 
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.Module;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.Modules;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.buff.BuffModule;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.profession.ProfessionModule;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.treasurescroll.TreasureScrollModule;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.render.RenderUtils;
@@ -98,6 +99,12 @@ public class GuiSettings extends GuiScreen {
             } else if (module instanceof ProfessionModule) {
                 ProfessionModule professionModule = (ProfessionModule) module;
                 if (professionModule.isMouseWithin(x, y)) {
+                    selectModule(module, x, y);
+                    foundModule = true;
+                }
+            }else if (module instanceof BuffModule) {
+                BuffModule buffModule = (BuffModule) module;
+                if (buffModule.isMouseWithin(x, y)) {
                     selectModule(module, x, y);
                     foundModule = true;
                 }

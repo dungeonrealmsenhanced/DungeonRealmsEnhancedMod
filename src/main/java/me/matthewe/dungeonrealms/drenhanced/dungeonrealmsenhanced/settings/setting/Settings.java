@@ -57,4 +57,6 @@ public class Settings {
         categoryMap.put(category, new SettingCategory(category));
         return categoryMap.get(category);
     }
+
+
 }

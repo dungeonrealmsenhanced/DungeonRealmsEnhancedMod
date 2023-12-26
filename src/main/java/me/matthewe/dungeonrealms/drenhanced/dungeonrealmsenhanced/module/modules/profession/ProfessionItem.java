@@ -108,11 +108,11 @@ public class ProfessionItem {
     public static ProfessionItem of(ItemStack itemStack) {
         if (ItemType.isProfessionItem(itemStack) && itemStack.hasTagCompound() && (itemStack.getTagCompound() != null)) {
             NBTTagCompound tagCompound = itemStack.getTagCompound();
-            Map<String, int[]> modifierMap = ItemUtils.getModifierMap(itemStack);
+            Map<String, double[]> modifierMap = ItemUtils.getModifierMap(itemStack);
 
             Map<String, Integer> enchants = new ConcurrentHashMap<>();
             if ((modifierMap != null) && !modifierMap.isEmpty()) {
-                modifierMap.forEach((s, ints) -> enchants.put(s, ints[0]));
+                modifierMap.forEach((s, ints) -> enchants.put(s, (int) ints[0]));
             }
             int level = tagCompound.hasKey("level") ? tagCompound.getInteger("level") : 0;
             int experience = tagCompound.hasKey("xp") ? tagCompound.getInteger("xp") : 0;

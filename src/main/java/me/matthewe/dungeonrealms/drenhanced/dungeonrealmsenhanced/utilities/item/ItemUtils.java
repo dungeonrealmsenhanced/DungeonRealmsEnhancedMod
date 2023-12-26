@@ -1,5 +1,6 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item;
 
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.NumberUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.init.Items;
@@ -51,8 +52,8 @@ public class ItemUtils {
         return ItemRarity.getByName(NbtTagUtils.getString("rarity", itemStack));
     }
 
-    public static Map<String, int[]> getModifierMap(ItemStack itemStack) {
-        Map<String, int[]> modifierMap = new ConcurrentHashMap<>();
+    public static Map<String, double[]> getModifierMap(ItemStack itemStack) {
+        Map<String, double[]> modifierMap = new ConcurrentHashMap<>();
         if ((itemStack.getItem() != Items.AIR) && itemStack.hasDisplayName() && itemStack.hasTagCompound()) {
             NBTTagCompound tagCompound = itemStack.getTagCompound();
             if (tagCompound == null) {
@@ -65,15 +66,16 @@ public class ItemUtils {
                     String trim = s1.split("\\[")[1].trim().split("\\]")[0].trim();
                     if (trim.contains(",")) {
                         String[] split = trim.split(",");
-                        int[] ints = new int[split.length];
+                        double[] ints = new double[split.length];
                         for (int i = 0; i < split.length; i++) {
                             String s2 = split[i];
-                            ints[i] = Integer.parseInt(s2.trim());
+                            ints[i] = NumberUtils.getNumber(s2.trim());
                         }
                         modifierMap.put(s, ints);
                     } else {
-                        int[] ints = new int[1];
-                        ints[0] = Integer.parseInt(trim.trim());
+
+                        double[] ints = new double[1];
+                        ints[0] = NumberUtils.getNumber(trim.trim());
                         modifierMap.put(s, ints);
                     }
                 }

@@ -34,14 +34,14 @@ public class NewLoreListener implements Listener {
             if (tagCompound == null) {
                 return;
             }
-            Map<String, int[]> modifierMap = ItemUtils.getModifierMap(itemStack);
+            Map<String, double[]> modifierMap = ItemUtils.getModifierMap(itemStack);
             if (modifierMap == null) {
                 return;
             }
 
 
             if (GuiScreen.isCtrlKeyDown() && GuiScreen.isAltKeyDown()) {
-                for (Map.Entry<String, int[]> stringEntry : modifierMap.entrySet()) {
+                for (Map.Entry<String, double[]> stringEntry : modifierMap.entrySet()) {
 
                     TextComponentString component = new TextComponentString(stringEntry.getKey());
                     Style style = component.getStyle();
@@ -49,8 +49,8 @@ public class NewLoreListener implements Listener {
                     style.setUnderlined(true);
                     style.setBold(true);
                     String intsString = "";
-                    for (int i : stringEntry.getValue()) {
-                        intsString += "" + TextFormatting.AQUA + i + "\n";
+                    for (double i : stringEntry.getValue()) {
+                        intsString += "" + TextFormatting.AQUA + (int)i + "\n";
                     }
 
 
@@ -63,9 +63,9 @@ public class NewLoreListener implements Listener {
                 int minDamage = 0;
                 int maxDamage = 0;
                 if (modifierMap.containsKey("MELEE_DAMAGE")) {
-                    int[] ints = modifierMap.get("MELEE_DAMAGE");
-                    minDamage = ints[0];
-                    maxDamage = ints[1];
+                    double[] ints = modifierMap.get("MELEE_DAMAGE");
+                    minDamage = (int) ints[0];
+                    maxDamage = (int) ints[1];
                     modifierMap.remove("MELEE_DAMAGE");
                 }
                 int plus = 0;
@@ -99,8 +99,8 @@ public class NewLoreListener implements Listener {
                     modifierMap.remove("PURE_DAMAGE");
                 }
                 newLore.add(" ");
-                for (Map.Entry<String, int[]> stringEntry : modifierMap.entrySet()) {
-                    int[] value = stringEntry.getValue();
+                for (Map.Entry<String, double[]> stringEntry : modifierMap.entrySet()) {
+                    double[] value = stringEntry.getValue();
                     String valueString = "";
                     if (value.length == 1) {
                         valueString = value[0] + "%";

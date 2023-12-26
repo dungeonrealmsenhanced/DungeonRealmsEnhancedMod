@@ -143,13 +143,13 @@ public class MiningListener implements Listener {
                 NBTTagCompound tagCompound = itemStack.getTagCompound();
                 if (ItemType.isWeapon(itemStack)) {
                     newToolTip.add(itemStack.getDisplayName());
-                    Map<String, int[]> modifierMap = ItemUtils.getModifierMap(itemStack);
+                    Map<String, double[]> modifierMap = ItemUtils.getModifierMap(itemStack);
                     int minDamage = 0;
                     int maxDamage = 0;
                     if (modifierMap.containsKey("MELEE_DAMAGE")) {
-                        int[] ints = modifierMap.get("MELEE_DAMAGE");
-                        minDamage = ints[0];
-                        maxDamage = ints[1];
+                        double[] ints = modifierMap.get("MELEE_DAMAGE");
+                        minDamage = (int) ints[0];
+                        maxDamage = (int) ints[1];
                         modifierMap.remove("MELEE_DAMAGE");
                     }
                     int plus = 0;
@@ -187,8 +187,8 @@ public class MiningListener implements Listener {
                         newToolTip.add(" ");
                         modifierMap.remove("PURE_DAMAGE");
                     }
-                    for (Map.Entry<String, int[]> stringEntry : modifierMap.entrySet()) {
-                        int[] value = stringEntry.getValue();
+                    for (Map.Entry<String, double[]> stringEntry : modifierMap.entrySet()) {
+                        double[] value = stringEntry.getValue();
                         String valueString = "";
                         if (value.length == 1) {
                             valueString = value[0] + "%";

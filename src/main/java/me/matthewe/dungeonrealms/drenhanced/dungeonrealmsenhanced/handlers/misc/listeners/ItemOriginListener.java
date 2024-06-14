@@ -68,7 +68,6 @@ public class ItemOriginListener implements Listener {
                         displayToolTip = true;
                     } else if (origin.equalsIgnoreCase("Loot Chest")) {
 
-                        toolTip.add(TextFormatting.GRAY + " Location" + TextFormatting.WHITE + ": " +StringUtils.formatDungeon(split[0].trim()));
                         displayToolTip = true;
                     }else if (origin.startsWith("Dungeon Reward")) {
                         String trim = origin.split("Dungeon Reward \\(")[1].trim().split("\\)")[0].trim();

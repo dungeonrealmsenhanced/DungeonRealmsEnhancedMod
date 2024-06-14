@@ -62,6 +62,7 @@ public class DREnhanced {
             "56a838cd-afd8-4e30-a34f-822e936eb949"
     };
 
+
     public static boolean isDeveloper() {
         for (String developer : DEVELOPERS) {
             if (Minecraft.getMinecraft().player != null && Minecraft.getMinecraft().player.getUniqueID().toString().equalsIgnoreCase(developer)) {

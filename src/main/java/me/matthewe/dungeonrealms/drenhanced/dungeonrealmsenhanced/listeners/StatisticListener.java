@@ -15,6 +15,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by Matthew E on 12/31/2018 at 2:39 PM for the project DungeonRealmsDREnhanced
  */
@@ -86,6 +88,17 @@ public class StatisticListener {
         return playing;
     }
 
+    private long lastExecutionTime = 0;
+    @SubscribeEvent
+    public void onClientTick(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            long currentTime = System.currentTimeMillis();
+            if (currentTime - lastExecutionTime >= TimeUnit.MINUTES.toMillis(5)) { // 60,000 milliseconds = 1 minute
+                DREnhanced.saveModuleSettings();
+                lastExecutionTime = currentTime;
+            }
+        }
+    }
     @SubscribeEvent
     public void onPlayerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
         playing = false;
@@ -100,7 +113,7 @@ public class StatisticListener {
             statisticTracker.setRunning(false);
         }
 
-        DREnhanced.INSTANCE.saveModuleSettings();
+        DREnhanced.saveModuleSettings();
     }
 
 }

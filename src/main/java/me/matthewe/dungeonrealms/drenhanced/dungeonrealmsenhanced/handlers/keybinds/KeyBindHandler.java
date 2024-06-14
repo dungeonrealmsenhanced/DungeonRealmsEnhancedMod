@@ -8,9 +8,15 @@ import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.keybi
  */
 public class KeyBindHandler extends Handler {
     public KeyBinds keyBinds;
+    private static KeyBindHandler instance;
+
+    public static KeyBindHandler getInstance() {
+        return instance;
+    }
 
     public KeyBindHandler() {
         super(true);
+        instance=this;
     }
 
     @Override

@@ -1,5 +1,7 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities;
 
+import net.minecraft.util.text.TextFormatting;
+
 /**
  * Created by Matthew E on 3/10/2019 at 5:37 PM for the project DungeonRealmsDREnhanced
  */
@@ -8,7 +10,20 @@ public class StringUtils {
         return shard.toUpperCase().replaceAll("US", "US-").replaceAll("SUB", "SUB-").replaceAll("EU", "EU-").replaceAll("BS", "BS-");
     }
     public static String formatDungeon(String dungeon) {
-        return formatEnum(dungeon).trim();
+        String dungeonName = formatEnum(dungeon).trim();
+        if (dungeonName.equalsIgnoreCase("Varenglade")) {
+            return TextFormatting.AQUA+dungeonName;
+        }
+        if (dungeonName.equalsIgnoreCase("Infernal Abyss")) {
+            return TextFormatting.LIGHT_PURPLE+dungeonName;
+        }
+        if (dungeonName.equalsIgnoreCase("Crystal Void")) {
+            return TextFormatting.YELLOW+dungeonName;
+        }
+        if (dungeonName.equalsIgnoreCase("Conjurers Chapel")) {
+            return TextFormatting.GREEN+dungeonName;
+        }
+        return dungeonName;
     }
 
     public static String formatTime(int seconds) {

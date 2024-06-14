@@ -18,6 +18,15 @@ public class DREnhancedRestful {
     private DREnhancedInformation information;
 
     public DREnhancedRestful() {
+        information=new DREnhancedInformation("1.1", new DREnhancedInformation.Developer[]{new DREnhancedInformation.Developer("1d48bd80-4cd0-4874-ba65-94284bc24ecc","MatthewEDev", true)},
+                "N/A", Changelog.builder()
+                .date(1718996400000L) //Date of summer 2024 wipe
+                .version("1.1")
+                .changes(Change.builder()
+                        .title("Bug Fixes")
+                        .description("Fixed crashing issue", "Fixed debug spacing")
+                        .build())
+                .build()); //Hardcoded changelogs for now
     }
 
     public DREnhancedInformation getInformation() {
@@ -26,6 +35,7 @@ public class DREnhancedRestful {
 
     public void update(Consumer<DREnhancedInformation> consumer) {
 
+        /*RESTFUL SERVICE OFFLINE DO NOT ATTEMPT TO CONNECT*/
         Thread thread = new Thread(() -> {
             try {
                 String content = HttpUtils.getStringFromUrl("http://202.5.31.117:4569/drenhanced/info/" + Minecraft.getMinecraft().player.getName());

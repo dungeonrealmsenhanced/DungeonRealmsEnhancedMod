@@ -27,7 +27,7 @@ public class DRPlayerJsonAdapter implements JsonSerializer<DRPlayer>, JsonDeseri
         Location location = drPlayer.getLocation();
         String locationString = location.getX() + "," + location.getY() + "," + location.getZ() + "," + location.getYaw() + "," + location.getPitch();
         jsonObject.addProperty("location", locationString);
-
+ 
         JsonObject settingsJsonObject = new JsonObject();
 
         Settings settings = drPlayer.getSettings();

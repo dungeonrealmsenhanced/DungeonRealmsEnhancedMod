@@ -26,9 +26,9 @@ public class DREnhancedRestful {
 
     public void update(Consumer<DREnhancedInformation> consumer) {
 
-        (new Thread(() -> {
+        Thread thread = new Thread(() -> {
             try {
-                String content = HttpUtils.getStringFromUrl("http://202.5.31.117:4569/drenhanced/info/"+ Minecraft.getMinecraft().player.getName());
+                String content = HttpUtils.getStringFromUrl("http://202.5.31.117:4569/drenhanced/info/" + Minecraft.getMinecraft().player.getName());
                 if (content == null) {
                     consumer.accept(null);
                     return;
@@ -66,7 +66,7 @@ public class DREnhancedRestful {
                 Changelog changelog = null;
                 if (jsonObject.has("changelog")) {
                     JsonObject changelog1 = (JsonObject) jsonObject.get("changelog");
-                    long date = changelog1.has("date")?changelog1.get("date").getAsLong():-1L;
+                    long date = changelog1.has("date") ? changelog1.get("date").getAsLong() : -1L;
 
                     List<Change> changes = new ArrayList<>();
 
@@ -95,7 +95,8 @@ public class DREnhancedRestful {
                 var9.printStackTrace();
                 consumer.accept(null);
             }
-        })).start();
+        });
+        thread.start();//DISABLED HOST OFFLINE
 
     }
 }

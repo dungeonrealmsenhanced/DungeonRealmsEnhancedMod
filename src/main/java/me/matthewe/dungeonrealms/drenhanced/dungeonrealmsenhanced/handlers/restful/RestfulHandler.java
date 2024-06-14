@@ -19,8 +19,8 @@ public class RestfulHandler extends Handler {
     public void onEnable() {
 
         this.drEnhancedRestful = new DREnhancedRestful();
-        registerListener(new RestfulListener(this));
-        registerCommand(new ChangelogCommand(this));
+//        registerListener(new RestfulListener(this));
+//        registerCommand(new ChangelogCommand(this));
     }
 
     public DREnhancedRestful getDrEnhancedRestful() {

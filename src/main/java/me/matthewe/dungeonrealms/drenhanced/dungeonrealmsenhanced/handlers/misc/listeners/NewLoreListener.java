@@ -83,19 +83,15 @@ public class NewLoreListener implements Listener {
                     newLore.add(TextFormatting.GRAY + "Damage: " + TextFormatting.WHITE + minDamage + "-" + maxDamage);
                 }
                 if (modifierMap.containsKey("ICE_DAMAGE")) {
-//                    newLore.add(TextFormatting.AQUA + "❉ Ice " + TextFormatting.GRAY + "Damage: " + TextFormatting.AQUA + "+" + modifierMap.get("ICE_DAMAGE")[0]);
                     modifierMap.remove("ICE_DAMAGE");
                 }
                 if (modifierMap.containsKey("FIRE_DAMAGE")) {
-//                    newLore.add(TextFormatting.RED + "✹ Fire " + TextFormatting.GRAY + "Damage: " + TextFormatting.RED + "+" + modifierMap.get("FIRE_DAMAGE")[0]);
                     modifierMap.remove("FIRE_DAMAGE");
                 }
                 if (modifierMap.containsKey("POISON_DAMAGE")) {
-//                    newLore.add(TextFormatting.DARK_GREEN + "✤ Poison  " + TextFormatting.GRAY + "Damage: " + TextFormatting.DARK_GREEN + "+" + modifierMap.get("POISON_DAMAGE")[0]);
                     modifierMap.remove("POISON_DAMAGE");
                 }
                 if (modifierMap.containsKey("PURE_DAMAGE")) {
-//                    newLore.add(TextFormatting.GOLD + "✤ Pure  " + TextFormatting.GRAY + "Damage: " + TextFormatting.GOLD + "+" + modifierMap.get("PURE_DAMAGE")[0]);
                     modifierMap.remove("PURE_DAMAGE");
                 }
                 newLore.add(" ");

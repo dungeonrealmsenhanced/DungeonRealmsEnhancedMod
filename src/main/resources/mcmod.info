@@ -3,7 +3,7 @@
         "modid": "dungeonrealmsenhanced",
         "name": "DREnhanced",
         "description": "DREnhanced",
-        "version": "${version}",
+        "version": "1.1",
         "mcversion": "${mcversion}",
         "url": "",
         "updateUrl": "",

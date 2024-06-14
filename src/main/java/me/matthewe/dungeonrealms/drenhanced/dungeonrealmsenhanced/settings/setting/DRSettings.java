@@ -18,7 +18,7 @@ public enum DRSettings {
     MINING_EXP_PERCENTAGE("Mining XP Percentage", new String[]{"Enable EXP % in mining exp debug"}, DRSettingCategory.CHAT_MINING, false, boolean.class),
     MISC_PROFESSION_EXP("Used Profession EXP", new String[]{"Shows used experience bottle amount", "on profession items"}, DRSettingCategory.ITEMS_MISC, true, boolean.class),
     MISC_PROFESSION_PERCENT_LEFT("Next Tier EXP", new String[]{"Shows percentage until next profession tier", "on profession items"}, DRSettingCategory.ITEMS_MISC, true, boolean.class),
-    MISC_PROFESSION_ENCHANT_INFO("Show Enchant Info", new String[]{"Shows enchantment info", "Hold "+TextFormatting.GREEN+"Shift" +TextFormatting.GRAY + " over an item for more information."}, DRSettingCategory.ITEMS_MISC, false, boolean.class),
+//    MISC_PROFESSION_ENCHANT_INFO("Show Enchant Info", new String[]{"Shows enchantment info", "Hold "+TextFormatting.GREEN+"Shift" +TextFormatting.GRAY + " over an item for more information."}, DRSettingCategory.ITEMS_MISC, false, boolean.class),
     //    DISABLE_CLEAR_CHAT("Disable Clear Chat", new String[] {"Disables the clear chat for", "chat clears and the welcome message."}, DRSettingCategory.CHAT, true, boolean.class),
     GAMMA("Gamma", "Change brightness.", DRSettingCategory.MISC, 1.0D, double.class),
 //    DEV_MAX_EXP("Max Experience", "Max EXP.", DRSettingCategory.DEVELOPMENT, 100000, int.class),

@@ -63,7 +63,7 @@ public class RarityOverlayListener {
         GlStateManager.disableLighting();
         DecimalFormat decimalFormat = new DecimalFormat("#,###");
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1F);
-        int x = 130;
+        int x = 145;
         int gems = getGems();
         int y = (int) ((Minecraft.getMinecraft().player.inventory.mainInventory.size() / 9) * 19.7) - 3;
         ScreenRenderer.beginGL(0, 0);

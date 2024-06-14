@@ -42,13 +42,46 @@ public class ItemOriginListener implements Listener {
                         toolTip.add(TextFormatting.GRAY + " Date" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + dateString);
                         displayToolTip = true;
                     } else if (origin.startsWith("Altar")) {
-//                    String trim = origin.split("Altar \\(")[1].trim().split("\\)")[0].trim();
-
+                        String trim = origin.split("Altar \\(")[1].trim().split("\\)")[0].trim();
+                        String[] split = trim.split("/");
                         toolTip.add(TextFormatting.AQUA + TextFormatting.BOLD.toString() + "Altar");
-                        toolTip.add(TextFormatting.RED + TextFormatting.BOLD.toString() + "DISABLED");
-                        toolTip.add(origin);
-//                    toolTip.add(TextFormatting.GRAY + " Player" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + trim.split(", ")[0].trim());
-//                    toolTip.add(TextFormatting.GRAY + " Location" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + trim.split(",")[1].trim());
+//                        toolTip.add(TextFormatting.RED + TextFormatting.BOLD.toString() + "DISABLED");
+
+
+                        toolTip.add(TextFormatting.GRAY + " Player" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + split[0].trim());
+                        toolTip.add(TextFormatting.GRAY + " Location" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + split[1].trim());
+                        Date date = new Date(Long.parseLong(split[2]));
+                        String dateString = new SimpleDateFormat("M/d/yyyy h:mm a").format(date);
+                        toolTip.add(TextFormatting.GRAY + " Date" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + dateString);
+                        displayToolTip = true;
+                    }else if (origin.startsWith("Clue Scroll")) {
+                        String trim = origin.split("Clue Scroll \\(")[1].trim().split("\\)")[0].trim();
+                        String[] split = trim.split("/");
+                        toolTip.add(TextFormatting.AQUA + TextFormatting.BOLD.toString() + "Clue Scroll");
+//                        toolTip.add(TextFormatting.RED + TextFormatting.BOLD.toString() + "DISABLED");
+
+
+                        toolTip.add(TextFormatting.GRAY + " Player" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + split[0].trim());
+                        Date date = new Date(Long.parseLong(split[1]));
+                        String dateString = new SimpleDateFormat("M/d/yyyy h:mm a").format(date);
+                        toolTip.add(TextFormatting.GRAY + " Date" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + dateString);
+                        displayToolTip = true;
+                    } else if (origin.equalsIgnoreCase("Loot Chest")) {
+
+                        toolTip.add(TextFormatting.GRAY + " Location" + TextFormatting.WHITE + ": " +StringUtils.formatDungeon(split[0].trim()));
+                        displayToolTip = true;
+                    }else if (origin.startsWith("Dungeon Reward")) {
+                        String trim = origin.split("Dungeon Reward \\(")[1].trim().split("\\)")[0].trim();
+                        String[] split = trim.split("/");
+                        toolTip.add(TextFormatting.AQUA + TextFormatting.BOLD.toString() + "Dungeon Reward");
+//                        toolTip.add(TextFormatting.RED + TextFormatting.BOLD.toString() + "DISABLED");
+
+
+                        toolTip.add(TextFormatting.GRAY + " Dungeon" + TextFormatting.WHITE + ": " +StringUtils.formatDungeon(split[0].trim()));
+                        toolTip.add(TextFormatting.GRAY + " Player" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + split[1].trim());
+                        Date date = new Date(Long.parseLong(split[2]));
+                        String dateString = new SimpleDateFormat("M/d/yyyy h:mm a").format(date);
+                        toolTip.add(TextFormatting.GRAY + " Date" + TextFormatting.WHITE + ": " + TextFormatting.AQUA + dateString);
                         displayToolTip = true;
                     } else if (origin.startsWith("Merchant GUI")) {
                         String trim = origin.split("Merchant GUI\\(")[1].trim().split("\\)")[0].trim();
@@ -90,6 +123,7 @@ public class ItemOriginListener implements Listener {
                 }
             }
         } catch (Exception e) {
+            event.getToolTip().add(TextFormatting.RED+"ERROR (Please message .matthewe on discord)");
             e.printStackTrace();
         }
     }

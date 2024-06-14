@@ -31,8 +31,8 @@ public class DurabilityListener implements Listener {
             if (tagCompound == null) {
                 return;
             }
-            if (tagCompound.hasKey("RepairCost")) {
-                int repairCost = tagCompound.getInteger("RepairCost");
+            if (tagCompound.hasKey("durability")) {
+                int repairCost = tagCompound.getInteger("durability");
 
                 double percentage = ((double) repairCost * 100.0D) / 2500.0D;
                 String displayNameToolTip = toolTip.get(0);

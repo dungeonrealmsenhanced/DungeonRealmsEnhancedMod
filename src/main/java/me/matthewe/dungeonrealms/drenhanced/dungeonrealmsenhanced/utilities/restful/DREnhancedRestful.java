@@ -24,7 +24,7 @@ public class DREnhancedRestful {
                 .version("1.1")
                 .changes(Change.builder()
                         .title("Bug Fixes")
-                        .description("Fixed crashing issue", "Fixed debug spacing")
+                        .description("Fixed crashing issue", "Durability fixed", "Enchant info", "Inventory gem location")
                         .build())
                 .build()); //Hardcoded changelogs for now
     }

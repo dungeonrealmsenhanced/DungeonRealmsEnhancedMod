@@ -5,7 +5,10 @@ package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities;
  */
 public class StringUtils {
     public static String formatShard(String shard) {
-        return shard.toUpperCase().replaceAll("US", "US-").replaceAll("SUB", "SUB-").replaceAll("BS", "BS-");
+        return shard.toUpperCase().replaceAll("US", "US-").replaceAll("SUB", "SUB-").replaceAll("EU", "EU-").replaceAll("BS", "BS-");
+    }
+    public static String formatDungeon(String dungeon) {
+        return formatEnum(dungeon).trim();
     }
 
     public static String formatTime(int seconds) {

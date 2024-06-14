@@ -137,89 +137,89 @@ public class MiningListener implements Listener {
 
             }
 
-            if (NEW_LORE_ENABLED && DRSettings.MISC_PROFESSION_ENCHANT_INFO.get(boolean.class) && itemStack.hasDisplayName()) {
-//            if (false) {
-                List<String> newToolTip = new ArrayList<>();
-                NBTTagCompound tagCompound = itemStack.getTagCompound();
-                if (ItemType.isWeapon(itemStack)) {
-                    newToolTip.add(itemStack.getDisplayName());
-                    Map<String, double[]> modifierMap = ItemUtils.getModifierMap(itemStack);
-                    int minDamage = 0;
-                    int maxDamage = 0;
-                    if (modifierMap.containsKey("MELEE_DAMAGE")) {
-                        double[] ints = modifierMap.get("MELEE_DAMAGE");
-                        minDamage = (int) ints[0];
-                        maxDamage = (int) ints[1];
-                        modifierMap.remove("MELEE_DAMAGE");
-                    }
-                    int plus = 0;
-                    if (tagCompound.hasKey("enchant")) {
-                        plus = tagCompound.getInteger("enchant");
-                    }
-
-
-                    newToolTip.add(TextFormatting.RED + "DMG: " + minDamage + " - " + maxDamage);
-                    if (modifierMap.containsKey("ICE_DAMAGE")) {
-                        newToolTip.add(TextFormatting.RED + "ICE DMG: +" + modifierMap.get("ICE_DAMAGE")[0]);
-                        newToolTip.add(TextFormatting.GRAY + "Ice damage has a chance to to " + TextFormatting.BLUE + TextFormatting.BOLD.toString() + "FREEZE" + TextFormatting.GRAY + " opponents,");
-                        newToolTip.add(TextFormatting.GRAY + "Also ice damage increases damage by " + TextFormatting.BLUE + modifierMap.get("ICE_DAMAGE")[0] + TextFormatting.GRAY + ".");
-                        newToolTip.add(" ");
-                        modifierMap.remove("ICE_DAMAGE");
-                    }
-                    if (modifierMap.containsKey("FIRE_DAMAGE")) {
-                        newToolTip.add(TextFormatting.RED + "FIRE DMG: +" + modifierMap.get("FIRE_DAMAGE")[0]);
-                        newToolTip.add(TextFormatting.GRAY + "Fire damage has a chance to to " + TextFormatting.RED + TextFormatting.BOLD.toString() + "BURN" + TextFormatting.GRAY + " opponents,");
-                        newToolTip.add(TextFormatting.GRAY + "Also fire damage increases damage by " + TextFormatting.RED + TextFormatting.BOLD.toString() + modifierMap.get("FIRE_DAMAGE")[0] + TextFormatting.GRAY + ".");
-                        newToolTip.add(" ");
-                        modifierMap.remove("FIRE_DAMAGE");
-                    }
-                    if (modifierMap.containsKey("POISON_DAMAGE")) {
-                        newToolTip.add(TextFormatting.RED + "POISON DMG: +" + modifierMap.get("POISON_DAMAGE")[0]);
-                        newToolTip.add(TextFormatting.GRAY + "Poison damage has a chance to to " + TextFormatting.DARK_GREEN + TextFormatting.BOLD.toString() + "POISON" + TextFormatting.GRAY + " opponents,");
-                        newToolTip.add(TextFormatting.GRAY + "Also poison damage increases damage by " + TextFormatting.DARK_GREEN + TextFormatting.BOLD.toString() + modifierMap.get("POISON_DAMAGE")[0] + TextFormatting.GRAY + ".");
-                        newToolTip.add(" ");
-                        modifierMap.remove("POISON_DAMAGE");
-                    }
-                    if (modifierMap.containsKey("PURE_DAMAGE")) {
-                        newToolTip.add(TextFormatting.RED + "PURE DMG: +" + modifierMap.get("PURE_DAMAGE")[0]);
-                        newToolTip.add(TextFormatting.GRAY + "Pure damage " + TextFormatting.GOLD + TextFormatting.BOLD.toString() + "PENETRATES" + TextFormatting.GRAY + " your opponents armor,");
-                        newToolTip.add(TextFormatting.GRAY + "Also pure damage increases damage by " + TextFormatting.GOLD + TextFormatting.BOLD.toString() + modifierMap.get("PURE_DAMAGE")[0] + TextFormatting.GRAY + ".");
-                        newToolTip.add(" ");
-                        modifierMap.remove("PURE_DAMAGE");
-                    }
-                    for (Map.Entry<String, double[]> stringEntry : modifierMap.entrySet()) {
-                        double[] value = stringEntry.getValue();
-                        String valueString = "";
-                        if (value.length == 1) {
-                            valueString = value[0] + "%";
-                        } else {
-                            valueString = value[0] + " - " + value[1];
-                        }
-                        if (stringEntry.getKey().equalsIgnoreCase("CRITICAL_HIT")) {
-                            newToolTip.add(TextFormatting.RED + "CRITICAL HIT: " + value[0] + "%");
-                            newToolTip.add(TextFormatting.GRAY + "Critical hit has a chance to " + TextFormatting.YELLOW + TextFormatting.BOLD.toString() + "DOUBLE " + TextFormatting.GRAY + "damage.");
-                            newToolTip.add(" ");
-                        } else if (stringEntry.getKey().equalsIgnoreCase("")) {
-
-                        } else {
-
-                            newToolTip.add(TextFormatting.RED + new String(stringEntry.getKey()).replaceAll("_", " ").toUpperCase() + ": " + valueString);
-                            newToolTip.add(TextFormatting.GRAY + stringEntry.getKey());
-                        }
-                        newToolTip.add(" ");
-                    }
-
-
-                }
-
-                if (GuiScreen.isShiftKeyDown()) {
-                    if (!newToolTip.isEmpty()) {
-                        event.getToolTip().clear();
-                        event.getToolTip().addAll(newToolTip);
-                    }
-                }
-
-            }
+//            if (NEW_LORE_ENABLED && DRSettings.MISC_PROFESSION_ENCHANT_INFO.get(boolean.class) && itemStack.hasDisplayName()) {
+////            if (false) {
+//                List<String> newToolTip = new ArrayList<>();
+//                NBTTagCompound tagCompound = itemStack.getTagCompound();
+//                if (ItemType.isWeapon(itemStack)) {
+//                    newToolTip.add(itemStack.getDisplayName());
+//                    Map<String, double[]> modifierMap = ItemUtils.getModifierMap(itemStack);
+//                    int minDamage = 0;
+//                    int maxDamage = 0;
+//                    if (modifierMap.containsKey("MELEE_DAMAGE")) {
+//                        double[] ints = modifierMap.get("MELEE_DAMAGE");
+//                        minDamage = (int) ints[0];
+//                        maxDamage = (int) ints[1];
+//                        modifierMap.remove("MELEE_DAMAGE");
+//                    }
+//                    int plus = 0;
+//                    if (tagCompound.hasKey("enchant")) {
+//                        plus = tagCompound.getInteger("enchant");
+//                    }
+//
+//
+//                    newToolTip.add(TextFormatting.RED + "DMG: " + minDamage + " - " + maxDamage);
+//                    if (modifierMap.containsKey("ICE_DAMAGE")) {
+//                        newToolTip.add(TextFormatting.RED + "ICE DMG: +" + modifierMap.get("ICE_DAMAGE")[0]);
+//                        newToolTip.add(TextFormatting.GRAY + "Ice damage has a chance to to " + TextFormatting.BLUE + TextFormatting.BOLD.toString() + "FREEZE" + TextFormatting.GRAY + " opponents,");
+//                        newToolTip.add(TextFormatting.GRAY + "Also ice damage increases damage by " + TextFormatting.BLUE + modifierMap.get("ICE_DAMAGE")[0] + TextFormatting.GRAY + ".");
+//                        newToolTip.add(" ");
+//                        modifierMap.remove("ICE_DAMAGE");
+//                    }
+//                    if (modifierMap.containsKey("FIRE_DAMAGE")) {
+//                        newToolTip.add(TextFormatting.RED + "FIRE DMG: +" + modifierMap.get("FIRE_DAMAGE")[0]);
+//                        newToolTip.add(TextFormatting.GRAY + "Fire damage has a chance to to " + TextFormatting.RED + TextFormatting.BOLD.toString() + "BURN" + TextFormatting.GRAY + " opponents,");
+//                        newToolTip.add(TextFormatting.GRAY + "Also fire damage increases damage by " + TextFormatting.RED + TextFormatting.BOLD.toString() + modifierMap.get("FIRE_DAMAGE")[0] + TextFormatting.GRAY + ".");
+//                        newToolTip.add(" ");
+//                        modifierMap.remove("FIRE_DAMAGE");
+//                    }
+//                    if (modifierMap.containsKey("POISON_DAMAGE")) {
+//                        newToolTip.add(TextFormatting.RED + "POISON DMG: +" + modifierMap.get("POISON_DAMAGE")[0]);
+//                        newToolTip.add(TextFormatting.GRAY + "Poison damage has a chance to to " + TextFormatting.DARK_GREEN + TextFormatting.BOLD.toString() + "POISON" + TextFormatting.GRAY + " opponents,");
+//                        newToolTip.add(TextFormatting.GRAY + "Also poison damage increases damage by " + TextFormatting.DARK_GREEN + TextFormatting.BOLD.toString() + modifierMap.get("POISON_DAMAGE")[0] + TextFormatting.GRAY + ".");
+//                        newToolTip.add(" ");
+//                        modifierMap.remove("POISON_DAMAGE");
+//                    }
+//                    if (modifierMap.containsKey("PURE_DAMAGE")) {
+//                        newToolTip.add(TextFormatting.RED + "PURE DMG: +" + modifierMap.get("PURE_DAMAGE")[0]);
+//                        newToolTip.add(TextFormatting.GRAY + "Pure damage " + TextFormatting.GOLD + TextFormatting.BOLD.toString() + "PENETRATES" + TextFormatting.GRAY + " your opponents armor,");
+//                        newToolTip.add(TextFormatting.GRAY + "Also pure damage increases damage by " + TextFormatting.GOLD + TextFormatting.BOLD.toString() + modifierMap.get("PURE_DAMAGE")[0] + TextFormatting.GRAY + ".");
+//                        newToolTip.add(" ");
+//                        modifierMap.remove("PURE_DAMAGE");
+//                    }
+//                    for (Map.Entry<String, double[]> stringEntry : modifierMap.entrySet()) {
+//                        double[] value = stringEntry.getValue();
+//                        String valueString = "";
+//                        if (value.length == 1) {
+//                            valueString = value[0] + "%";
+//                        } else {
+//                            valueString = value[0] + " - " + value[1];
+//                        }
+//                        if (stringEntry.getKey().equalsIgnoreCase("CRITICAL_HIT")) {
+//                            newToolTip.add(TextFormatting.RED + "CRITICAL HIT: " + value[0] + "%");
+//                            newToolTip.add(TextFormatting.GRAY + "Critical hit has a chance to " + TextFormatting.YELLOW + TextFormatting.BOLD.toString() + "DOUBLE " + TextFormatting.GRAY + "damage.");
+//                            newToolTip.add(" ");
+//                        } else if (stringEntry.getKey().equalsIgnoreCase("")) {
+//
+//                        } else {
+//
+//                            newToolTip.add(TextFormatting.RED + new String(stringEntry.getKey()).replaceAll("_", " ").toUpperCase() + ": " + valueString);
+//                            newToolTip.add(TextFormatting.GRAY + stringEntry.getKey());
+//                        }
+//                        newToolTip.add(" ");
+//                    }
+//
+//
+//                }
+//
+//                if (GuiScreen.isShiftKeyDown()) {
+//                    if (!newToolTip.isEmpty()) {
+//                        event.getToolTip().clear();
+//                        event.getToolTip().addAll(newToolTip);
+//                    }
+//                }
+//
+//            }
         }
     }
 

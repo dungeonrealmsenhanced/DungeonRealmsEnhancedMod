@@ -12,9 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
+import java.util.*;
 
 public class ArmorTooltipCompare {
 
@@ -51,7 +49,7 @@ public class ArmorTooltipCompare {
         addedBeginningText = false;
 
         tooltips.add("");
-        tooltips.add(TextFormatting.DARK_GRAY + TextFormatting.STRIKETHROUGH.toString()+ "────────── " + TextFormatting.GOLD + "Comparison" + TextFormatting.DARK_GRAY + TextFormatting.STRIKETHROUGH.toString()+ " ──────────");
+        tooltips.add(TextFormatting.DARK_GRAY + "────────── " +TextFormatting.STRIKETHROUGH  + TextFormatting.GOLD + "Comparison" + TextFormatting.DARK_GRAY +TextFormatting.STRIKETHROUGH+ " ──────────");
 
         // Equipped Item
         tooltips.add(TextFormatting.GRAY + "⚔ " + TextFormatting.BOLD + "Equipped: " + (equippedStacks != null ? equippedStacks.getDisplayName() : "None"));
@@ -62,42 +60,29 @@ public class ArmorTooltipCompare {
         tooltips.add(TextFormatting.GRAY + "🛡 " + TextFormatting.BOLD + "Item: " + tooltipStack.getDisplayName());
         tooltips.add(getTierString(tooltipStack));
 
-        // Compare Attributes (Show only new & removed stats)
-        Set<String> equippedStats = new HashSet<>(equippedAttributes.getAttributes());
-        Set<String> hoveredStats = new HashSet<>(itemAttributes.getAttributes());
+        // Compare Attributes (Properly handle additions, removals, and changes)
+        Set<String> allStats = new HashSet<>();
+        allStats.addAll(equippedAttributes.getAttributes());
+        allStats.addAll(itemAttributes.getAttributes());
 
-        for (String stat : hoveredStats) {
-            if (!equippedStats.contains(stat)) { // Newly added stats
-                createTooltip(stat, tooltips, itemAttributes, equippedAttributes, false);
+        for (String stat : allStats) {
+            double equippedValue = equippedAttributes.getCompareValue(stat);
+            double hoveredValue = itemAttributes.getCompareValue(stat);
+
+            if (equippedValue == hoveredValue) continue; // Ignore if no change
+
+            if (equippedValue == 0) { // Stat is newly added
+                tooltips.add(TextFormatting.GREEN + "✔ +" + (int) hoveredValue + " " + stat);
+            } else if (hoveredValue == 0) { // Stat is removed
+                tooltips.add(TextFormatting.RED + "" + TextFormatting.STRIKETHROUGH + "✖ " + stat);
+            } else { // Stat changed
+                String color = hoveredValue > equippedValue ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
+                String sign = hoveredValue > equippedValue ? "+" : "-";
+                tooltips.add(color + "✔ " + sign + (int) Math.abs(hoveredValue - equippedValue) + " " + stat);
             }
         }
 
-        for (String stat : equippedStats) {
-            if (!hoveredStats.contains(stat)) { // Removed stats
-                createTooltip(stat, tooltips, itemAttributes, equippedAttributes, true);
-            }
-        }
-
-        tooltips.add(TextFormatting.DARK_GRAY + TextFormatting.STRIKETHROUGH.toString()+ "────────────────────────────");
-    }
-
-    public void createTooltip(String currentAttribute, List<String> tooltips, ItemAttributes tooltipAttributes, ItemAttributes equippedAttributes, boolean isRemoved) {
-        String tooltipName = equippedAttributes.getCompareName(currentAttribute);
-        double modEquippedValue = equippedAttributes.getCompareValue(currentAttribute);
-        double modTooltipValue = tooltipAttributes.getCompareValue(currentAttribute);
-
-        if (!addedBeginningText) {
-            tooltips.add("");
-            addedBeginningText = true;
-        }
-
-        if (isRemoved) {
-            tooltips.add(TextFormatting.RED + "" + TextFormatting.STRIKETHROUGH + "✖ " + tooltipName);
-        } else {
-            String color = modTooltipValue > modEquippedValue ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
-            String sign = modTooltipValue > modEquippedValue ? "+" : "-";
-            tooltips.add(color + "✔ " + sign + (int)Math.abs(modTooltipValue - modEquippedValue) + " " + tooltipName);
-        }
+        tooltips.add(TextFormatting.DARK_GRAY +TextFormatting.STRIKETHROUGH.toString()+ "────────────────────────────");
     }
 
     private String getTierString(ItemStack item) {

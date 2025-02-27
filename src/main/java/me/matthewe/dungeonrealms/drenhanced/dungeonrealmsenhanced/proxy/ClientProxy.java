@@ -1,5 +1,6 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.proxy;
 
+import clutch.dungeonrealms.DungeonRealmsMod;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.commands.CommandInfo;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.commands.ZoneCommand;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.Handlers;
@@ -32,12 +33,14 @@ public class ClientProxy implements IProxy {
         MinecraftForge.EVENT_BUS.register(new ItemCheckerListener());
         MinecraftForge.EVENT_BUS.register(new RarityOverlayListener());
         MinecraftForge.EVENT_BUS.register(new MenuReplacerListener());
-//        MinecraftForge.EVENT_BUS.register(new PacketInterceptorListener());
+        MinecraftForge.EVENT_BUS.register(new PacketSwingDetector());
+        DungeonRealmsMod.init();
 
         Handlers.init();
         Handlers.enableHandlers();
 
     }
+
 
     @Override
     public void init(FMLInitializationEvent event) {

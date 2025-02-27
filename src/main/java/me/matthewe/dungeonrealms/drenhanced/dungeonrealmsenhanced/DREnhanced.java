@@ -38,7 +38,8 @@ import java.util.Date;
 @Mod(
         modid = DREnhanced.MOD_ID,
         name = DREnhanced.MOD_NAME,
-        version = DREnhanced.VERSION
+        version = DREnhanced.VERSION,
+        clientSideOnly = true
 )
 public class DREnhanced {
     @SidedProxy(

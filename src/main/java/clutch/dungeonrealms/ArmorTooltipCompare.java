@@ -83,8 +83,8 @@ public class ArmorTooltipCompare {
 
     public void createTooltip(String currentAttribute, List<String> tooltips, ItemAttributes tooltipAttributes, ItemAttributes equippedAttributes, boolean isRemoved) {
         String tooltipName = equippedAttributes.getCompareName(currentAttribute);
-        int modEquippedValue = equippedAttributes.getCompareValue(currentAttribute);
-        int modTooltipValue = tooltipAttributes.getCompareValue(currentAttribute);
+        double modEquippedValue = equippedAttributes.getCompareValue(currentAttribute);
+        double modTooltipValue = tooltipAttributes.getCompareValue(currentAttribute);
 
         if (!addedBeginningText) {
             tooltips.add("");
@@ -96,7 +96,7 @@ public class ArmorTooltipCompare {
         } else {
             String color = modTooltipValue > modEquippedValue ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
             String sign = modTooltipValue > modEquippedValue ? "+" : "-";
-            tooltips.add(color + "✔ " + sign + Math.abs(modTooltipValue - modEquippedValue) + " " + tooltipName);
+            tooltips.add(color + "✔ " + sign + (int)Math.abs(modTooltipValue - modEquippedValue) + " " + tooltipName);
         }
     }
 

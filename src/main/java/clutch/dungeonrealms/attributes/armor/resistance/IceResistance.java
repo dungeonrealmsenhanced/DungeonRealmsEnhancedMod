@@ -6,15 +6,15 @@ import net.minecraft.item.ItemStack;
 
 public class IceResistance extends Attribute {
 
-    private int iceResistance = 0;
+    private double iceResistance = 0;
 
     @Override
     public void updateInfo(ItemStack stack) {
-        this.iceResistance = ArmorUtils.getIntListFromList(stack, getCompare()).get(0);
+        this.iceResistance = ArmorUtils.getDoubleListFromList(stack, getCompare()).get(0);
     }
 
     @Override
-    public int getCompareValue() {
+    public double getCompareValue() {
         return iceResistance;
     }
 

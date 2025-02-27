@@ -6,15 +6,15 @@ import net.minecraft.item.ItemStack;
 
 public class Block extends Attribute {
 
-    private int block = 0;
+    private double block = 0;
 
     @Override
     public void updateInfo(ItemStack stack) {
-        this.block = ArmorUtils.getIntListFromList(stack, getCompare()).get(0);
+        this.block = ArmorUtils.getDoubleListFromList(stack, getCompare()).get(0);
     }
 
     @Override
-    public int getCompareValue() {
+    public double getCompareValue() {
         return block;
     }
 

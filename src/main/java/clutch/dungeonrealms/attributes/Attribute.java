@@ -5,7 +5,7 @@ import net.minecraft.item.ItemStack;
 public abstract class Attribute {
 
     public abstract void updateInfo(ItemStack stack);
-    public abstract int getCompareValue();
+    public abstract double getCompareValue();
 
     public abstract String getCompare();
     public abstract String getTooltipName();

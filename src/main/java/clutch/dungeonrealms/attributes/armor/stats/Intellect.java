@@ -6,15 +6,15 @@ import net.minecraft.item.ItemStack;
 
 public class Intellect extends Attribute {
 
-    private int intellect = 0;
+    private double intellect = 0;
 
     @Override
     public void updateInfo(ItemStack stack) {
-        this.intellect = ArmorUtils.getIntListFromList(stack, getCompare()).get(0);
+        this.intellect = ArmorUtils.getDoubleListFromList(stack, getCompare()).get(0);
     }
 
     @Override
-    public int getCompareValue() {
+    public double getCompareValue() {
         return intellect;
     }
 

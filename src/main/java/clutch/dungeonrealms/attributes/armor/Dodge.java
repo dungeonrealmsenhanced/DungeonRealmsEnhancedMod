@@ -6,15 +6,15 @@ import net.minecraft.item.ItemStack;
 
 public class Dodge extends Attribute {
 
-    private int dodge = 0;
+    private double dodge = 0;
 
     @Override
     public void updateInfo(ItemStack stack) {
-        this.dodge = ArmorUtils.getIntListFromList(stack, getCompare()).get(0);
+        this.dodge = ArmorUtils.getDoubleListFromList(stack, getCompare()).get(0);
     }
 
     @Override
-    public int getCompareValue() {
+    public double getCompareValue() {
         return dodge;
     }
 

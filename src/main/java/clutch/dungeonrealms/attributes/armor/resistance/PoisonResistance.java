@@ -6,15 +6,15 @@ import net.minecraft.item.ItemStack;
 
 public class PoisonResistance extends Attribute {
 
-    private int poisonResistance = 0;
+    private double poisonResistance = 0;
 
     @Override
     public void updateInfo(ItemStack stack) {
-        this.poisonResistance = ArmorUtils.getIntListFromList(stack, getCompare()).get(0);
+        this.poisonResistance = ArmorUtils.getDoubleListFromList(stack, getCompare()).get(0);
     }
 
     @Override
-    public int getCompareValue() {
+    public double getCompareValue() {
         return poisonResistance;
     }
 

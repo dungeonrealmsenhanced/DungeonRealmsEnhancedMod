@@ -6,15 +6,15 @@ import net.minecraft.item.ItemStack;
 
 public class Healing extends Attribute {
 
-    private int healing = 0;
+    private double healing = 0;
 
     @Override
     public void updateInfo(ItemStack stack) {
-        this.healing = ArmorUtils.getIntListFromList(stack, getCompare()).get(0);
+        this.healing = ArmorUtils.getDoubleListFromList(stack, getCompare()).get(0);
     }
 
     @Override
-    public int getCompareValue() {
+    public double getCompareValue() {
         return healing;
     }
 

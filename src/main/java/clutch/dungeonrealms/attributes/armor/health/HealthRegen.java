@@ -6,15 +6,15 @@ import net.minecraft.item.ItemStack;
 
 public class HealthRegen extends Attribute {
 
-    private int healthRegen = 0;
+    private double healthRegen = 0;
 
     @Override
     public void updateInfo(ItemStack stack) {
-        this.healthRegen = ArmorUtils.getIntListFromList(stack, getCompare()).get(0);
+        this.healthRegen = ArmorUtils.getDoubleListFromList(stack, getCompare()).get(0);
     }
 
     @Override
-    public int getCompareValue() {
+    public double getCompareValue() {
         return healthRegen;
     }
 

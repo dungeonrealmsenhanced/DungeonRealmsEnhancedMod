@@ -7,15 +7,15 @@ import net.minecraft.item.ItemStack;
 
 public class ElementalResistance extends Attribute {
 
-    private int elementalResistance = 0;
+    private double elementalResistance = 0;
 
     @Override
     public void updateInfo(ItemStack stack) {
-        this.elementalResistance = ArmorUtils.getIntListFromList(stack, getCompare()).get(0);
+        this.elementalResistance = ArmorUtils.getDoubleListFromList(stack, getCompare()).get(0);
     }
 
     @Override
-    public int getCompareValue() {
+    public double getCompareValue() {
         return elementalResistance;
     }
 

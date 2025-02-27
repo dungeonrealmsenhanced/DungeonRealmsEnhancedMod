@@ -6,15 +6,15 @@ import net.minecraft.item.ItemStack;
 
 public class Thorns extends Attribute {
 
-    private int thorns = 0;
+    private double thorns = 0;
 
     @Override
     public void updateInfo(ItemStack stack) {
-        this.thorns = ArmorUtils.getIntListFromList(stack, getCompare()).get(0);
+        this.thorns = ArmorUtils.getDoubleListFromList(stack, getCompare()).get(0);
     }
 
     @Override
-    public int getCompareValue() {
+    public double getCompareValue() {
         return thorns;
     }
 

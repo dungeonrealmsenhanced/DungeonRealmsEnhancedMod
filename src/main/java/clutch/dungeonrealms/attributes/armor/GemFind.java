@@ -6,15 +6,15 @@ import net.minecraft.item.ItemStack;
 
 public class GemFind extends Attribute {
 
-    private int gemFind = 0;
+    private double gemFind = 0;
 
     @Override
     public void updateInfo(ItemStack stack) {
-        this.gemFind = ArmorUtils.getIntListFromList(stack, getCompare()).get(0);
+        this.gemFind = ArmorUtils.getDoubleListFromList(stack, getCompare()).get(0);
     }
 
     @Override
-    public int getCompareValue() {
+    public double getCompareValue() {
         return gemFind;
     }
 

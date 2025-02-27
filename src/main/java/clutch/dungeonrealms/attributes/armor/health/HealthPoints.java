@@ -6,15 +6,15 @@ import net.minecraft.item.ItemStack;
 
 public class HealthPoints extends Attribute {
 
-    private int healthPoints = 0;
+    private double healthPoints = 0;
 
     @Override
     public void updateInfo(ItemStack stack) {
-        this.healthPoints = ArmorUtils.getIntListFromList(stack, getCompare()).get(0);
+        this.healthPoints = ArmorUtils.getDoubleListFromList(stack, getCompare()).get(0);
     }
 
     @Override
-    public int getCompareValue() {
+    public double getCompareValue() {
         return healthPoints;
     }
 

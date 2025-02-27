@@ -6,15 +6,15 @@ import net.minecraft.item.ItemStack;
 
 public class Strength extends Attribute {
 
-    private int strength = 0;
+    private double strength = 0;
 
     @Override
     public void updateInfo(ItemStack stack) {
-        this.strength = ArmorUtils.getIntListFromList(stack, getCompare()).get(0);
+        this.strength = ArmorUtils.getDoubleListFromList(stack, getCompare()).get(0);
     }
 
     @Override
-    public int getCompareValue() {
+    public double getCompareValue() {
         return strength;
     }
 

@@ -6,15 +6,15 @@ import net.minecraft.item.ItemStack;
 
 public class Reflection extends Attribute {
 
-    private int reflection = 0;
+    private double reflection = 0;
 
     @Override
     public void updateInfo(ItemStack stack) {
-        this.reflection = ArmorUtils.getIntListFromList(stack, getCompare()).get(0);
+        this.reflection = ArmorUtils.getDoubleListFromList(stack, getCompare()).get(0);
     }
 
     @Override
-    public int getCompareValue() {
+    public double getCompareValue() {
         return reflection;
     }
 

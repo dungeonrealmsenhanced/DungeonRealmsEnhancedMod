@@ -17,7 +17,26 @@ public class ArmorUtils {
         itemAttributes.updateItemInfo(stack);
         return itemAttributes;
     }
-
+    public static List<Double> _getDoubleListFromList(ItemStack stack, String intName) {
+        // If does not have nbt tags then return
+        if (stack.getTagCompound() == null) return Collections.singletonList(0d);
+        // If does not have nbt tag attributes then return
+        if (!stack.getTagCompound().hasKey("modifiers", 10)) return Collections.singletonList(0d);
+        NBTTagCompound itemAttributes = stack.getTagCompound().getCompoundTag("modifiers");
+        // If attributes has not tags then return
+        if (itemAttributes==null||itemAttributes.isEmpty()){
+            return Collections.singletonList(0d);
+        }
+        // If attributes has not tags then return
+        if (!itemAttributes.hasKey(intName)) return Collections.singletonList(0d);
+        // Return all
+        NBTTagList tagList = itemAttributes.getTagList(intName, 3);
+        List<Double> integerList = new ArrayList<>();
+        for (int tagIndex = 0; tagIndex < tagList.tagCount(); ++tagIndex) {
+            integerList.add(tagList.getDoubleAt(tagIndex));
+        }
+        return integerList;
+    }
     public static List<Integer> _getIntListFromList(ItemStack stack, String intName) {
         // If does not have nbt tags then return
         if (stack.getTagCompound() == null) return Collections.singletonList(0);
@@ -43,6 +62,13 @@ public class ArmorUtils {
 
         if (integers==null || integers.isEmpty())return Collections.singletonList(0);
         return integers;
+    }
+
+    public static List<Double> getDoubleListFromList(ItemStack stack, String intName) {
+        List<Double> doubles = _getDoubleListFromList(stack, intName);
+
+        if (doubles==null || doubles.isEmpty())return Collections.singletonList(0d);
+        return doubles;
     }
 
     public static ArmorType getArmorType(ItemStack stack) {

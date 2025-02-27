@@ -64,7 +64,7 @@ public class ItemAttributes {
         return this.attributes.get(name).getTooltipName();
     }
 
-    public int getCompareValue(String name) {
+    public double getCompareValue(String name) {
         return this.attributes.get(name).getCompareValue();
     }
 

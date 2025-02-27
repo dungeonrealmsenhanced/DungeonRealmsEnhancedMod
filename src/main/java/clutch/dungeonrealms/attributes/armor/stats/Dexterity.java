@@ -6,15 +6,15 @@ import net.minecraft.item.ItemStack;
 
 public class Dexterity extends Attribute {
 
-    private int dexterity = 0;
+    private double dexterity = 0;
 
     @Override
     public void updateInfo(ItemStack stack) {
-        this.dexterity = ArmorUtils.getIntListFromList(stack, getCompare()).get(0);
+        this.dexterity = ArmorUtils.getDoubleListFromList(stack, getCompare()).get(0);
     }
 
     @Override
-    public int getCompareValue() {
+    public double getCompareValue() {
         return dexterity;
     }
 

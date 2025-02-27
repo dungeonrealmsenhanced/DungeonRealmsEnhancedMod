@@ -6,15 +6,15 @@ import net.minecraft.item.ItemStack;
 
 public class Vitality extends Attribute {
 
-    private int vitality = 0;
+    private double vitality = 0;
 
     @Override
     public void updateInfo(ItemStack stack) {
-        this.vitality = ArmorUtils.getIntListFromList(stack, getCompare()).get(0);
+        this.vitality = ArmorUtils.getDoubleListFromList(stack, getCompare()).get(0);
     }
 
     @Override
-    public int getCompareValue() {
+    public double getCompareValue() {
         return vitality;
     }
 

@@ -8,16 +8,16 @@ import java.util.List;
 
 public class Armor extends Attribute {
 
-    private int armorMax = 0;
+    private double armorMax = 0;
 
     @Override
     public void updateInfo(ItemStack stack) {
-        List<Integer> armorInfo = ArmorUtils.getIntListFromList(stack, getCompare());
+        List<Double> armorInfo = ArmorUtils.getDoubleListFromList(stack, getCompare());
         if (armorInfo.size() >= 2) this.armorMax = armorInfo.get(1);
     }
 
     @Override
-    public int getCompareValue() {
+    public double getCompareValue() {
         return armorMax;
     }
 

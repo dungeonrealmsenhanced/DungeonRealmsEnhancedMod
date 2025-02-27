@@ -27,13 +27,15 @@ public class ArmorTooltipCompare {
         try {
             ArmorUtils.ArmorType tooltipStackArmorType = ArmorUtils.getArmorType(tooltipStack);
             if (tooltipStackArmorType != ArmorUtils.ArmorType.NONE) {
-                ItemAttributes tooltipModifiers = ArmorUtils.getModifiers(tooltipStack);
-                int value = tooltipStackArmorType.ordinal() - 1;
-                if (value == -1) return;
-                ItemStack equipped = Minecraft.getMinecraft().player.inventory.armorInventory.get(value);
-                if (equipped != tooltipStack) {
-                    addCompareTooltip(event.getToolTip(), tooltipModifiers, equipped, tooltipStack);
-                }
+                Map<String, double[]> tooltipModifiers = ItemUtils.getModifierMap(tooltipStack);
+
+                int slotIndex = tooltipStackArmorType.ordinal() - 1;
+                if (slotIndex == -1) return;
+                ItemStack equipped = Minecraft.getMinecraft().player.inventory.armorInventory.get(slotIndex);
+
+                Map<String, double[]> equippedModifiers = equipped != null ? ItemUtils.getModifierMap(equipped) : new HashMap<>();
+
+                addCompareTooltip(event.getToolTip(), tooltipModifiers, equippedModifiers, equipped, tooltipStack);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -41,39 +43,35 @@ public class ArmorTooltipCompare {
         }
     }
 
-    public void addCompareTooltip(List<String> tooltips, ItemAttributes itemAttributes, ItemStack equippedStacks, ItemStack tooltipStack) {
-        ItemAttributes equippedAttributes = new ItemAttributes();
-        if (equippedStacks != null) {
-            equippedAttributes = ArmorUtils.getModifiers(equippedStacks);
-        }
+    public void addCompareTooltip(List<String> tooltips, Map<String, double[]> itemModifiers, Map<String, double[]> equippedModifiers, ItemStack equippedStack, ItemStack tooltipStack) {
         addedBeginningText = false;
 
         tooltips.add("");
-        tooltips.add(TextFormatting.DARK_GRAY + "────────── " +TextFormatting.STRIKETHROUGH  + TextFormatting.GOLD + "Comparison" + TextFormatting.DARK_GRAY +TextFormatting.STRIKETHROUGH+ " ──────────");
+        tooltips.add(TextFormatting.DARK_GRAY + TextFormatting.STRIKETHROUGH.toString() + "────────── " + TextFormatting.GOLD + "Comparison" + TextFormatting.DARK_GRAY + TextFormatting.STRIKETHROUGH.toString() + " ──────────");
 
         // Equipped Item
-        tooltips.add(TextFormatting.GRAY + "⚔ " + TextFormatting.BOLD + "Equipped: " + (equippedStacks != null ? equippedStacks.getDisplayName() : "None"));
-        tooltips.add(getTierString(equippedStacks));
+        tooltips.add(TextFormatting.GRAY + "⚔ " + TextFormatting.BOLD + "Equipped: " + (equippedStack != null ? equippedStack.getDisplayName() : "None"));
+        tooltips.add(getTierString(equippedStack));
 
         // Hovered Item
         tooltips.add("");
         tooltips.add(TextFormatting.GRAY + "🛡 " + TextFormatting.BOLD + "Item: " + tooltipStack.getDisplayName());
         tooltips.add(getTierString(tooltipStack));
 
-        // Compare Attributes (Properly handle additions, removals, and changes)
+        // Compare Attributes (Handle additions, removals, and changes)
         Set<String> allStats = new HashSet<>();
-        allStats.addAll(equippedAttributes.getAttributes());
-        allStats.addAll(itemAttributes.getAttributes());
+        allStats.addAll(equippedModifiers.keySet());
+        allStats.addAll(itemModifiers.keySet());
 
         for (String stat : allStats) {
-            double equippedValue = equippedAttributes.getCompareValue(stat);
-            double hoveredValue = itemAttributes.getCompareValue(stat);
+            double equippedValue = equippedModifiers.getOrDefault(stat, new double[]{0})[0];
+            double hoveredValue = itemModifiers.getOrDefault(stat, new double[]{0})[0];
 
             if (equippedValue == hoveredValue) continue; // Ignore if no change
 
-            if (equippedValue == 0) { // Stat is newly added
+            if (equippedValue == 0) { // New stat added
                 tooltips.add(TextFormatting.GREEN + "✔ +" + (int) hoveredValue + " " + stat);
-            } else if (hoveredValue == 0) { // Stat is removed
+            } else if (hoveredValue == 0) { // Stat removed
                 tooltips.add(TextFormatting.RED + "" + TextFormatting.STRIKETHROUGH + "✖ " + stat);
             } else { // Stat changed
                 String color = hoveredValue > equippedValue ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
@@ -82,7 +80,7 @@ public class ArmorTooltipCompare {
             }
         }
 
-        tooltips.add(TextFormatting.DARK_GRAY +TextFormatting.STRIKETHROUGH.toString()+ "────────────────────────────");
+        tooltips.add(TextFormatting.DARK_GRAY + TextFormatting.STRIKETHROUGH.toString() + "────────────────────────────");
     }
 
     private String getTierString(ItemStack item) {

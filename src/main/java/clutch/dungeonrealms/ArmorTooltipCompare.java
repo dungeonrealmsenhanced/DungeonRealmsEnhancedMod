@@ -51,7 +51,7 @@ public class ArmorTooltipCompare {
         addedBeginningText = false;
 
         tooltips.add("");
-        tooltips.add(TextFormatting.DARK_GRAY + "────────── " + TextFormatting.GOLD + "Comparison" + TextFormatting.DARK_GRAY + " ──────────");
+        tooltips.add(TextFormatting.DARK_GRAY + TextFormatting.STRIKETHROUGH.toString()+ "────────── " + TextFormatting.GOLD + "Comparison" + TextFormatting.DARK_GRAY + TextFormatting.STRIKETHROUGH.toString()+ " ──────────");
 
         // Equipped Item
         tooltips.add(TextFormatting.GRAY + "⚔ " + TextFormatting.BOLD + "Equipped: " + (equippedStacks != null ? equippedStacks.getDisplayName() : "None"));
@@ -78,11 +78,12 @@ public class ArmorTooltipCompare {
             }
         }
 
-        tooltips.add(TextFormatting.DARK_GRAY + "────────────────────────────");
+        tooltips.add(TextFormatting.DARK_GRAY + TextFormatting.STRIKETHROUGH.toString()+ "────────────────────────────");
     }
 
     public void createTooltip(String currentAttribute, List<String> tooltips, ItemAttributes tooltipAttributes, ItemAttributes equippedAttributes, boolean isRemoved) {
         String tooltipName = equippedAttributes.getCompareName(currentAttribute);
+        int modEquippedValue = equippedAttributes.getCompareValue(currentAttribute);
         int modTooltipValue = tooltipAttributes.getCompareValue(currentAttribute);
 
         if (!addedBeginningText) {
@@ -91,9 +92,11 @@ public class ArmorTooltipCompare {
         }
 
         if (isRemoved) {
-            tooltips.add(TextFormatting.RED + "✖ " + tooltipName);
+            tooltips.add(TextFormatting.RED + "" + TextFormatting.STRIKETHROUGH + "✖ " + tooltipName);
         } else {
-            tooltips.add(TextFormatting.GREEN + "✔ +" + modTooltipValue + " " + tooltipName);
+            String color = modTooltipValue > modEquippedValue ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
+            String sign = modTooltipValue > modEquippedValue ? "+" : "-";
+            tooltips.add(color + "✔ " + sign + Math.abs(modTooltipValue - modEquippedValue) + " " + tooltipName);
         }
     }
 

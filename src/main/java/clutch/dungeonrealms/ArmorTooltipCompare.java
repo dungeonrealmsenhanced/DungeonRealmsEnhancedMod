@@ -51,12 +51,12 @@ public class ArmorTooltipCompare {
 
         // Equipped Item
         tooltips.add(TextFormatting.GRAY + "⚔ " + TextFormatting.BOLD + "Equipped: " + (equippedStack != null ? equippedStack.getDisplayName() : "None"));
-        tooltips.add(getTierString(equippedStack));
+//        tooltips.add(getTierString(equippedStack));
 
         // Hovered Item
         tooltips.add("");
         tooltips.add(TextFormatting.GRAY + "🛡 " + TextFormatting.BOLD + "Item: " + tooltipStack.getDisplayName());
-        tooltips.add(getTierString(tooltipStack));
+//        tooltips.add(getTierString(tooltipStack));
 
         // Compare Attributes (Handle additions, removals, and changes)
         Set<String> allStats = new HashSet<>();
@@ -70,17 +70,24 @@ public class ArmorTooltipCompare {
             if (equippedValue == hoveredValue) continue; // Ignore if no change
 
             if (equippedValue == 0) { // New stat added
-                tooltips.add(TextFormatting.GREEN + "✔ +" + (int) hoveredValue + " " + stat);
+                tooltips.add(TextFormatting.GREEN + "✔ +" + (int) hoveredValue + " " + formatStat(stat));
             } else if (hoveredValue == 0) { // Stat removed
-                tooltips.add(TextFormatting.RED + "" + TextFormatting.STRIKETHROUGH + "✖ " + stat);
+                tooltips.add(TextFormatting.RED + "" + TextFormatting.STRIKETHROUGH + "✖ " + formatStat(stat));
             } else { // Stat changed
                 String color = hoveredValue > equippedValue ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
                 String sign = hoveredValue > equippedValue ? "+" : "-";
-                tooltips.add(color + "✔ " + sign + (int) Math.abs(hoveredValue - equippedValue) + " " + stat);
+                double toFormat =Math.abs(hoveredValue - equippedValue);
+                String formattedValue = (toFormat % 1 == 0) ? String.valueOf((int) toFormat) : String.format("%.2f", toFormat);
+                tooltips.add(color + "✔ " + sign + formattedValue + " " + formatStat(stat));
             }
         }
 
         tooltips.add(TextFormatting.DARK_GRAY + TextFormatting.STRIKETHROUGH.toString() + "────────────────────────────");
+    }
+
+    private String formatStat(String stat) {
+       // Minecraft.getMinecraft().player.sendMessage(new TextComponentString("SEARCH STAT " + stat));
+        return ItemAttributes.get(stat).getTooltipName();
     }
 
     private String getTierString(ItemStack item) {

@@ -25,8 +25,14 @@ import java.util.Set;
  */
 public class ItemAttributes {
 
-    private Map<String, Attribute> attributes = new HashMap<>();
+    private static Map<String, Attribute> attributes = new HashMap<>();
+    private static Map<String, String> keyOneMap = new HashMap<>();
+//    private static Map<String, String> keyTwoMap = new HashMap<>();
 
+    static {
+        new ItemAttributes();
+
+    }
     public ItemAttributes() {
         // Armor Main
         registerAttribute(new Armor());
@@ -52,6 +58,9 @@ public class ItemAttributes {
         registerAttribute(new Intellect());
         registerAttribute(new Strength());
         registerAttribute(new Vitality());
+        for (Attribute value : attributes.values()) {
+            keyOneMap.put(value.getCompare(), value.getTooltipName());
+        }
     }
 
     public void updateItemInfo(ItemStack stack) {
@@ -59,6 +68,12 @@ public class ItemAttributes {
             attribute.updateInfo(stack);
         }
     }
+
+    public static Attribute get(String input) {
+        return attributes.get(input);
+
+    }
+
 
     public String getCompareName(String name) {
         return this.attributes.get(name).getTooltipName();

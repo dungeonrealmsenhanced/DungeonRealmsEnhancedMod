@@ -1,8 +1,4 @@
 # DungeonRealmsEnhanced
 
-
-**Download Release:** [here](https://minecraft.curseforge.com/projects/dungeonrealms-enhanced)
-
-**Download Beta:** [here](https://github.com/dungeonrealmsenhanced/DungeonRealmsEnhancedMod/releases)
-
-_Downloadable using the twitch/curseforge client_
+Athuors: MatthewEDEv
+Note: The code in this repository is a mess if you want to contribute message .matthewe on discord. 

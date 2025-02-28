@@ -10,7 +10,13 @@ public class ProfessionsUtils {
         String startingBar = TextFormatting.GRAY + "XP: ";
         String containsBar = "";
         String expBarText = ItemStackUtils.getLore(stack, startingBar, containsBar, true);
-        return TextFormatting.GRAY + "" + getXP(stack) + " " + expBarText  + TextFormatting.GRAY + " " + getMaxXP(stack);
+        String maxXP = getMaxXP(stack);
+
+        if (!maxXP.equalsIgnoreCase("?")){
+
+            return TextFormatting.GRAY + "" + getXP(stack) + " " + expBarText  + TextFormatting.GRAY + " " + maxXP;
+        }
+        return TextFormatting.GRAY + "MAX LEVEL";
     }
 
     public static String getMaxXP(ItemStack stack) {

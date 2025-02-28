@@ -192,7 +192,7 @@ public class DRPlayer {
     public void update() {
         this.updateGamma();
         this.updatePercentFormat();
-//        BuffListener.requestActiveBuffs(); Temp Disabled
+        BuffListener.requestActiveBuffs();
 
     }
 

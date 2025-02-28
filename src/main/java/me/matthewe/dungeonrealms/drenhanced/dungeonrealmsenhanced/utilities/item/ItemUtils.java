@@ -4,6 +4,7 @@ import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.Numb
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -170,6 +171,43 @@ public class ItemUtils {
         if (item == Items.IRON_SHOVEL) return true;
         return false;
     }
+
+    public static boolean isEquippedOrInHotbarSlot0(ItemStack itemStack) {
+        Minecraft mc = Minecraft.getMinecraft();
+
+        // If the item is armor, check if it's equipped in an armor slot
+        if (isArmor(itemStack.getItem())) {
+            for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
+                if (slot.getSlotType() == EntityEquipmentSlot.Type.ARMOR) {
+                    if (mc.player.getItemStackFromSlot(slot) == itemStack) {
+                        return false; // Armor is equipped, do not allow
+                    }
+                }
+            }
+        }
+
+        // If the item is neither armor nor a weapon, allow it
+        if (!isArmor(itemStack.getItem()) && !isWeapon(itemStack.getItem())) {
+            return true;
+        }
+
+        // Allow pickaxes specifically
+        if (isPickaxe(itemStack.getItem())) {
+            return true;
+        }
+
+        // Check if the item is in the main hand or offhand
+        if (mc.player.getHeldItemMainhand() == itemStack || mc.player.getHeldItemOffhand() == itemStack) {
+            return true;
+        }
+
+        // Check if the item is in hotbar slot 0
+        if (!mc.player.inventory.getStackInSlot(0).isEmpty() && mc.player.inventory.getStackInSlot(0) == itemStack) {
+            return true;
+        }
+
+        return false;
+    }
     public static boolean isScythe(Item item) {
         if (item == Items.DIAMOND_HOE) return true;
         if (item == Items.GOLDEN_HOE) return true;
@@ -186,6 +224,15 @@ public class ItemUtils {
 
         if (item == Items.STONE_SWORD) return true;
         if (item == Items.IRON_SWORD) return true;
+        return false;
+    }
+    public static boolean isPickaxe(Item item) {
+        if (item == Items.DIAMOND_PICKAXE) return true;
+        if (item == Items.GOLDEN_PICKAXE) return true;
+        if (item == Items.IRON_PICKAXE) return true;
+
+        if (item == Items.STONE_PICKAXE) return true;
+        if (item == Items.WOODEN_PICKAXE) return true;
         return false;
     }
 

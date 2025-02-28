@@ -5,7 +5,6 @@ import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DREnhanced;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.CoordsModule;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.GemsModule;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.buff.BuffModule;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.drysteak.DrySteakModule;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.profession.ProfessionModule;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.treasurescroll.TreasureScrollModule;
 import net.minecraftforge.common.MinecraftForge;
@@ -43,7 +42,7 @@ public class Modules {
         addModule(new ProfessionModule());
         addModule(new GemsModule());
         addModule(new BuffModule());
-        addModule(new DrySteakModule());
+//        addModule(new DrySteakModule());
     }
 
     public static void loadModules() {

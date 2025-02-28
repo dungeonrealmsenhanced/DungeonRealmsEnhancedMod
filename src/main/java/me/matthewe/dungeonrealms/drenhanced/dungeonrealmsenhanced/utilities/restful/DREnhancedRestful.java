@@ -18,20 +18,26 @@ public class DREnhancedRestful {
     private DREnhancedInformation information;
 
     public DREnhancedRestful() {
-        information=new DREnhancedInformation("1.1", new DREnhancedInformation.Developer[]{new DREnhancedInformation.Developer("1d48bd80-4cd0-4874-ba65-94284bc24ecc","MatthewEDev", true)},
+        information = new DREnhancedInformation("1.2", new DREnhancedInformation.Developer[]{new DREnhancedInformation.Developer("1d48bd80-4cd0-4874-ba65-94284bc24ecc", "MatthewEDev", true)},
                 "N/A", Changelog.builder()
-                .date(1718996400000L) //Date of summer 2024 wipe
-                .version("1.1")
+                .date(1740704964255L)
+                .version("1.2")
                 .changes(Change.builder()
-                        .title("Bug Fixes")
-                        .description("- Fixed crashing issue", "- Durability fixed", "- Enchant info", "- Inventory gem location")
-                        .build(),
+                                .title("Bug Fixes")
+                                .description("- Removed dry steak due to limitations." )
+                                .build(),
                         Change.builder()
                                 .title("Improvements")
-                                .description("- Dungeon origin", "- Clue scroll origin", "- Inventory gem total")
+                                .description("- UK time format.")
+                                .build(),
+
+                        Change.builder()
+                                .title("Compare Stats")
+                                .description("- Added ability to compare stats on items.")
                                 .build())
                 .build()); //Hardcoded changelogs for now
     }
+
 
     public DREnhancedInformation getInformation() {
         return information;

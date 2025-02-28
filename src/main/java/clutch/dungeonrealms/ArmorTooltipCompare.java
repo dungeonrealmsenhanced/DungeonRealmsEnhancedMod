@@ -24,16 +24,13 @@ public class ArmorTooltipCompare {
             if (ItemUtils.isWeapon(tooltipStack.getItem())) {
                 Map<String, double[]> tooltipModifiers = ItemUtils.getModifierMap(tooltipStack);
 
-                // ✅ Get currently equipped weapon (main hand or offhand)
-                ItemStack equipped = mc.player.getHeldItemMainhand();
+                ItemStack equipped = mc.player.inventory.getStackInSlot(0);
                 if (equipped.isEmpty() || !ItemUtils.isWeapon(equipped.getItem())) {
                     equipped = mc.player.getHeldItemOffhand();
                 }
 
-                // ✅ If no valid weapon is equipped, return an empty list
                 if (equipped.isEmpty() || !ItemUtils.isWeapon(equipped.getItem())) return new ArrayList<>();
 
-                // ✅ Compare weapon stats
                 Map<String, double[]> equippedModifiers = ItemUtils.getModifierMap(equipped);
                 List<String> newTooltip = new ArrayList<>();
                 addCompareTooltip(newTooltip, tooltipModifiers, equippedModifiers, equipped, tooltipStack);

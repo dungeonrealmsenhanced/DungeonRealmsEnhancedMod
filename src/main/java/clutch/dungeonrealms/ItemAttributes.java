@@ -69,6 +69,7 @@ public class ItemAttributes {
         registerAttribute(new IceDamage());
         registerAttribute(new VSPlayers());
         registerAttribute(new VSMonsters());
+        registerAttribute(new CriticalHit());
 
 
         for (Attribute value : attributes.values()) {

@@ -1,12 +1,10 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.proxy;
 
+import clutch.dungeonrealms.DungeonRealmsMod;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.commands.CommandInfo;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.commands.ZoneCommand;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.Handlers;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners.ItemCheckerListener;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners.MenuReplacerListener;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners.RarityOverlayListener;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners.StatisticListener;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners.*;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.Modules;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.texture.DRTextures;
 import net.minecraft.entity.player.EntityPlayer;
@@ -35,11 +33,14 @@ public class ClientProxy implements IProxy {
         MinecraftForge.EVENT_BUS.register(new ItemCheckerListener());
         MinecraftForge.EVENT_BUS.register(new RarityOverlayListener());
         MinecraftForge.EVENT_BUS.register(new MenuReplacerListener());
+        MinecraftForge.EVENT_BUS.register(new PacketSwingDetector());
+        DungeonRealmsMod.init();
 
         Handlers.init();
         Handlers.enableHandlers();
 
     }
+
 
     @Override
     public void init(FMLInitializationEvent event) {

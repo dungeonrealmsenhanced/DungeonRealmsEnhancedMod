@@ -13,6 +13,7 @@ import clutch.dungeonrealms.attributes.armor.stats.Dexterity;
 import clutch.dungeonrealms.attributes.armor.stats.Intellect;
 import clutch.dungeonrealms.attributes.armor.stats.Strength;
 import clutch.dungeonrealms.attributes.armor.stats.Vitality;
+import clutch.dungeonrealms.attributes.weapon.*;
 import net.minecraft.item.ItemStack;
 
 import java.util.HashMap;
@@ -58,7 +59,20 @@ public class ItemAttributes {
         registerAttribute(new Intellect());
         registerAttribute(new Strength());
         registerAttribute(new Vitality());
+
+
+
+        registerAttribute(new MeleeDamage());
+        registerAttribute(new PoisonDamage());
+        registerAttribute(new FireDamage());
+        registerAttribute(new PureDamage());
+        registerAttribute(new IceDamage());
+        registerAttribute(new VSPlayers());
+        registerAttribute(new VSMonsters());
+
+
         for (Attribute value : attributes.values()) {
+            if (value.getCompare() == null) continue;
             keyOneMap.put(value.getCompare(), value.getTooltipName());
         }
     }

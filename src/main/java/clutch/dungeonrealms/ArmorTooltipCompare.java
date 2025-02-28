@@ -20,20 +20,25 @@ public class ArmorTooltipCompare {
         if (!tooltipStack.hasTagCompound()) return new ArrayList<>();
 
         try {
-            if (ItemUtils.isWeapon(tooltipStack.getItem())){
+            Minecraft mc = Minecraft.getMinecraft();
+            if (ItemUtils.isWeapon(tooltipStack.getItem())) {
                 Map<String, double[]> tooltipModifiers = ItemUtils.getModifierMap(tooltipStack);
 
-                ItemStack equipped = Minecraft.getMinecraft().player.inventory.armorInventory.get(0);
-
-                if (ItemUtils.isWeapon(equipped.getItem())) {
-
-                    Map<String, double[]> equippedModifiers = equipped != null ? ItemUtils.getModifierMap(equipped) : new HashMap<>();
-
-                    List<String> newTooltip = new ArrayList<>();
-
-                    addCompareTooltip(newTooltip, tooltipModifiers, equippedModifiers, equipped, tooltipStack);
-                    return newTooltip;
+                // ✅ Get currently equipped weapon (main hand or offhand)
+                ItemStack equipped = mc.player.getHeldItemMainhand();
+                if (equipped.isEmpty() || !ItemUtils.isWeapon(equipped.getItem())) {
+                    equipped = mc.player.getHeldItemOffhand();
                 }
+
+                // ✅ If no valid weapon is equipped, return an empty list
+                if (equipped.isEmpty() || !ItemUtils.isWeapon(equipped.getItem())) return new ArrayList<>();
+
+                // ✅ Compare weapon stats
+                Map<String, double[]> equippedModifiers = ItemUtils.getModifierMap(equipped);
+                List<String> newTooltip = new ArrayList<>();
+                addCompareTooltip(newTooltip, tooltipModifiers, equippedModifiers, equipped, tooltipStack);
+
+                return newTooltip;
             }
 
             ArmorUtils.ArmorType tooltipStackArmorType = ArmorUtils.getArmorType(tooltipStack);
@@ -87,33 +92,67 @@ public class ArmorTooltipCompare {
 
         int count = 0;
         for (String stat : allStats) {
-            double equippedValue = equippedModifiers.getOrDefault(stat, new double[]{0})[0];
-            double hoveredValue = itemModifiers.getOrDefault(stat, new double[]{0})[0];
+            double[] equippedValues = equippedModifiers.getOrDefault(stat, new double[]{0, 0});
+            double[] hoveredValues = itemModifiers.getOrDefault(stat, new double[]{0, 0});
 
-            if (equippedValue == hoveredValue) continue; // Ignore if no change
+            if (stat.equalsIgnoreCase("MELEE_DAMAGE")) {
+                double equippedMin = equippedValues.length > 0 ? equippedValues[0] : 0;
+                double equippedMax = equippedValues.length > 1 ? equippedValues[1] : 0;
+                double hoveredMin = hoveredValues.length > 0 ? hoveredValues[0] : 0;
+                double hoveredMax = hoveredValues.length > 1 ? hoveredValues[1] : 0;
 
-            if (equippedValue == 0) { // New stat added
-                tooltips.add(TextFormatting.GREEN + "✔ +" + (int) hoveredValue + " " + formatStat(stat));
-                count++;
-            } else if (hoveredValue == 0) { // Stat removed
-                tooltips.add(TextFormatting.RED + "" + TextFormatting.STRIKETHROUGH + "✖ " + formatStat(stat));
-                count++;
-            } else { // Stat changed
-                String color = hoveredValue > equippedValue ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
-                String sign = hoveredValue > equippedValue ? "+" : "-";
+                if (equippedMin == hoveredMin && equippedMax == hoveredMax) continue; // No change
 
+                if (equippedMin == 0 && equippedMax == 0) { // New melee damage added
+                    tooltips.add(TextFormatting.GREEN + "✔ +" + (int) hoveredMin + " - " + (int) hoveredMax + " " + formatStat(stat));
+                } else if (hoveredMin == 0 && hoveredMax == 0) { // Melee damage removed
+                    tooltips.add(TextFormatting.RED + "" + TextFormatting.STRIKETHROUGH + "✖ " + formatStat(stat));
+                } else { // Melee damage changed
+                    String minColor = hoveredMin > equippedMin ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
+                    String maxColor = hoveredMax > equippedMax ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
 
-                double toFormat = Math.abs(hoveredValue - equippedValue);
-                String formattedValue;
-                if (EXEMPTED.contains(stat)) {
-                    formattedValue = String.valueOf((int) toFormat);
-                } else {
+                    String minSign = hoveredMin > equippedMin ? "+" : "-";
+                    String maxSign = hoveredMax > equippedMax ? "+" : "-";
 
-                    formattedValue = (toFormat % 1 == 0) ? String.valueOf((int) toFormat) : String.format("%.2f", toFormat);
+                    double minDiff = Math.abs(hoveredMin - equippedMin);
+                    double maxDiff = Math.abs(hoveredMax - equippedMax);
+
+                    tooltips.add(minColor + "✔ " + minSign + (int) minDiff + TextFormatting.DARK_GRAY + " - " + maxColor + maxSign + (int) maxDiff + " " + formatStat(stat));
                 }
-                tooltips.add(color + "✔ " + sign + formattedValue + " " + formatStat(stat));
                 count++;
+            } else {
+                double equippedValue = equippedModifiers.getOrDefault(stat, new double[]{0})[0];
+                double hoveredValue = itemModifiers.getOrDefault(stat, new double[]{0})[0];
+
+                if (equippedValue == hoveredValue) continue; // Ignore if no change
+
+                if (equippedValue == 0) { // New stat added
+                    tooltips.add(TextFormatting.GREEN + "✔ +" + (int) hoveredValue + " " + formatStat(stat));
+                    count++;
+                } else if (hoveredValue == 0) { // Stat removed
+                    tooltips.add(TextFormatting.RED + "" + TextFormatting.STRIKETHROUGH + "✖ " + formatStat(stat));
+                    count++;
+                } else { // Stat changed
+
+
+                    String color = hoveredValue > equippedValue ? TextFormatting.GREEN.toString() : TextFormatting.RED.toString();
+                    String sign = hoveredValue > equippedValue ? "+" : "-";
+
+
+                    double toFormat = Math.abs(hoveredValue - equippedValue);
+                    String formattedValue;
+                    if (EXEMPTED.contains(stat)) {
+                        formattedValue = String.valueOf((int) toFormat);
+                    } else {
+
+                        formattedValue = (toFormat % 1 == 0) ? String.valueOf((int) toFormat) : String.format("%.2f", toFormat);
+                    }
+                    tooltips.add(color + "✔ " + sign + formattedValue + " " + formatStat(stat));
+                    count++;
+                }
             }
+
+
         }
 
         tooltips.add(TextFormatting.DARK_GRAY + TextFormatting.STRIKETHROUGH.toString() + "----------------------------");
@@ -123,8 +162,12 @@ public class ArmorTooltipCompare {
     }
 
     private static String formatStat(String stat) {
-        // Minecraft.getMinecraft().player.sendMessage(new TextComponentString("SEARCH STAT " + stat));
-        return ItemAttributes.get(stat).getTooltipName();
+       try {
+           // Minecraft.getMinecraft().player.sendMessage(new TextComponentString("SEARCH STAT " + stat));
+           return ItemAttributes.get(stat).getTooltipName();
+       } catch (Exception e) {
+           return stat;
+       }
     }
 
 

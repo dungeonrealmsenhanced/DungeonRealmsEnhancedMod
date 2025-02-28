@@ -4,10 +4,10 @@ import net.minecraft.item.ItemStack;
 
 public abstract class Attribute {
 
-    public abstract void updateInfo(ItemStack stack);
-    public abstract double getCompareValue();
+    public  void updateInfo(ItemStack stack) {}
+    public  double getCompareValue() {return 0;};
 
-    public abstract String getCompare();
+    public  String getCompare() {return null;}
     public abstract String getTooltipName();
 
 }

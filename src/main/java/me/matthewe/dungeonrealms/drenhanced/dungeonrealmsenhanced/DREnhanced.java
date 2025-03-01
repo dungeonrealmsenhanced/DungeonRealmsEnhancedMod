@@ -60,7 +60,7 @@ public class DREnhanced {
             .registerTypeAdapter(Settings.class, new SettingsJsonAdapter())
             .registerTypeAdapter(Changelog.class, new ChangelogJsonDeserializer());
 
-    private static StatKeyDatabase statKeyDatabase = new StatKeyDatabase();
+    public static StatKeyDatabase statKeyDatabase = new StatKeyDatabase();
 
     public static StatKeyDatabase getStatKeyDatabase() {
         return statKeyDatabase;
@@ -103,7 +103,6 @@ public class DREnhanced {
         if (!new File(folderLocation).exists()) {
             new File(folderLocation).mkdirs();
         }
-        statKeyDatabase.loadDictionary();
 
         log(folderLocation);
         if (FMLCommonHandler.instance().getSide().isClient()) {

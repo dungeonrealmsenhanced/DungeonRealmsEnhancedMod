@@ -4,12 +4,11 @@ import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DREnhanced;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 
 import java.util.*;
-
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
 
 public class ArmorTooltipCompare {
 
@@ -84,12 +83,15 @@ public class ArmorTooltipCompare {
 
         // Compare Attributes (Handle additions, removals, and changes)
         Set<String> allStats = new HashSet<>();
-        allStats.addAll(equippedModifiers.keySet());
+        if (equippedModifiers!=null&&!equippedModifiers.isEmpty()){
+            allStats.addAll(equippedModifiers.keySet());
+
+        }
         allStats.addAll(itemModifiers.keySet());
 
         int count = 0;
         for (String stat : allStats) {
-            double[] equippedValues = equippedModifiers.getOrDefault(stat, new double[]{0, 0});
+            double[] equippedValues = equippedModifiers!=null?equippedModifiers.getOrDefault(stat, new double[]{0, 0}): new double[]{0, 0};
             double[] hoveredValues = itemModifiers.getOrDefault(stat, new double[]{0, 0});
 
             if (stat.equalsIgnoreCase("MELEE_DAMAGE")) {

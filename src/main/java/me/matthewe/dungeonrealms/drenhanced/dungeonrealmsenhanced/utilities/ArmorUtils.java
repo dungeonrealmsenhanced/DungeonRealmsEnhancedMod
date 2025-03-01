@@ -1,6 +1,5 @@
-package clutch.dungeonrealms.utils;
+package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities;
 
-import clutch.dungeonrealms.ItemAttributes;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -12,11 +11,7 @@ import java.util.List;
 
 public class ArmorUtils {
 
-    public static ItemAttributes getModifiers(ItemStack stack) {
-        ItemAttributes itemAttributes = new ItemAttributes();
-        itemAttributes.updateItemInfo(stack);
-        return itemAttributes;
-    }
+
     public static List<Double> _getDoubleListFromList(ItemStack stack, String intName) {
         // If does not have nbt tags then return
         if (stack.getTagCompound() == null) return Collections.singletonList(0d);

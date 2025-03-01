@@ -1,18 +1,18 @@
-package clutch.dungeonrealms;
+package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities;
 
-import clutch.dungeonrealms.utils.ArmorUtils;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DREnhanced;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 
 import java.util.*;
 
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
+
 public class ArmorTooltipCompare {
 
-//    private boolean addedBeginningText = false;
 
 
     public static List<String> handleToolTip(ItemTooltipEvent event) {
@@ -63,7 +63,7 @@ public class ArmorTooltipCompare {
 
     }
 
-    private static final List<String> EXEMPTED = Arrays.asList("HEALTH_POINTS");
+    private static final List<String> EXEMPTED = Arrays.asList("HEALTH_POINTS"); //dealing with decimal bug.
 
     public static void addCompareTooltip(List<String> tooltips1, Map<String, double[]> itemModifiers, Map<String, double[]> equippedModifiers, ItemStack equippedStack, ItemStack tooltipStack) {
 //        addedBeginningText = false;
@@ -161,7 +161,7 @@ public class ArmorTooltipCompare {
     private static String formatStat(String stat) {
        try {
            // Minecraft.getMinecraft().player.sendMessage(new TextComponentString("SEARCH STAT " + stat));
-           return ItemAttributes.get(stat).getTooltipName();
+           return DREnhanced.getStatKeyDatabase().formatKey(stat);
        } catch (Exception e) {
            return stat;
        }

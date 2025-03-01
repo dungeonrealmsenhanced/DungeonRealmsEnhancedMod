@@ -1,7 +1,7 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.misc.listeners;
 
-import clutch.dungeonrealms.ArmorTooltipCompare;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setting.DRSettings;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.ArmorTooltipCompare;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.Listener;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.StringUtils;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemUtils;

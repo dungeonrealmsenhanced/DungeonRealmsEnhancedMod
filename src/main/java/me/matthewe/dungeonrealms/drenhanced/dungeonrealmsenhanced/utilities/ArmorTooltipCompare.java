@@ -25,8 +25,8 @@ public class ArmorTooltipCompare {
                 Map<String, double[]> tooltipModifiers = ItemUtils.getModifierMap(tooltipStack);
 
                 ItemStack equipped = mc.player.inventory.getStackInSlot(0);
-                if (equipped.isEmpty() || !ItemUtils.isWeapon(equipped.getItem())) {
-                    equipped = mc.player.getHeldItemOffhand();
+                if (equipped==null||equipped.isEmpty() || !ItemUtils.isWeapon(equipped.getItem())) {
+                    equipped = mc.player.getHeldItemMainhand();
                 }
 
                 if (equipped.isEmpty() || !ItemUtils.isWeapon(equipped.getItem())) return new ArrayList<>();
@@ -66,17 +66,16 @@ public class ArmorTooltipCompare {
         tooltips.add("");
         tooltips.add(TextFormatting.DARK_GRAY + TextFormatting.STRIKETHROUGH.toString() + "---------- " + TextFormatting.AQUA + TextFormatting.BOLD.toString() + "Comparison" + TextFormatting.DARK_GRAY + TextFormatting.STRIKETHROUGH.toString() + "----------");
 
-        // Equipped Item
         tooltips.add(TextFormatting.GRAY + TextFormatting.BOLD.toString() + "Old Item: " + (equippedStack != null ? equippedStack.getDisplayName() : "None"));
         tooltips.add(TextFormatting.GRAY + TextFormatting.BOLD.toString() + "New Item: " + tooltipStack.getDisplayName());
         tooltips.add("");
 
-        Set<String> allStats = new HashSet<>(equippedModifiers.keySet());
+        Set<String> allStats = equippedModifiers==null?new HashSet<>() : new HashSet<>(equippedModifiers.keySet());
         allStats.addAll(itemModifiers.keySet());
 
         int count = 0;
         for (String stat : allStats) {
-            double[] equippedValues = equippedModifiers.getOrDefault(stat, new double[]{0, 0});
+            double[] equippedValues =equippedModifiers!=null? equippedModifiers.getOrDefault(stat, new double[]{0, 0}) :new double[]{0, 0} ;
             double[] hoveredValues = itemModifiers.getOrDefault(stat, new double[]{0, 0});
 
             if (DAMAGE_TYPES.contains(stat)) {
@@ -92,6 +91,20 @@ public class ArmorTooltipCompare {
         if (count > 0) {
             tooltips1.addAll(tooltips);
         }
+    }
+
+    private static void compareDamage(List<String> tooltips, String stat, double[] equippedValues, double[] hoveredValues) {
+        double equippedMin = equippedValues[0];
+        double equippedMax = equippedValues[1];
+        double hoveredMin = hoveredValues[0];
+        double hoveredMax = hoveredValues[1];
+
+        if (equippedMin == hoveredMin && equippedMax == hoveredMax) return;
+
+        String minDiff = formatNumber(Math.abs(hoveredMin - equippedMin), stat);
+        String maxDiff = formatNumber(Math.abs(hoveredMax - equippedMax), stat);
+
+        tooltips.add((hoveredMin > equippedMin ? TextFormatting.GREEN : TextFormatting.RED) + "✔ " + (hoveredMin > equippedMin ? "+" : "-") + minDiff + TextFormatting.DARK_GRAY + " - " + (hoveredMax > equippedMax ? TextFormatting.GREEN : TextFormatting.RED) + (hoveredMax > equippedMax ? "+" : "-") + maxDiff + " " + formatStat(stat));
     }
 
     private static String formatNumber(double value, String stat) {

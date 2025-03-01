@@ -94,15 +94,11 @@ public class ArmorTooltipCompare {
         }
     }
 
-    private static void compareDamage(List<String> tooltips, String stat, double[] equippedValues, double[] hoveredValues) {
-        double equippedMin = equippedValues[0];
-        double equippedMax = equippedValues[1];
-        double hoveredMin = hoveredValues[0];
-        double hoveredMax = hoveredValues[1];
-
-        if (equippedMin == hoveredMin && equippedMax == hoveredMax) return;
-
-        tooltips.add((hoveredMin > equippedMin ? TextFormatting.GREEN : TextFormatting.RED) + "✔ " + (hoveredMin > equippedMin ? "+" : "-") + Math.abs(hoveredMin - equippedMin) + TextFormatting.DARK_GRAY + " - " + (hoveredMax > equippedMax ? TextFormatting.GREEN : TextFormatting.RED) + (hoveredMax > equippedMax ? "+" : "-") + Math.abs(hoveredMax - equippedMax) + " " + formatStat(stat));
+    private static String formatNumber(double value, String stat) {
+        if (EXEMPTED.contains(stat)) {
+            return String.valueOf((int) value);
+        }
+        return (value % 1 == 0) ? String.valueOf((int) value) : String.format("%.2f", value);
     }
 
     private static void compareStats(List<String> tooltips, String stat, double[] equippedValues, double[] hoveredValues) {
@@ -111,7 +107,8 @@ public class ArmorTooltipCompare {
 
         if (equippedValue == hoveredValue) return;
 
-        tooltips.add((hoveredValue > equippedValue ? TextFormatting.GREEN : TextFormatting.RED) + "✔ " + (hoveredValue > equippedValue ? "+" : "-") + Math.abs(hoveredValue - equippedValue) + " " + formatStat(stat));
+        String formattedValue = formatNumber(Math.abs(hoveredValue - equippedValue), stat);
+        tooltips.add((hoveredValue > equippedValue ? TextFormatting.GREEN : TextFormatting.RED) + "✔ " + (hoveredValue > equippedValue ? "+" : "-") + formattedValue + " " + formatStat(stat));
     }
 
     private static String formatStat(String stat) {

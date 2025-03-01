@@ -21,9 +21,9 @@ public class ItemChecker {
             if (entityItem.getTags().contains("M_CHECKED")) {
                 continue;
             }
-            for (String tag : entityItem.getTags()) {
-                System.out.println(tag);
-            }
+//            for (String tag : entityItem.getTags()) {
+//                System.out.println(tag);
+//            }
             entityItem.addTag("M_CHECKED");
             this.findItemConsumer.accept(entityItem);
         }

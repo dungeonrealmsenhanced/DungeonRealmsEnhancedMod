@@ -5,6 +5,8 @@ import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.rend
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraftforge.common.MinecraftForge;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,7 @@ import static me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.setting
  * Created by Matthew E on 12/31/2018 at 3:27 PM for the project DungeonRealmsDREnhanced
  */
 public abstract class Module {
+    private static final Log log = LogFactory.getLog(Module.class);
     protected String name;
     public int posX;
     public int posY;
@@ -96,6 +99,7 @@ public abstract class Module {
 
     public abstract void render(ScaledResolution scaledResolution, float particleTicks);
 
+
     public void load() {
         if (this.loaded) {
             return;
@@ -103,7 +107,7 @@ public abstract class Module {
 
         MinecraftForge.EVENT_BUS.register(this);
         this.onLoad();
-        System.out.println("[" + name + "] Enabled.");
+        log.info("[" + name + "] Enabled.");
 
         this.loaded = true;
         defaultPosX = new Integer(this.posX).intValue();
@@ -116,7 +120,7 @@ public abstract class Module {
         }
         MinecraftForge.EVENT_BUS.unregister(this);
         this.onUnload();
-        System.out.println("[" + name + "] Disabled.");
+        log.info("[" + name + "] Disabled.");
 
         this.loaded = false;
     }

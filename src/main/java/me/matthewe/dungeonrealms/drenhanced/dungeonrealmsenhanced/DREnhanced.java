@@ -26,6 +26,8 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.lwjgl.opengl.Display;
 
 import java.io.File;
@@ -42,6 +44,7 @@ import java.util.Date;
         clientSideOnly = true
 )
 public class DREnhanced {
+    private static final Log log = LogFactory.getLog(DREnhanced.class);
     @SidedProxy(
             clientSide = "me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.proxy.ClientProxy",
             serverSide = "me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.proxy.ServerProxy"
@@ -204,9 +207,10 @@ public class DREnhanced {
 
     }
 
+
     public static void log(String par1, Object... par2) {
         String var1 = String.format(par1, par2);
-        System.out.println("[" + new Date().toLocaleString() + "] [DREnhanced] " + var1);
+        log.info(("[" + new Date().toLocaleString() + "] [DREnhanced] " + var1)); //gross
     }
 
     /**

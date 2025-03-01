@@ -22,7 +22,7 @@ public class ClickListener implements Listener {
         }
         if (event.isButtonstate()) {
             this.hasClickedThisTick = true;
-            System.out.println(Minecraft.getMinecraft().player.experience);
+//            System.out.println(Minecraft.getMinecraft().player.experience);
             if (Minecraft.getMinecraft().player.experienceLevel >= 15){
                 DRPlayer.drPlayer.addClick();
             } else {

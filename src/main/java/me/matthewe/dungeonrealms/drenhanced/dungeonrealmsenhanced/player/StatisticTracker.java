@@ -32,7 +32,7 @@ public class StatisticTracker extends Thread {
     public void run() {
         while (running) {
             times++;
-            System.out.println("[StatisticTracker] Running (" + times + ")");
+//            System.out.println("[StatisticTracker] Running (" + times + ")");
             this.updateStatistics();
             try {
                 sleep(1000L);
@@ -87,7 +87,7 @@ public class StatisticTracker extends Thread {
                 DRPlayer.drPlayer.getStatistics().setOreMined(oreMined);
             }
             if (playerName.startsWith("Bank Gems: ")) {
-                System.out.println(playerName);
+//                System.out.println(playerName);
                 DRPlayer.drPlayer.getStatistics().setBankGems((long) Integer.parseInt(playerName.split("Bank Gems: ")[1].trim()));
             }
             if (playerName.startsWith("Player Kills: ")) {

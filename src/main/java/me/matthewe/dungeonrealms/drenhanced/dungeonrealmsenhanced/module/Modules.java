@@ -4,6 +4,7 @@ package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DREnhanced;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.CoordsModule;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.GemsModule;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.ShardCountModule;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.buff.BuffModule;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.profession.ProfessionModule;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.treasurescroll.TreasureScrollModule;
@@ -42,6 +43,7 @@ public class Modules {
         addModule(new ProfessionModule());
         addModule(new GemsModule());
         addModule(new BuffModule());
+        addModule(new ShardCountModule());
 //        addModule(new DrySteakModule());
     }
 

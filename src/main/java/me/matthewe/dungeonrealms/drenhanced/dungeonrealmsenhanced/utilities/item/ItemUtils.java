@@ -1,5 +1,6 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item;
 
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.MathUtils;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.NumberUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -60,6 +61,16 @@ public class ItemUtils {
             if (tagCompound == null) {
                 return null;
             }
+
+            if (tagCompound.hasKey("augmentations")) {
+                NBTTagCompound augmentations = tagCompound.getCompoundTag("augmentations");
+                for (String s : augmentations.getKeySet()) {
+                    double v = Double.parseDouble(augmentations.getTag(s).toString());
+                    double[] values = {v};
+                    modifierMap.put(s,values);
+                }
+            }
+
             NBTTagCompound modifiers = tagCompound.getCompoundTag("modifiers");
             for (String s : modifiers.getKeySet()) {
                 String s1 = modifiers.getTag(s).toString();
@@ -72,18 +83,28 @@ public class ItemUtils {
                             String s2 = split[i];
                             ints[i] = NumberUtils.getNumber(s2.trim());
                         }
-                        modifierMap.put(s, ints);
+                        if (modifierMap.containsKey(s)){
+                            modifierMap.put(s, MathUtils.elementWiseSum(ints, modifierMap.get(s)));
+                        } else {
+
+                            modifierMap.put(s, ints);
+                        }
                     } else {
 
                         double[] ints = new double[1];
                         ints[0] = NumberUtils.getNumber(trim.trim());
-                        modifierMap.put(s, ints);
+                        if (modifierMap.containsKey(s)){
+                            modifierMap.put(s, MathUtils.elementWiseSum(ints, modifierMap.get(s)));
+                        } else {
+                            modifierMap.put(s, ints);
+                        }
                     }
                 }
             }
         }
         return !modifierMap.isEmpty() ? modifierMap : null;
     }
+
 
     public static boolean isWeapon(Item item) {
         if (item == Items.DIAMOND_SWORD) return true;

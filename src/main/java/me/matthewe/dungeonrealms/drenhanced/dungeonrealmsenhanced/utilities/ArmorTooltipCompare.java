@@ -12,8 +12,13 @@ import java.util.*;
 
 public class ArmorTooltipCompare {
 
-    private static final List<String> EXEMPTED = Arrays.asList("HEALTH_POINTS"); // dealing with decimal bug.
-    private static final Set<String> DAMAGE_TYPES = new HashSet<>(Arrays.asList("MELEE_DAMAGE", "RANGE_DAMAGE"));
+    private static final List<String> EXEMPTED = Arrays.asList("HEALTH_POINTS","MELEE_DAMAGE", "RANGE_DAMAGE", "DAMAGE"); // dealing with decimal bug.
+    private static final Map<String, String> DAMAGE_TYPE_MAP = new HashMap<>();
+
+    static {
+        DAMAGE_TYPE_MAP.put("MELEE_DAMAGE", "DAMAGE");
+        DAMAGE_TYPE_MAP.put("RANGE_DAMAGE", "DAMAGE");
+    }
 
     public static List<String> handleToolTip(ItemTooltipEvent event) {
         ItemStack tooltipStack = event.getItemStack();
@@ -25,7 +30,7 @@ public class ArmorTooltipCompare {
                 Map<String, double[]> tooltipModifiers = ItemUtils.getModifierMap(tooltipStack);
 
                 ItemStack equipped = mc.player.inventory.getStackInSlot(0);
-                if (equipped==null||equipped.isEmpty() || !ItemUtils.isWeapon(equipped.getItem())) {
+                if (equipped == null || equipped.isEmpty() || !ItemUtils.isWeapon(equipped.getItem())) {
                     equipped = mc.player.getHeldItemMainhand();
                 }
 
@@ -70,15 +75,16 @@ public class ArmorTooltipCompare {
         tooltips.add(TextFormatting.GRAY + TextFormatting.BOLD.toString() + "New Item: " + tooltipStack.getDisplayName());
         tooltips.add("");
 
-        Set<String> allStats = equippedModifiers==null?new HashSet<>() : new HashSet<>(equippedModifiers.keySet());
+        Set<String> allStats = equippedModifiers == null ? new HashSet<>() : new HashSet<>(equippedModifiers.keySet());
         allStats.addAll(itemModifiers.keySet());
 
         int count = 0;
         for (String stat : allStats) {
-            double[] equippedValues =equippedModifiers!=null? equippedModifiers.getOrDefault(stat, new double[]{0, 0}) :new double[]{0, 0} ;
+            String normalizedStat = DAMAGE_TYPE_MAP.getOrDefault(stat, stat);
+            double[] equippedValues = equippedModifiers != null ? equippedModifiers.getOrDefault(stat, new double[]{0, 0}) : new double[]{0, 0};
             double[] hoveredValues = itemModifiers.getOrDefault(stat, new double[]{0, 0});
 
-            if (DAMAGE_TYPES.contains(stat)) {
+            if (normalizedStat.equals("DAMAGE")) {
                 compareDamage(tooltips, stat, equippedValues, hoveredValues);
                 count++;
             } else {

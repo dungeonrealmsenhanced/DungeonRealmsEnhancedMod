@@ -112,7 +112,7 @@ public class BuffListener implements Listener {
                return;
            }
 
-           delay = System.currentTimeMillis()+ TimeUnit.SECONDS.toMillis(5);
+           delay = System.currentTimeMillis()+ TimeUnit.SECONDS.toMillis(3);
            delay1 = System.currentTimeMillis()+ TimeUnit.SECONDS.toMillis(1);
 
            Minecraft.getMinecraft().player.sendChatMessage("/bufftime");

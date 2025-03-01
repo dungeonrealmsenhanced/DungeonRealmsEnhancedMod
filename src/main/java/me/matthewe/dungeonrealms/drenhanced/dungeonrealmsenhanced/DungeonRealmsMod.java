@@ -1,4 +1,4 @@
-package clutch.dungeonrealms;
+package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced;
 
 public class DungeonRealmsMod {
 

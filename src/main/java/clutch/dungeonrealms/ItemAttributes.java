@@ -34,6 +34,9 @@ public class ItemAttributes {
         new ItemAttributes();
 
     }
+    public static  Map<String, Attribute> get() {
+        return attributes;
+    }
     public ItemAttributes() {
         // Armor Main
         registerAttribute(new Armor());

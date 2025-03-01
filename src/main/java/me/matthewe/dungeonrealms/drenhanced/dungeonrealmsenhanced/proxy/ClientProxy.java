@@ -1,6 +1,6 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.proxy;
 
-import clutch.dungeonrealms.DungeonRealmsMod;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DungeonRealmsMod;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.commands.CommandInfo;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.commands.ZoneCommand;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.Handlers;

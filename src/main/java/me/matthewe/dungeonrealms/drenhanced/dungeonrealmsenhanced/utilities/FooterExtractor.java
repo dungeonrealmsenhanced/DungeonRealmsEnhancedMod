@@ -19,7 +19,7 @@ public class FooterExtractor {
 
         // Remove color codes and trim
         footerText = footerText.replaceAll("§.", "").trim();
-        System.out.println("Extracted Footer: " + footerText);
+//        System.out.println("Extracted Footer: " + footerText);
 
         // Extract player count
         Matcher playerMatcher = ONLINE_PLAYER_PATTERN.matcher(footerText);

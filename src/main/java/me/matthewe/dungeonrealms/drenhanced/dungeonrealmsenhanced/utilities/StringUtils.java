@@ -2,6 +2,9 @@ package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities;
 
 import net.minecraft.util.text.TextFormatting;
 
+import java.util.List;
+import java.util.function.Function;
+
 /**
  * Created by Matthew E on 3/10/2019 at 5:37 PM for the project DungeonRealmsDREnhanced
  */
@@ -9,6 +12,11 @@ public class StringUtils {
     public static String formatShard(String shard) {
         return shard.toUpperCase().replaceAll("US", "US-").replaceAll("SUB", "SUB-").replaceAll("EU", "EU-").replaceAll("BS", "BS-");
     }
+
+    public static void editStringList(List<String> list, Function<String, String> modifier) {
+        list.replaceAll(modifier::apply);
+    }
+
     public static String formatDungeon(String dungeon) {
         String dungeonName = formatEnum(dungeon).trim();
         if (dungeonName.equalsIgnoreCase("Varenglade")) {
@@ -53,5 +61,9 @@ public class StringUtils {
             return returnString.trim();
         }
         return returnString.trim();
+    }
+
+    public static String clearColor(String s) {
+        return new String(s).replaceAll("§.","").trim();
     }
 }

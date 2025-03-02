@@ -1,10 +1,15 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.misc.listeners;
 
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DREnhanced;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.StatKeyDatabase;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setting.DRSettings;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.ArmorTooltipCompare;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.IntRange;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.Listener;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.StringUtils;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemRarity;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemUtils;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.Tier;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -218,6 +223,8 @@ public class ItemOriginListener implements Listener {
                         event.getToolTip().addAll(toolTip);
                     }
 
+                    handleStatPercentages(event);
+
                 }
 
             }
@@ -225,5 +232,45 @@ public class ItemOriginListener implements Listener {
             event.getToolTip().add(TextFormatting.RED + "ERROR (Please message .matthewe on discord)");
             e.printStackTrace();
         }
+    }
+
+    private void handleStatPercentages(ItemTooltipEvent event) {
+        List<String> newToolTip = new ArrayList<>();
+
+        for (String line : event.getToolTip()) {
+            newToolTip.add(line);
+        }
+        ItemStack itemStack = event.getItemStack();
+        Map<String, double[]> modifierMap = ItemUtils.getModifierMap(itemStack);
+
+        StatKeyDatabase database = DREnhanced.getStatKeyDatabase();
+
+
+        List<String> armorElementals = Arrays.asList("VIT", "DEX", "STR", "INT");
+
+
+        Tier tier = ItemUtils.getTier(itemStack);
+        ItemRarity rarity = ItemUtils.getRarity(itemStack);
+
+        StringUtils.editStringList(newToolTip, s -> {
+            String colorStripped = StringUtils.clearColor(s);
+
+            for (String elemental : armorElementals) {
+                if (colorStripped.startsWith(elemental) && modifierMap.containsKey(database.getKeyFromValue(elemental))) {
+                    IntRange intRange = database.getElemental(tier, rarity);
+                    int min = intRange.getMin();
+                    int max = intRange.getMax();
+                    int stat = (int) modifierMap.get(database.getKeyFromValue(elemental))[0];
+                    double percentage = ((double) (stat - min) / (max - min)) * 100;
+                    return TextFormatting.GRAY+"["+(int)percentage+"%] " + s;
+
+
+
+                }
+            }
+            return s;
+        });
+        event.getToolTip().clear();
+        event.getToolTip().addAll(newToolTip);
     }
 }

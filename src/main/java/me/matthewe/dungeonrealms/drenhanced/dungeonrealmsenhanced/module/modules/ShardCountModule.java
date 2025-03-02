@@ -8,6 +8,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.util.text.TextFormatting;
 
+import javax.xml.soap.Text;
 import java.text.DecimalFormat;
 import java.util.Collection;
 
@@ -24,9 +25,14 @@ public class ShardCountModule extends Module {
     }
 
     private static int count;
+    private static String shard;
     @Override
     public void renderEditing(ScaledResolution resolution, float partialTicks) {
         Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(getTextToShow(), this.posX, this.posY, 0xFFFF55);
+    }
+
+    public static void setShard(String shard) {
+        ShardCountModule.shard = shard;
     }
 
     private final DecimalFormat format = new DecimalFormat("#,###");
@@ -35,7 +41,18 @@ public class ShardCountModule extends Module {
 
 
 
-        return TextFormatting.YELLOW +"Player Count: " + TextFormatting.WHITE+format.format(count);
+        if (shard!=null){
+            if (count>1){
+
+                return TextFormatting.YELLOW + TextFormatting.BOLD.toString() +shard.toUpperCase() +": " + TextFormatting.WHITE+TextFormatting.BOLD.toString() + format.format(count) +" Players";
+            }
+            return TextFormatting.YELLOW + TextFormatting.BOLD.toString() +shard.toUpperCase() +": " + TextFormatting.WHITE+TextFormatting.BOLD.toString() + format.format(count) +" Player";
+
+        } else {
+            return TextFormatting.RED +"NO SHARD FOUND";
+
+        }
+
 
     }
     @Override
@@ -59,7 +76,7 @@ public class ShardCountModule extends Module {
     @Override
     public void onLoad() {
         this.posX = 150;
-        this.posY = 250;
+        this.posY = 100;
     }
 
     @Override

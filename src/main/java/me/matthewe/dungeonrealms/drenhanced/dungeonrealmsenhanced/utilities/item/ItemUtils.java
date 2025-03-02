@@ -1,6 +1,5 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item;
 
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.MathUtils;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.NumberUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -13,6 +12,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -53,6 +53,70 @@ public class ItemUtils {
     public static ItemRarity getRarity(ItemStack itemStack) {
         return ItemRarity.getByName(NbtTagUtils.getString("rarity", itemStack));
     }
+
+    public static int[] calculateDPS(ItemStack itemStack) {
+        if (!isWeapon(itemStack.getItem())) return new int[]{0,0};
+        Map<String, double[]> modifierMap = getModifierMap(itemStack);
+
+
+        double[] damage = getDamage(itemStack, modifierMap);
+
+        double dmgToAdd = 0;
+
+
+        for (String elemental : Arrays.asList("ICE_DAMAGE", "PURE_DAMAGE", "FIRE_DAMAGE", "POISON_DAMAGE")) {
+
+            if (modifierMap.containsKey(elemental)) {
+
+                dmgToAdd += modifierMap.get(elemental)[0];
+            }
+        }
+
+        double multipliers = 1.0D;
+        if (modifierMap.containsKey("VS_MONSTERS")) {
+            double multiplier = modifierMap.get("VS_MONSTERS")[0];
+
+            multipliers+= (multiplier/100.0D);
+        }
+
+        double criticalMultiplier = 1.0;
+        if (modifierMap.containsKey("CRITICAL_HIT")) {
+            double criticalChance = modifierMap.get("CRITICAL_HIT")[0] / 100.0; // Convert % to decimal
+            criticalMultiplier = 1 + criticalChance; // Weighted average of crit damage
+        }
+
+        double executeMultiplier = 1.0;
+        if (modifierMap.containsKey("EXECUTE")) {
+            double executePercent = modifierMap.get("EXECUTE")[0] / 100.0;
+            executeMultiplier += executePercent * 0.50; // Assume 50% effectiveness over time
+        }
+
+        // Apply estimated Crushing multiplier (50% effectiveness over a fight)
+        double crushingMultiplier = 1.0;
+        if (modifierMap.containsKey("CRUSHING")) {
+            double crushingPercent = modifierMap.get("CRUSHING")[0] / 100.0;
+            crushingMultiplier += crushingPercent * 0.50; // Assume 50% effectiveness over time
+        }
+
+        // Final DPS calculation
+        double dpsMin = damage[0] * multipliers * criticalMultiplier * executeMultiplier * crushingMultiplier;
+        double dpsMax = damage[1] * multipliers * criticalMultiplier * executeMultiplier * crushingMultiplier;
+
+        dpsMax+=dmgToAdd;
+        dpsMin+=dmgToAdd;
+        return new int[] {(int) Math.round(dpsMin), (int) Math.round(dpsMax)};
+
+
+    }
+
+    public static double[] getDamage(ItemStack itemStack, Map<String, double[]> modifierMap) {
+
+        if (itemStack.getItem()==Items.BOW) {
+           return modifierMap.get("RANGE_DAMAGE");
+        }
+        return modifierMap.get("MELEE_DAMAGE");
+    }
+
 
     public static Map<String, double[]> getModifierMap(ItemStack itemStack) {
         Map<String, double[]> modifierMap = new ConcurrentHashMap<>();

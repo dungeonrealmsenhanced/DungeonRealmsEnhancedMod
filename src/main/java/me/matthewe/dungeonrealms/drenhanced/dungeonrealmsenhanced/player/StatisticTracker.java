@@ -1,12 +1,15 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player;
 
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.ShardCountModule;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.FooterExtractor;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.Tier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiPlayerTabOverlay;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +21,7 @@ import java.util.regex.Pattern;
  * Created by Matthew E on 12/31/2018 at 2:42 PM for the project DungeonRealmsDREnhanced
  */
 public class StatisticTracker extends Thread {
+    private static final Log log = LogFactory.getLog(StatisticTracker.class);
     private long times = 0;
     private boolean running = false;
 
@@ -55,6 +59,11 @@ public class StatisticTracker extends Thread {
         if (Minecraft.getMinecraft().getConnection() == null) {
             return;
         }
+
+//        log.info("Updating statistics.");
+        if (tabList==null)return;
+       FooterExtractor.extractFooterInfo(tabList);
+
 
         List<NetworkPlayerInfo> playersC = new ArrayList<>(Minecraft.getMinecraft().getConnection().getPlayerInfoMap());
 
@@ -149,17 +158,7 @@ public class StatisticTracker extends Thread {
             if (playerName.startsWith("Loot Opened: ")) {
                 DRPlayer.drPlayer.getStatistics().setLootOpened(Integer.parseInt(playerName.split("Loot Opened: ")[1].trim()));
             }
-            if (playerName.matches("^\\(\\d+ here\\).*")) {
 
-                Matcher matcher = ONLINE_PLAYER_PATTERN.matcher(playerName);
-
-                if (matcher.find()) {
-                    int number = Integer.parseInt(matcher.group(1));
-                    ShardCountModule.setCount(number);
-                }  else {
-                    ShardCountModule.setCount(0);
-                }
-            }
 
 //            if (playerName.startsWith("Ore Mined: ")) {
 //                DRPlayer.drPlayer.getStatistics().setOreMined(Integer.parseInt(playerName.split("Ore Mined: ")[1].trim()));
@@ -232,6 +231,5 @@ public class StatisticTracker extends Thread {
         }
         DRPlayer.drPlayer.setUuid(Minecraft.getMinecraft().player.getUniqueID());
     }
-    private final Pattern ONLINE_PLAYER_PATTERN = Pattern.compile("^\\((\\d+) here\\)");
 
 }

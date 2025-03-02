@@ -55,9 +55,13 @@ public class ItemOriginListener implements Listener {
             ItemStack itemStack = event.getItemStack();
             if (itemStack.hasTagCompound()) {
                 List<String> toolTip = new ArrayList<>();
+
+
                 boolean displayToolTip = false;
 
                 NBTTagCompound tagCompound = itemStack.getTagCompound();
+
+
                 if (tagCompound.hasKey("origin")) {
                     if( !GuiScreen.isCtrlKeyDown() && !GuiScreen.isShiftKeyDown()) {
                         toolTip.add(TextFormatting.GRAY + TextFormatting.STRIKETHROUGH.toString() + "------------------");
@@ -172,6 +176,8 @@ public class ItemOriginListener implements Listener {
 
                         if (!ItemUtils.isEquippedOrInHotbarSlot0(itemStack)){
                             if (!strings.isEmpty()) {
+
+
                                 toolTip.addAll(strings);
                                 displayToolTip=true;
                             }
@@ -181,7 +187,36 @@ public class ItemOriginListener implements Listener {
 
                 }
                 if (displayToolTip) {
-                    event.getToolTip().addAll(toolTip);
+
+                    if (ItemUtils.isWeapon(itemStack.getItem())) {
+                        List<String> finalToolTip = new ArrayList<>();
+
+                        double[] damage = ItemUtils.getDamage(itemStack, ItemUtils.getModifierMap(itemStack));
+
+                        List<String> cache  = new ArrayList<>();
+                        cache.addAll(event.getToolTip());
+
+
+                        int[] ints = ItemUtils.calculateDPS(itemStack);
+                        String toAdd = "";
+                        if ( DRSettings.DISPLAY_DPS.get(boolean.class)) {
+                            toAdd = TextFormatting.GRAY +" (DPS: "+ints[0]+" - " + ints[1] +")";
+
+                        }
+                        cache.set(1, TextFormatting.RED + "DMG: +"+Math.round(damage[0]) +" - " + Math.round(damage[1]) + toAdd);
+//                        cache.set(1, TextFormatting.RED + "DMG : +"+ints[0] +" - " + ints[1]);
+                        finalToolTip.addAll(cache);
+
+
+
+
+
+                        event.getToolTip().clear();
+                        event.getToolTip().addAll(finalToolTip);
+                        event.getToolTip().addAll(toolTip);
+                    } else {
+                        event.getToolTip().addAll(toolTip);
+                    }
 
                 }
 

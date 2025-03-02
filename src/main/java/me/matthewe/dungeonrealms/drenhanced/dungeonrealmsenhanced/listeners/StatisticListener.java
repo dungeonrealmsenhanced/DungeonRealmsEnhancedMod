@@ -2,6 +2,7 @@ package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners;
 
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DREnhanced;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.events.DungeonRealmsJoinEvent;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners.buff.BuffListener;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.DRPlayer;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.StatisticTracker;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setting.DRSettings;
@@ -32,17 +33,27 @@ public class StatisticListener {
         this.statisticTracker = new StatisticTracker();
     }
 
+    private long delay2;
+
     @SubscribeEvent
     public void onTickClientTick(TickEvent.ClientTickEvent event) {
         if (System.currentTimeMillis() > this.delay && playing) {
             this.delay = System.currentTimeMillis() + 250L;
             EntityPlayerSP player = Minecraft.getMinecraft().player;
-            if (player == null) {
-                return;
+            if (player != null) {
+                DRPlayer.get().update();
+                DRPlayer.get().setLocation(new Location(player.posX, player.posY, player.posZ, player.cameraYaw, player.cameraPitch));
             }
-            DRPlayer.get().update();
-            DRPlayer.get().setLocation(new Location(player.posX, player.posY, player.posZ, player.cameraYaw, player.cameraPitch));
         }
+        if (System.currentTimeMillis() > this.delay2 && playing) {
+            this.delay2 = System.currentTimeMillis() + 3000L;
+            EntityPlayerSP player = Minecraft.getMinecraft().player;
+            if (player != null) {
+                BuffListener.requestActiveBuffs();
+            }
+        }
+
+
 
     }
 

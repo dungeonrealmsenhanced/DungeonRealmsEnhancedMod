@@ -127,7 +127,11 @@ public class ArmorTooltipCompare {
         if (equippedValue == hoveredValue) return;
 
         String formattedValue = formatNumber(Math.abs(hoveredValue - equippedValue), stat);
-        tooltips.add((hoveredValue > equippedValue ? TextFormatting.GREEN : TextFormatting.RED) + "✔ " + (hoveredValue > equippedValue ? "+" : "-") + formattedValue + " " + formatStat(stat));
+        boolean statDecreased = hoveredValue < equippedValue;
+
+        tooltips.add((statDecreased ? TextFormatting.RED + "✘ " : TextFormatting.GREEN + "✔ ")
+                + (hoveredValue > equippedValue ? "+" : "-") + formattedValue
+                + " " + formatStat(stat));
     }
 
     private static String formatStat(String stat) {

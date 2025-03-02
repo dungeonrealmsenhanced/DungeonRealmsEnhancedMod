@@ -2,13 +2,13 @@ package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced;
 
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.IntRange;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemRarity;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.Tier;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.restful.HttpUtils;
-import net.minecraft.item.ItemTippedArrow;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,7 +25,7 @@ public class StatKeyDatabase {
     private ExecutorService executorService = Executors.newCachedThreadPool();
     private boolean complete = false;
     private boolean runningDataUpdate = false;
-    private Gson gson = DREnhanced.gsonBuilder.setPrettyPrinting().create();
+    private Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     private Map<Tier, TierValue> tierValues;
 
@@ -43,6 +43,11 @@ public class StatKeyDatabase {
         public TierValue(Tier tier) {
             this.tier = tier;
             this.rarityValues = new HashMap<>();
+        }
+
+        @Override
+        public String toString() {
+            return tier +" {"+rarityValues+"}";
         }
 
         public void addRarityValue(RarityValue rarityValue) {
@@ -89,7 +94,7 @@ public class StatKeyDatabase {
     public static void main(String[] args) {
         StatKeyDatabase statKeyDatabase = new StatKeyDatabase();
         statKeyDatabase.loadDictionary();
-        System.out.println(statKeyDatabase.getKeyDictionary());
+
     }
 
     public void updateData() {
@@ -112,7 +117,7 @@ public class StatKeyDatabase {
                 }
                 JsonObject data = jsonObject.get("data").getAsJsonObject();
 
-                DREnhanced.getStatKeyDatabase().update(data);
+                update(data);
                 completeDataUpdate();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -149,6 +154,9 @@ public class StatKeyDatabase {
         updateMappings(data.getAsJsonArray("mappings.csv"));
         updateElementals(data.getAsJsonArray("int_str_dex_vit.csv"));
         System.out.println(tierValues);
+        System.out.println(this.keyDictionary);
+
+        System.out.println("RARE T5 VIT: " + getElemental(Tier.T5,ItemRarity.RARE));
     }
 
     private void updateElementals(JsonArray array) {
@@ -162,7 +170,7 @@ public class StatKeyDatabase {
 
             ItemRarity rarity = ItemRarity.getByName(entry.get(1).getAsString());
             int min =Integer.parseInt( entry.get(2).getAsString());
-            int max = Integer.parseInt(entry.get(2).getAsString());
+            int max = Integer.parseInt(entry.get(3).getAsString());
 
             if (!tierValues.containsKey(tier)) {
                 TierValue tierValue = new TierValue(tier);

@@ -35,6 +35,7 @@ public class ClientProxy implements IProxy {
         MinecraftForge.EVENT_BUS.register(new ItemCheckerListener());
         MinecraftForge.EVENT_BUS.register(new RarityOverlayListener());
         MinecraftForge.EVENT_BUS.register(new MenuReplacerListener());
+        MinecraftForge.EVENT_BUS.register(new AdvancementHiderListener());
         DungeonRealmsMod.init();
 
         Handlers.init();

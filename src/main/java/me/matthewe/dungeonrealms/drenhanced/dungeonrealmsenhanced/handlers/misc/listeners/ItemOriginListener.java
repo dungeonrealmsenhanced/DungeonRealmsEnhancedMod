@@ -241,7 +241,7 @@ public class ItemOriginListener implements Listener {
             newToolTip.add(line);
         }
         ItemStack itemStack = event.getItemStack();
-        Map<String, double[]> modifierMap = ItemUtils.getModifierMap(itemStack);
+        Map<String, double[]> modifierMap = ItemUtils.getModifierMap(itemStack,true);
 
         StatKeyDatabase database = DREnhanced.getStatKeyDatabase();
 
@@ -262,7 +262,9 @@ public class ItemOriginListener implements Listener {
                     int max = intRange.getMax();
                     int stat = (int) modifierMap.get(database.getKeyFromValue(elemental))[0];
                     double percentage = ((double) (stat - min) / (max - min)) * 100;
-                    return TextFormatting.GRAY+"["+(int)percentage+"%] " + s;
+                    String per = (percentage>=100?"MAX":(int)percentage+"%");
+
+                    return TextFormatting.GRAY+"["+per+"] " + s;
 
 
 

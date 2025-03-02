@@ -117,8 +117,10 @@ public class ItemUtils {
         return modifierMap.get("MELEE_DAMAGE");
     }
 
-
     public static Map<String, double[]> getModifierMap(ItemStack itemStack) {
+        return getModifierMap(itemStack, false);
+    }
+    public static Map<String, double[]> getModifierMap(ItemStack itemStack, boolean skipAugmentations) {
         Map<String, double[]> modifierMap = new ConcurrentHashMap<>();
         if ((itemStack.getItem() != Items.AIR) && itemStack.hasDisplayName() && itemStack.hasTagCompound()) {
             NBTTagCompound tagCompound = itemStack.getTagCompound();
@@ -126,13 +128,16 @@ public class ItemUtils {
                 return null;
             }
 
-            if (tagCompound.hasKey("augmentations")) {
-                NBTTagCompound augmentations = tagCompound.getCompoundTag("augmentations");
-                for (String s : augmentations.getKeySet()) {
-                    double v = Double.parseDouble(augmentations.getTag(s).toString());
-                    double[] values = {v};
+            if (!skipAugmentations) {
 
-                    modifierMap.put(s,values);
+                if (tagCompound.hasKey("augmentations")) {
+                    NBTTagCompound augmentations = tagCompound.getCompoundTag("augmentations");
+                    for (String s : augmentations.getKeySet()) {
+                        double v = Double.parseDouble(augmentations.getTag(s).toString());
+                        double[] values = {v};
+
+                        modifierMap.put(s,values);
+                    }
                 }
             }
 

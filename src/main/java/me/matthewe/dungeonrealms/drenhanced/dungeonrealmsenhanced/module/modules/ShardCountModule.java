@@ -19,6 +19,11 @@ public class ShardCountModule extends Module {
         super("ShardCount");
     }
 
+    public static void setCount(int count) {
+        ShardCountModule.count = count;
+    }
+
+    private static int count;
     @Override
     public void renderEditing(ScaledResolution resolution, float partialTicks) {
         Minecraft.getMinecraft().fontRenderer.drawStringWithShadow(getTextToShow(), this.posX, this.posY, 0xFFFF55);
@@ -28,13 +33,7 @@ public class ShardCountModule extends Module {
 
     private String getTextToShow(){
 
-        int count = 1;
 
-        Minecraft mc = Minecraft.getMinecraft();
-        if (mc.getConnection() != null) {
-            Collection<NetworkPlayerInfo> players = mc.getConnection().getPlayerInfoMap();
-            count = players.size(); // Returns the number of players in the tab list
-        }
 
         return TextFormatting.YELLOW +"Player Count: " + TextFormatting.WHITE+format.format(count);
 

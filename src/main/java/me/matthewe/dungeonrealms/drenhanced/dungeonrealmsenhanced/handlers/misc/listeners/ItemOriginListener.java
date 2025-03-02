@@ -169,6 +169,7 @@ public class ItemOriginListener implements Listener {
                     } else if (GuiScreen.isShiftKeyDown()) {
                         List<String> strings = ArmorTooltipCompare.handleToolTip(event);
 
+
                         if (!ItemUtils.isEquippedOrInHotbarSlot0(itemStack)){
                             if (!strings.isEmpty()) {
                                 toolTip.addAll(strings);

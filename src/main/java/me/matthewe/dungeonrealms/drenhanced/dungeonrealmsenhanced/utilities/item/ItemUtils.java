@@ -67,6 +67,7 @@ public class ItemUtils {
                 for (String s : augmentations.getKeySet()) {
                     double v = Double.parseDouble(augmentations.getTag(s).toString());
                     double[] values = {v};
+
                     modifierMap.put(s,values);
                 }
             }
@@ -84,7 +85,11 @@ public class ItemUtils {
                             ints[i] = NumberUtils.getNumber(s2.trim());
                         }
                         if (modifierMap.containsKey(s)){
-                            modifierMap.put(s, MathUtils.elementWiseSum(ints, modifierMap.get(s)));
+
+                            double[] doubles = modifierMap.get(s);
+                            double[] news = new  double[] {ints[0]+doubles[0],ints[1]+doubles[1] };
+
+                            modifierMap.put(s,news);
                         } else {
 
                             modifierMap.put(s, ints);
@@ -93,8 +98,11 @@ public class ItemUtils {
 
                         double[] ints = new double[1];
                         ints[0] = NumberUtils.getNumber(trim.trim());
+
+
                         if (modifierMap.containsKey(s)){
-                            modifierMap.put(s, MathUtils.elementWiseSum(ints, modifierMap.get(s)));
+                            double[] doubles = modifierMap.get(s);
+                            modifierMap.put(s,  new double[] {doubles[0]+ints[0]});
                         } else {
                             modifierMap.put(s, ints);
                         }

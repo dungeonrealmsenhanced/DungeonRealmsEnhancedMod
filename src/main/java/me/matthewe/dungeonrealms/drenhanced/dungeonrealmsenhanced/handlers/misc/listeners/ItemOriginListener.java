@@ -242,11 +242,17 @@ public class ItemOriginListener implements Listener {
         }
         ItemStack itemStack = event.getItemStack();
         Map<String, double[]> modifierMap = ItemUtils.getModifierMap(itemStack,true);
-
+        if (modifierMap==null)return;
         StatKeyDatabase database = DREnhanced.getStatKeyDatabase();
 
 
         List<String> armorElementals = Arrays.asList("VIT", "DEX", "STR", "INT");
+
+        List<String> orbStats = new ArrayList<>();
+        for (String s : modifierMap.keySet()) {
+            if (armorElementals.contains(database.getKeyFromValue(s)))continue;
+            orbStats.add(s);
+        }
 
 
         Tier tier = ItemUtils.getTier(itemStack);
@@ -264,7 +270,7 @@ public class ItemOriginListener implements Listener {
                     double percentage = ((double) (stat - min) / (max - min)) * 100;
                     String per = (percentage>=100?"MAX":(int)percentage+"%");
 
-                    return TextFormatting.GRAY+"["+per+"] " + s;
+                    return TextFormatting.GRAY+"["+per+"]";
 
 
 

@@ -10,14 +10,11 @@ import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.Tier;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.restful.HttpUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Function;
 
 public class StatKeyDatabase {
     private Map<String, String> keyDictionary;
@@ -38,12 +35,15 @@ public class StatKeyDatabase {
         private Tier tier;
 
 
+        private Map<String, IntRange> orbValues;
         private Map<ItemRarity, RarityValue> rarityValues;
 
         public TierValue(Tier tier) {
             this.tier = tier;
             this.rarityValues = new HashMap<>();
+            this.orbValues = new HashMap<>();
         }
+
 
         @Override
         public String toString() {
@@ -65,6 +65,9 @@ public class StatKeyDatabase {
         public static class RarityValue {
             private ItemRarity rarity;
             private IntRange elementals;
+
+            private IntRange damageMin;
+            private IntRange damageMax;
 
             public RarityValue(ItemRarity rarity) {
                 this.rarity = rarity;
@@ -153,12 +156,41 @@ public class StatKeyDatabase {
 
         updateMappings(data.getAsJsonArray("mappings.csv"));
         updateElementals(data.getAsJsonArray("int_str_dex_vit.csv"));
+        updateOrbValues(data.getAsJsonArray("orb_values.csv"));
         System.out.println(tierValues);
         System.out.println(this.keyDictionary);
 
         System.out.println("RARE T5 VIT: " + getElemental(Tier.T5,ItemRarity.RARE));
     }
+    private void updateOrbValues(JsonArray array) {
+        for (int i = 1; i < array.size(); i++) {
+            JsonArray entry = array.get(i).getAsJsonArray();
+            if (entry.get(0).getAsString().equalsIgnoreCase("stat"))continue;
 
+
+            String stat = entry.get(0).getAsString();
+
+            Tier tier = Tier.getByNumber(Integer.parseInt(entry.get(1).getAsString()));
+            int min =Integer.parseInt( entry.get(2).getAsString());
+            int max = Integer.parseInt(entry.get(3).getAsString());
+
+            if (!tierValues.containsKey(tier)) {
+                TierValue tierValue = new TierValue(tier);
+                tierValues.put(tier,tierValue);
+            }
+
+            TierValue tierValue = tierValues.get(tier);
+
+            tierValue.orbValues.put(stat, new IntRange(min, max));
+        }
+    }
+
+    public IntRange getElementalValue(Tier tier, String stat) {
+        if (tierValues.containsKey(tier)) {
+            return tierValues.get(tier).orbValues.getOrDefault(stat, null);
+        }
+        return null;
+    }
     private void updateElementals(JsonArray array) {
         for (int i = 1; i < array.size(); i++) {
             JsonArray entry = array.get(i).getAsJsonArray();

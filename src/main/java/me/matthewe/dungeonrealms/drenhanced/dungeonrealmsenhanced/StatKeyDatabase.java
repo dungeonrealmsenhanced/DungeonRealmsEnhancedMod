@@ -30,6 +30,17 @@ public class StatKeyDatabase {
         return keyDictionaryReverse.getOrDefault(elemental, elemental);
     }
 
+    public IntRange getOrbStat(String key, String value, Tier tier, ItemRarity rarity) {
+        if (key.equalsIgnoreCase("HPS")) {
+            return getHPS(tier,rarity);
+        }
+        if (tierValues.containsKey(tier)) {
+            TierValue tierValue = tierValues.get(tier);
+            return tierValue.orbValues.getOrDefault(key, null);
+        }
+        return null;
+    }
+
 
     public static class TierValue {
         private Tier tier;
@@ -63,20 +74,19 @@ public class StatKeyDatabase {
         }
 
         public static class RarityValue {
+            public IntRange hps;
             private ItemRarity rarity;
-            private IntRange elementals;
+            private Map<String, IntRange> orbValues;
 
             private IntRange damageMin;
             private IntRange damageMax;
 
+
             public RarityValue(ItemRarity rarity) {
                 this.rarity = rarity;
+                this.orbValues =new HashMap<>();
             }
 
-            @Override
-            public String toString() {
-                return rarity+"_"+elementals.toString();
-            }
         }
     }
     public StatKeyDatabase() {
@@ -155,12 +165,11 @@ public class StatKeyDatabase {
 
 
         updateMappings(data.getAsJsonArray("mappings.csv"));
-        updateElementals(data.getAsJsonArray("int_str_dex_vit.csv"));
         updateOrbValues(data.getAsJsonArray("orb_values.csv"));
         System.out.println(tierValues);
         System.out.println(this.keyDictionary);
 
-        System.out.println("RARE T5 VIT: " + getElemental(Tier.T5,ItemRarity.RARE));
+        System.out.println("RARE T5 VIT: " + getWeaponElementals(Tier.T5,ItemRarity.RARE));
     }
     private void updateOrbValues(JsonArray array) {
         for (int i = 1; i < array.size(); i++) {
@@ -169,10 +178,7 @@ public class StatKeyDatabase {
 
 
             String stat = entry.get(0).getAsString();
-
             Tier tier = Tier.getByNumber(Integer.parseInt(entry.get(1).getAsString()));
-            int min =Integer.parseInt( entry.get(2).getAsString());
-            int max = Integer.parseInt(entry.get(3).getAsString());
 
             if (!tierValues.containsKey(tier)) {
                 TierValue tierValue = new TierValue(tier);
@@ -180,48 +186,51 @@ public class StatKeyDatabase {
             }
 
             TierValue tierValue = tierValues.get(tier);
+            if (stat.equalsIgnoreCase("hps")) {
+                ItemRarity itemRarity = ItemRarity.getByName(entry.get(3).getAsString());
 
-            tierValue.orbValues.put(stat, new IntRange(min, max));
+                if (itemRarity==null)continue;
+                TierValue.RarityValue rarityValue = tierValue.editRarityValue(itemRarity);
+                rarityValue.hps = IntRange.fromString(entry.get(2).getAsString());
+            } else {
+
+
+                int min =Integer.parseInt( entry.get(2).getAsString());
+                int max = Integer.parseInt(entry.get(3).getAsString());
+
+
+
+                tierValue.orbValues.put(stat, new IntRange(min, max));
+            }
+
+
         }
     }
 
-    public IntRange getElementalValue(Tier tier, String stat) {
+    public IntRange getHPS(Tier tier, ItemRarity rarity) {
         if (tierValues.containsKey(tier)) {
-            return tierValues.get(tier).orbValues.getOrDefault(stat, null);
+            TierValue tierValue = tierValues.get(tier);
+            if (tierValue.rarityValues.containsKey(rarity)) {
+                TierValue.RarityValue rarityValue = tierValue.rarityValues.get(rarity);
+                return rarityValue.hps;
+            }
         }
         return null;
     }
-    private void updateElementals(JsonArray array) {
-        for (int i = 1; i < array.size(); i++) {
-            JsonArray entry = array.get(i).getAsJsonArray();
-            String key = entry.get(0).getAsString();
-            if (key.equalsIgnoreCase("tier"))continue;
-
-
-            Tier tier = Tier.getByNumber(Integer.parseInt(key));
-
-            ItemRarity rarity = ItemRarity.getByName(entry.get(1).getAsString());
-            int min =Integer.parseInt( entry.get(2).getAsString());
-            int max = Integer.parseInt(entry.get(3).getAsString());
-
-            if (!tierValues.containsKey(tier)) {
-                TierValue tierValue = new TierValue(tier);
-                tierValues.put(tier,tierValue);
-            }
-
-            TierValue tierValue = tierValues.get(tier);
-
-            TierValue.RarityValue rarityValue = tierValue.editRarityValue(rarity);
-            rarityValue.elementals = new IntRange(min,max);
-        }
-    }
-
-    public IntRange getElemental(Tier tier, ItemRarity rarity) {
+    
+    
+    public IntRange getWeaponElementals(Tier tier, ItemRarity rarity) {
         if (tierValues.containsKey(tier)) {
             TierValue tierValue = tierValues.get(tier);
-            if (tierValue.rarityValues.containsKey(rarity)){
-                return tierValue.rarityValues.get(rarity).elementals;
-            }
+            return tierValue.orbValues.getOrDefault("elemental_damage", null);
+        }
+        return null;
+    }
+
+    public IntRange getElementals(Tier tier, ItemRarity rarity) {
+        if (tierValues.containsKey(tier)) {
+            TierValue tierValue = tierValues.get(tier);
+            return tierValue.orbValues.getOrDefault("ELEMENTALS", null);
         }
         return null;
     }

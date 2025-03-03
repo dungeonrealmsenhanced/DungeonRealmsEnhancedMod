@@ -246,12 +246,13 @@ public class ItemOriginListener implements Listener {
         StatKeyDatabase database = DREnhanced.getStatKeyDatabase();
 
 
-        List<String> armorElementals = Arrays.asList("VIT", "DEX", "STR", "INT");
 
-        List<String> orbStats = new ArrayList<>();
+        Map<String, String> orbStats = new HashMap<>();
         for (String s : modifierMap.keySet()) {
-            if (armorElementals.contains(database.getKeyFromValue(s)))continue;
-            orbStats.add(s);
+            String orDefault = database.getKeyDictionary().getOrDefault(s, s);
+            if (orDefault!=null){
+                orbStats.put(s, orDefault);
+            }
         }
 
 
@@ -260,22 +261,42 @@ public class ItemOriginListener implements Listener {
 
         StringUtils.editStringList(newToolTip, s -> {
             String colorStripped = StringUtils.clearColor(s);
-
-            for (String elemental : armorElementals) {
-                if (colorStripped.startsWith(elemental) && modifierMap.containsKey(database.getKeyFromValue(elemental))) {
-                    IntRange intRange = database.getElemental(tier, rarity);
-                    int min = intRange.getMin();
-                    int max = intRange.getMax();
-                    int stat = (int) modifierMap.get(database.getKeyFromValue(elemental))[0];
-                    double percentage = ((double) (stat - min) / (max - min)) * 100;
-                    String per = (percentage>=100?"MAX":(int)percentage+"%");
-
-                    return TextFormatting.GRAY+"["+per+"]";
+            if (colorStripped.contains("✘"))return s;
+            if (colorStripped.contains("✔"))return s;
+            if (colorStripped.contains("Trinket"))return s;
+            if (colorStripped.contains("Passive"))return s;
 
 
+            for (Map.Entry<String, String> entry : orbStats.entrySet()) {
 
+                if (!colorStripped.contains(entry.getValue())) {
+                    if (!colorStripped.contains(entry.getKey())) {
+
+                        continue;
+                    }
                 }
+                IntRange intRange = null;
+
+                if (colorStripped.contains("ICE DMG") || colorStripped.contains("POISON DMG") || colorStripped.contains("FIRE DMG")) {
+                    intRange = database.getWeaponElementals(tier, rarity);
+                } else if (colorStripped.contains("INT") || colorStripped.contains("VIT") || colorStripped.contains("DEX")|| colorStripped.contains("STR")) {
+                    intRange = database.getElementals(tier, rarity);
+                } else {
+                    intRange=database.getOrbStat(entry.getKey(), entry.getValue(), tier,rarity);
+                }
+
+                if (intRange==null){
+                    return s;
+                }
+                int min = intRange.getMin();
+                int max = intRange.getMax();
+                int stat = (int) modifierMap.get(entry.getKey())[0];
+                double percentage = ((double) (stat - min) / (max - min)) * 100;
+                String per = (percentage>=100?"MAX":(int)percentage+"%");
+
+                return TextFormatting.GRAY +"["+per+"] " + s +" ["+min+"-"+max+"]";
             }
+
             return s;
         });
         event.getToolTip().clear();

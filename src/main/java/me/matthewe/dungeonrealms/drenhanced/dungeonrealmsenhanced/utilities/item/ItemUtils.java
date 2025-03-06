@@ -12,6 +12,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -53,13 +54,93 @@ public class ItemUtils {
         return ItemRarity.getByName(NbtTagUtils.getString("rarity", itemStack));
     }
 
+    public static int[] calculateDPS(ItemStack itemStack) {
+        if (!isWeapon(itemStack.getItem())) return new int[]{0,0};
+        Map<String, double[]> modifierMap = getModifierMap(itemStack);
+
+
+        double[] damage = getDamage(itemStack, modifierMap);
+
+        double dmgToAdd = 0;
+
+
+        for (String elemental : Arrays.asList("ICE_DAMAGE", "PURE_DAMAGE", "FIRE_DAMAGE", "POISON_DAMAGE")) {
+
+            if (modifierMap.containsKey(elemental)) {
+
+                dmgToAdd += modifierMap.get(elemental)[0];
+            }
+        }
+
+        double multipliers = 1.0D;
+        if (modifierMap.containsKey("VS_MONSTERS")) {
+            double multiplier = modifierMap.get("VS_MONSTERS")[0];
+
+            multipliers+= (multiplier/100.0D);
+        }
+
+        double criticalMultiplier = 1.0;
+        if (modifierMap.containsKey("CRITICAL_HIT")) {
+            double criticalChance = modifierMap.get("CRITICAL_HIT")[0] / 100.0; // Convert % to decimal
+            criticalMultiplier = 1 + criticalChance; // Weighted average of crit damage
+        }
+
+        double executeMultiplier = 1.0;
+        if (modifierMap.containsKey("EXECUTE")) {
+            double executePercent = modifierMap.get("EXECUTE")[0] / 100.0;
+            executeMultiplier += executePercent * 0.50; // Assume 50% effectiveness over time
+        }
+
+        // Apply estimated Crushing multiplier (50% effectiveness over a fight)
+        double crushingMultiplier = 1.0;
+        if (modifierMap.containsKey("CRUSHING")) {
+            double crushingPercent = modifierMap.get("CRUSHING")[0] / 100.0;
+            crushingMultiplier += crushingPercent * 0.50; // Assume 50% effectiveness over time
+        }
+
+        // Final DPS calculation
+        double dpsMin = damage[0] * multipliers * criticalMultiplier * executeMultiplier * crushingMultiplier;
+        double dpsMax = damage[1] * multipliers * criticalMultiplier * executeMultiplier * crushingMultiplier;
+
+        dpsMax+=dmgToAdd;
+        dpsMin+=dmgToAdd;
+        return new int[] {(int) Math.round(dpsMin), (int) Math.round(dpsMax)};
+
+
+    }
+
+    public static double[] getDamage(ItemStack itemStack, Map<String, double[]> modifierMap) {
+
+        if (itemStack.getItem()==Items.BOW) {
+           return modifierMap.get("RANGE_DAMAGE");
+        }
+        return modifierMap.get("MELEE_DAMAGE");
+    }
+
     public static Map<String, double[]> getModifierMap(ItemStack itemStack) {
+        return getModifierMap(itemStack, false);
+    }
+    public static Map<String, double[]> getModifierMap(ItemStack itemStack, boolean skipAugmentations) {
         Map<String, double[]> modifierMap = new ConcurrentHashMap<>();
         if ((itemStack.getItem() != Items.AIR) && itemStack.hasDisplayName() && itemStack.hasTagCompound()) {
             NBTTagCompound tagCompound = itemStack.getTagCompound();
             if (tagCompound == null) {
                 return null;
             }
+
+            if (!skipAugmentations) {
+
+                if (tagCompound.hasKey("augmentations")) {
+                    NBTTagCompound augmentations = tagCompound.getCompoundTag("augmentations");
+                    for (String s : augmentations.getKeySet()) {
+                        double v = Double.parseDouble(augmentations.getTag(s).toString());
+                        double[] values = {v};
+
+                        modifierMap.put(s,values);
+                    }
+                }
+            }
+
             NBTTagCompound modifiers = tagCompound.getCompoundTag("modifiers");
             for (String s : modifiers.getKeySet()) {
                 String s1 = modifiers.getTag(s).toString();
@@ -72,18 +153,35 @@ public class ItemUtils {
                             String s2 = split[i];
                             ints[i] = NumberUtils.getNumber(s2.trim());
                         }
-                        modifierMap.put(s, ints);
+                        if (modifierMap.containsKey(s)){
+
+                            double[] doubles = modifierMap.get(s);
+                            double[] news = new  double[] {ints[0]+doubles[0],ints[1]+doubles[1] };
+
+                            modifierMap.put(s,news);
+                        } else {
+
+                            modifierMap.put(s, ints);
+                        }
                     } else {
 
                         double[] ints = new double[1];
                         ints[0] = NumberUtils.getNumber(trim.trim());
-                        modifierMap.put(s, ints);
+
+
+                        if (modifierMap.containsKey(s)){
+                            double[] doubles = modifierMap.get(s);
+                            modifierMap.put(s,  new double[] {doubles[0]+ints[0]});
+                        } else {
+                            modifierMap.put(s, ints);
+                        }
                     }
                 }
             }
         }
         return !modifierMap.isEmpty() ? modifierMap : null;
     }
+
 
     public static boolean isWeapon(Item item) {
         if (item == Items.DIAMOND_SWORD) return true;
@@ -271,6 +369,83 @@ public class ItemUtils {
         return Tier.getByNumber(NbtTagUtils.getInt("tier", itemStack));
     }
 
+
+    public static int getLevel(ItemStack itemStack) {
+        if ((itemStack.getItem() != Items.AIR) && itemStack.hasDisplayName() && itemStack.hasTagCompound()) {
+            NBTTagCompound tagCompound = itemStack.getTagCompound();
+            if (tagCompound == null) {
+                return 0;
+            }
+
+            if (tagCompound.hasKey("level")) {
+                return tagCompound.getInteger("level");
+            }
+        }
+        return 0;
+    }
+    public static int getEnchant(ItemStack itemStack) {
+        if ((itemStack.getItem() != Items.AIR) && itemStack.hasDisplayName() && itemStack.hasTagCompound()) {
+            NBTTagCompound tagCompound = itemStack.getTagCompound();
+            if (tagCompound == null) {
+                return 0;
+            }
+
+            if (tagCompound.hasKey("enchant")) {
+                return tagCompound.getInteger("enchant");
+            }
+        }
+        return 0;
+    }
+
+    public static ItemType getType(ItemStack stack) {
+        // Helmets
+        if (stack.getItem() == Items.LEATHER_HELMET || stack.getItem() == Items.CHAINMAIL_HELMET ||
+                stack.getItem() == Items.IRON_HELMET || stack.getItem() == Items.DIAMOND_HELMET ||
+                stack.getItem() == Items.GOLDEN_HELMET) {
+            return ItemType.HELMET;
+        }
+        // Chestplate
+        if (stack.getItem() == Items.LEATHER_CHESTPLATE || stack.getItem() == Items.CHAINMAIL_CHESTPLATE ||
+                stack.getItem() == Items.IRON_CHESTPLATE || stack.getItem() == Items.DIAMOND_CHESTPLATE ||
+                stack.getItem() == Items.GOLDEN_CHESTPLATE) {
+            return ItemType.CHESTPLATE;
+        }
+        // Leggings
+        if (stack.getItem() == Items.LEATHER_LEGGINGS || stack.getItem() == Items.CHAINMAIL_LEGGINGS ||
+                stack.getItem() == Items.IRON_LEGGINGS || stack.getItem() == Items.DIAMOND_LEGGINGS ||
+                stack.getItem() == Items.GOLDEN_LEGGINGS) {
+            return ItemType.LEGGINGS;
+        }
+        // Boots
+        if (stack.getItem() == Items.LEATHER_BOOTS || stack.getItem() == Items.CHAINMAIL_BOOTS ||
+                stack.getItem() == Items.IRON_BOOTS || stack.getItem() == Items.DIAMOND_BOOTS ||
+                stack.getItem() == Items.GOLDEN_BOOTS) {
+            return ItemType.BOOTS;
+        }
+        if (isSword(stack.getItem())) return ItemType.SWORD;
+        if (isAxe(stack.getItem())) return ItemType.AXE;
+        if (isPickaxe(stack.getItem())) return ItemType.PICKAXE;
+        if (isClub(stack.getItem())) return ItemType.POLEARM;
+        if (isScythe(stack.getItem())) return ItemType.HOE;
+        if (stack.getItem()== Items.FISHING_ROD) return ItemType.FISHING_ROD;
+        return ItemType.NONE;
+    }
+
+    public enum ItemType {
+        NONE,
+        BOOTS,
+        LEGGINGS,
+        CHESTPLATE,
+        HELMET,
+        SWORD,
+        BOW,
+        FISHING_ROD,
+        PICKAXE,
+        AXE,
+        POLEARM,
+        HOE;
+    }
+
     public static boolean hasClueScrolls() {
         return getClueScrolls() != null;
     }
@@ -286,7 +461,7 @@ public class ItemUtils {
         for (Slot slot : player.inventoryContainer.inventorySlots) {
             ItemStack itemStack = slot.getStack();
 
-            if ((itemStack.getItem() == Items.AIR) || (itemStack.getCount() == 0) || (!ItemType.isClueScroll(itemStack))) {
+            if ((itemStack.getItem() == Items.AIR) || (itemStack.getCount() == 0) || (!me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemType.isClueScroll(itemStack))) {
                 continue;
             }
             ClueScroll clueScroll = ClueScroll.of(itemStack);

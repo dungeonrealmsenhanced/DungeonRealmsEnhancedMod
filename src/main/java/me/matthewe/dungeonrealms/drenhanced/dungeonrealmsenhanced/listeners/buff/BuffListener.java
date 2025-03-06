@@ -65,7 +65,7 @@ public class BuffListener implements Listener {
                     removeActiveBuff(buffType);
                     try{
                         Buff buff = new Buff(Integer.parseInt(time.trim()), name.trim(), buffType, Integer.parseInt(percent.trim().replaceAll("\\+", "").replaceAll("%", "")));
-                        System.out.println(buff.toString());
+//                        System.out.println(buff.toString());
                         activeBuffs.add(buff);
                     } catch (Exception e){
                         e.printStackTrace();
@@ -112,7 +112,7 @@ public class BuffListener implements Listener {
                return;
            }
 
-           delay = System.currentTimeMillis()+ TimeUnit.SECONDS.toMillis(5);
+           delay = System.currentTimeMillis()+ TimeUnit.SECONDS.toMillis(3);
            delay1 = System.currentTimeMillis()+ TimeUnit.SECONDS.toMillis(1);
 
            Minecraft.getMinecraft().player.sendChatMessage("/bufftime");

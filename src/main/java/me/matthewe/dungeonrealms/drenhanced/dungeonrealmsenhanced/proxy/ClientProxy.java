@@ -17,6 +17,7 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import static me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DREnhanced.loadModuleSettings;
+import static me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DREnhanced.statKeyDatabase;
 
 public class ClientProxy implements IProxy {
     @Override
@@ -25,6 +26,7 @@ public class ClientProxy implements IProxy {
 
         Modules.init();
         Modules.loadModules();
+        statKeyDatabase.loadDictionary();
 
         loadModuleSettings();
 
@@ -33,6 +35,7 @@ public class ClientProxy implements IProxy {
         MinecraftForge.EVENT_BUS.register(new ItemCheckerListener());
         MinecraftForge.EVENT_BUS.register(new RarityOverlayListener());
         MinecraftForge.EVENT_BUS.register(new MenuReplacerListener());
+        MinecraftForge.EVENT_BUS.register(new AdvancementHiderListener());
         DungeonRealmsMod.init();
 
         Handlers.init();

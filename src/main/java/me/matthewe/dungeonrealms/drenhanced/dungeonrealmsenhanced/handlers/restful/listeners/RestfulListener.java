@@ -5,7 +5,6 @@ import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.events.Dungeon
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.keybinds.KeyBindHandler;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.restful.RestfulHandler;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.DRPlayer;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setting.DRSettings;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.Listener;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.restful.DREnhancedInformation;
 import net.minecraft.client.Minecraft;
@@ -36,7 +35,7 @@ public class RestfulListener implements Listener {
         DREnhancedInformation information = restfulHandler.getDrEnhancedRestful().getInformation();
         if (information==null)return;
 
-        System.out.println(DREnhanced.gsonBuilder.create().toJson(information));
+//        System.out.println(DREnhanced.gsonBuilder.create().toJson(information));
         DRPlayer.get().setVersion(DREnhanced.VERSION);
         TextComponentString textComponents = new TextComponentString(TextFormatting.AQUA + TextFormatting.BOLD.toString() + "UPDATED" + TextFormatting.WHITE + TextFormatting.BOLD.toString() + ":" + TextFormatting.GRAY + " You have updated to version ");
         TextComponentString versionComponents = new TextComponentString(TextFormatting.WHITE + information.getVersion());

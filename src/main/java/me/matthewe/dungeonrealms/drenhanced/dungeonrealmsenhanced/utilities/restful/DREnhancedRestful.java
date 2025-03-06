@@ -18,31 +18,35 @@ public class DREnhancedRestful {
     private DREnhancedInformation information;
 
     public DREnhancedRestful() {
-        information = new DREnhancedInformation("1.2", new DREnhancedInformation.Developer[]{new DREnhancedInformation.Developer("1d48bd80-4cd0-4874-ba65-94284bc24ecc", "MatthewEDev", true)},
+        information = new DREnhancedInformation("1.3", new DREnhancedInformation.Developer[]{new DREnhancedInformation.Developer("1d48bd80-4cd0-4874-ba65-94284bc24ecc", "MatthewEDev", true)},
                 "N/A", Changelog.builder()
                 .date(1740704964255L)
-                .version("1.2")
                 .changes(Change.builder()
-                                .title("Bug Fixes")
-                                .description("- Removed dry steak due to limitations." )
-                                .build(),
+                        .title("Additions")
+                        .description("Orb & stat % added" +
+                                "DMG %" +
+                                "Energy %" +
+                                "Shard player count display" +
+                                "Weapon DPS" +
+                                "Restful API so values can be updated dynamically. ")
+                        .build(),
                         Change.builder()
-                                .title("Improvements")
-                                .description("- UK time format.")
-                                .build(),
-
-                        Change.builder()
-                                .title("Compare Stats")
-                                .description("- Added ability to compare stats on items.")
+                                .title("Fixes")
+                                .description("Debug spam issue.")
                                 .build())
+                .version("1.3")
                 .build()); //Hardcoded changelogs for now
+
     }
+
+
 
 
     public DREnhancedInformation getInformation() {
         return information;
     }
 
+    @Deprecated
     public void update(Consumer<DREnhancedInformation> consumer) {
 
         /*RESTFUL SERVICE OFFLINE DO NOT ATTEMPT TO CONNECT*/

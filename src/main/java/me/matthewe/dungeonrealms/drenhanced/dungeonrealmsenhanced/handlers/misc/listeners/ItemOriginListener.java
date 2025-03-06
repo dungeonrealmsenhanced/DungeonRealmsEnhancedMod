@@ -1,10 +1,12 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.misc.listeners;
 
-import clutch.dungeonrealms.ArmorTooltipCompare;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DREnhanced;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.StatKeyDatabase;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setting.DRSettings;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.Listener;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.StringUtils;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.*;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemRarity;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemUtils;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.Tier;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -14,6 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -22,6 +25,7 @@ import java.util.*;
  */
 public class ItemOriginListener implements Listener {
     private static SimpleDateFormat DATE_FORMAT;
+    private DecimalFormat decimalFormat =new DecimalFormat("#.##");
 
     public ItemOriginListener() {
 
@@ -55,9 +59,13 @@ public class ItemOriginListener implements Listener {
             ItemStack itemStack = event.getItemStack();
             if (itemStack.hasTagCompound()) {
                 List<String> toolTip = new ArrayList<>();
+
+
                 boolean displayToolTip = false;
 
                 NBTTagCompound tagCompound = itemStack.getTagCompound();
+
+
                 if (tagCompound.hasKey("origin")) {
                     if( !GuiScreen.isCtrlKeyDown() && !GuiScreen.isShiftKeyDown()) {
                         toolTip.add(TextFormatting.GRAY + TextFormatting.STRIKETHROUGH.toString() + "------------------");
@@ -169,8 +177,11 @@ public class ItemOriginListener implements Listener {
                     } else if (GuiScreen.isShiftKeyDown()) {
                         List<String> strings = ArmorTooltipCompare.handleToolTip(event);
 
+
                         if (!ItemUtils.isEquippedOrInHotbarSlot0(itemStack)){
                             if (!strings.isEmpty()) {
+
+
                                 toolTip.addAll(strings);
                                 displayToolTip=true;
                             }
@@ -180,7 +191,38 @@ public class ItemOriginListener implements Listener {
 
                 }
                 if (displayToolTip) {
-                    event.getToolTip().addAll(toolTip);
+
+                    if (ItemUtils.isWeapon(itemStack.getItem())) {
+                        List<String> finalToolTip = new ArrayList<>();
+
+                        double[] damage = ItemUtils.getDamage(itemStack, ItemUtils.getModifierMap(itemStack));
+
+                        List<String> cache  = new ArrayList<>();
+                        cache.addAll(event.getToolTip());
+
+
+                        int[] ints = ItemUtils.calculateDPS(itemStack);
+                        String toAdd = "";
+                        if ( DRSettings.DISPLAY_DPS.get(boolean.class)) {
+                            toAdd = TextFormatting.GRAY +" (DPS: "+ints[0]+" - " + ints[1] +")";
+
+                        }
+                        cache.set(1, TextFormatting.RED + "DMG: +"+Math.round(damage[0]) +" - " + Math.round(damage[1]) + toAdd);
+//                        cache.set(1, TextFormatting.RED + "DMG : +"+ints[0] +" - " + ints[1]);
+                        finalToolTip.addAll(cache);
+
+
+
+
+
+                        event.getToolTip().clear();
+                        event.getToolTip().addAll(finalToolTip);
+                        event.getToolTip().addAll(toolTip);
+                    } else {
+                        event.getToolTip().addAll(toolTip);
+                    }
+
+                    handleStatPercentages(event);
 
                 }
 
@@ -189,5 +231,158 @@ public class ItemOriginListener implements Listener {
             event.getToolTip().add(TextFormatting.RED + "ERROR (Please message .matthewe on discord)");
             e.printStackTrace();
         }
+    }
+
+    private void handleStatPercentages(ItemTooltipEvent event) {
+        if ( !DRSettings.SHOW_ORB_PERCENTAGE.get(boolean.class)) {
+            return;
+        }
+        List<String> newToolTip = new ArrayList<>();
+
+        for (String line : event.getToolTip()) {
+            newToolTip.add(line);
+        }
+        ItemStack itemStack = event.getItemStack();
+        Map<String, double[]> modifierMap = ItemUtils.getModifierMap(itemStack,true);
+        if (modifierMap==null)return;
+        StatKeyDatabase database = DREnhanced.getStatKeyDatabase();
+
+
+
+        Map<String, String> orbStats = new HashMap<>();
+        for (String s : modifierMap.keySet()) {
+            String orDefault = database.getKeyDictionary().getOrDefault(s, s);
+            if (orDefault!=null){
+                orbStats.put(s, orDefault);
+            }
+        }
+
+
+        Tier tier = ItemUtils.getTier(itemStack);
+        ItemRarity rarity = ItemUtils.getRarity(itemStack);
+
+        int level = ItemUtils.getLevel(itemStack);
+        int enchant = ItemUtils.getEnchant(itemStack);
+
+        ItemUtils.ItemType type = ItemUtils.getType(itemStack);
+        if (type== ItemUtils.ItemType.NONE)return;
+
+        if (level==0)return;
+        StringUtils.editStringList(newToolTip, s -> {
+            String colorStripped = StringUtils.clearColor(s);
+            if (colorStripped.contains("✘"))return s;
+            if (colorStripped.contains("✔"))return s;
+            if (colorStripped.contains("Trinket"))return s;
+            if (colorStripped.contains("Passive"))return s;
+
+
+            for (Map.Entry<String, String> entry : orbStats.entrySet()) {
+
+                if (!colorStripped.contains(entry.getValue())) {
+                    if (!colorStripped.contains(entry.getKey())) {
+
+                        continue;
+                    }
+                }
+                IntRange intRange = null;
+
+                boolean dmg = false;
+                boolean hp = false;
+                boolean energy = false;
+
+                if (colorStripped.contains("ICE DMG") || colorStripped.contains("POISON DMG") || colorStripped.contains("FIRE DMG")) {
+                    intRange = database.getWeaponElementals(tier, rarity);
+                } else if (colorStripped.contains("INT") || colorStripped.contains("VIT") || colorStripped.contains("DEX")|| colorStripped.contains("STR")) {
+                    intRange = database.getElementals(tier, rarity);
+
+                }else if (colorStripped.contains("DODGE") || colorStripped.contains("REFLECT") || colorStripped.contains("BLOCK")) {
+                    intRange = database.getRBLODGE(tier, rarity);
+                } else if (colorStripped.startsWith("DMG: +")) {
+                    if (rarity!=ItemRarity.MYTHIC) {
+
+                        intRange = new IntRange(0,0);
+                        dmg = true;
+                    }
+                } else if (colorStripped.startsWith("HP: +")) {
+                    if (rarity != ItemRarity.MYTHIC) {
+
+
+                        intRange = new IntRange(0, 0);
+                        hp = true;
+                    }
+                }else if (colorStripped.startsWith("ENERGY REGEN: +")) {
+                    if (rarity!=ItemRarity.MYTHIC) {
+
+
+                        intRange = new IntRange(0,0);
+                        energy =  true;
+                    }
+                } else {
+                    intRange=database.getOrbStat(entry.getKey(), entry.getValue(), tier,rarity);
+                }
+
+                if (intRange==null){
+                    return s;
+                }
+
+
+                int min = intRange.getMin();
+                int max = intRange.getMax();
+                int stat = (int) modifierMap.get(entry.getKey())[0];
+
+                double percentage = 0;
+
+                if (dmg) {
+                    stat = (int) (stat - (stat * (enchant * 0.05))); //undo enchants
+                    int maxDMG = (int) modifierMap.get(entry.getKey())[1];
+                    maxDMG = (int) (maxDMG - (maxDMG * (enchant * 0.05))); //undo enchants
+
+
+                    StatKeyDatabase.TierValue.RarityValue.WeaponValue weaponValue = database.getWeaponValue(tier, rarity);
+                    if (weaponValue != null) {
+
+                        return TextFormatting.GRAY + "[" + (percentage >= 100 ?
+                                "MAX" :
+                                (int) WeaponCalculator.calculateRollPercentage(level, type, weaponValue, stat, maxDMG) + "%") + "] " + s;
+                    }
+                } else if (energy) {
+                    double eStat =  modifierMap.get(entry.getKey())[0];
+                    double en  = (eStat - (eStat * (enchant * 0.05))); //undo enchants
+
+                    StatKeyDatabase.TierValue.RarityValue.ArmorValue armorValue = database.getArmorValue(tier, rarity);
+                    if (armorValue != null) {
+                        double minE = armorValue.getEnergy().getMin();
+                        double maxE = armorValue.getEnergy().getMax();
+
+
+                        percentage=  ((double) (en - minE) / (maxE - minE)) * 100;
+
+                        return TextFormatting.GRAY + "[" + (percentage >= 100 ?
+                                "MAX" :
+                                (int)percentage + "%") + "] " + s;
+                    }
+                } else if (hp) {
+                    stat = (int) (stat - (stat * (enchant * 0.05))); //undo enchants
+
+                    StatKeyDatabase.TierValue.RarityValue.ArmorValue armorValue = database.getArmorValue(tier, rarity);
+
+                    if (armorValue != null) {
+
+                        percentage =  WeaponCalculator.calculateRollPercentageArmor(level, type, armorValue, stat);
+
+                        return TextFormatting.GRAY + "[" + (percentage >= 100 ?
+                                "MAX" :
+                                (int) WeaponCalculator.calculateRollPercentageArmor(level, type, armorValue, stat) + "%") + "] " + s;
+                    }
+                } else {
+                    percentage=  ((double) (stat - min) / (max - min)) * 100;
+                }
+                return TextFormatting.GRAY +"["+(percentage>=100?"MAX":(int)percentage+"%")+"] " + s;
+            }
+
+            return s;
+        });
+        event.getToolTip().clear();
+        event.getToolTip().addAll(newToolTip);
     }
 }

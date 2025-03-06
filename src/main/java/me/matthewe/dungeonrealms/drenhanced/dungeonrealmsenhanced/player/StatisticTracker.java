@@ -1,20 +1,27 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player;
 
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.ShardCountModule;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.FooterExtractor;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.Tier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiPlayerTabOverlay;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Matthew E on 12/31/2018 at 2:42 PM for the project DungeonRealmsDREnhanced
  */
 public class StatisticTracker extends Thread {
+    private static final Log log = LogFactory.getLog(StatisticTracker.class);
     private long times = 0;
     private boolean running = false;
 
@@ -32,7 +39,7 @@ public class StatisticTracker extends Thread {
     public void run() {
         while (running) {
             times++;
-            System.out.println("[StatisticTracker] Running (" + times + ")");
+//            System.out.println("[StatisticTracker] Running (" + times + ")");
             this.updateStatistics();
             try {
                 sleep(1000L);
@@ -52,6 +59,11 @@ public class StatisticTracker extends Thread {
         if (Minecraft.getMinecraft().getConnection() == null) {
             return;
         }
+
+//        log.info("Updating statistics.");
+        if (tabList==null)return;
+       FooterExtractor.extractFooterInfo(tabList);
+
 
         List<NetworkPlayerInfo> playersC = new ArrayList<>(Minecraft.getMinecraft().getConnection().getPlayerInfoMap());
 
@@ -87,7 +99,7 @@ public class StatisticTracker extends Thread {
                 DRPlayer.drPlayer.getStatistics().setOreMined(oreMined);
             }
             if (playerName.startsWith("Bank Gems: ")) {
-                System.out.println(playerName);
+//                System.out.println(playerName);
                 DRPlayer.drPlayer.getStatistics().setBankGems((long) Integer.parseInt(playerName.split("Bank Gems: ")[1].trim()));
             }
             if (playerName.startsWith("Player Kills: ")) {
@@ -97,6 +109,7 @@ public class StatisticTracker extends Thread {
                 DRPlayer.drPlayer.getStatistics().setDeaths(deaths);
                 DRPlayer.drPlayer.getStatistics().setPlayerKills(playerKills);
             }
+
             if (playerName.startsWith("Playtime: ")) {
 
                 long time = 0L;
@@ -145,6 +158,8 @@ public class StatisticTracker extends Thread {
             if (playerName.startsWith("Loot Opened: ")) {
                 DRPlayer.drPlayer.getStatistics().setLootOpened(Integer.parseInt(playerName.split("Loot Opened: ")[1].trim()));
             }
+
+
 //            if (playerName.startsWith("Ore Mined: ")) {
 //                DRPlayer.drPlayer.getStatistics().setOreMined(Integer.parseInt(playerName.split("Ore Mined: ")[1].trim()));
 //            }
@@ -216,4 +231,5 @@ public class StatisticTracker extends Thread {
         }
         DRPlayer.drPlayer.setUuid(Minecraft.getMinecraft().player.getUniqueID());
     }
+
 }

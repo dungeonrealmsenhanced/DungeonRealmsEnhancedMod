@@ -1,5 +1,6 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.nostalgia.listeners;
 
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DREnhanced;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.profession.ProfessionItem;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setting.DRSettings;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.Listener;
@@ -58,9 +59,7 @@ public class HealthBarListener implements Listener {
                 }
             }
         }
-        if (ProfessionItem.has()){
-          System.out.println(bossInfo.getPercent());
-        }
+
         if (DRSettings.OLD_BOSS_BAR.get(boolean.class)) {
             bossInfo.setName(new TextComponentString(TextFormatting.LIGHT_PURPLE + TextFormatting.BOLD.toString() + "HP " + TextFormatting.LIGHT_PURPLE + getHealth() + " " + TextFormatting.BOLD + "/" + TextFormatting.LIGHT_PURPLE + " " + getMaxHealth()));
             bossInfo.setColor(BossInfo.Color.PINK);

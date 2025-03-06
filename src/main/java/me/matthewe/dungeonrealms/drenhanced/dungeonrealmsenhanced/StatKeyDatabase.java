@@ -9,8 +9,11 @@ import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.IntR
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemRarity;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.Tier;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.restful.HttpUtils;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.world.DoubleRange;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -24,7 +27,7 @@ public class StatKeyDatabase {
     private boolean runningDataUpdate = false;
     private Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    private Map<Tier, TierValue> tierValues;
+    private Map<Tier, TierValue> tierValues =new HashMap<>();
 
     public String getKeyFromValue(String elemental) {
         return keyDictionaryReverse.getOrDefault(elemental, elemental);
@@ -78,9 +81,53 @@ public class StatKeyDatabase {
             private ItemRarity rarity;
             private Map<String, IntRange> orbValues;
 
-            private IntRange damageMin;
-            private IntRange damageMax;
+            private WeaponValue weaponValue;
+            private ArmorValue armorValue;
 
+            public static class WeaponValue {
+                private IntRange damageMin;
+                private IntRange damageMax;
+
+                public WeaponValue(IntRange damageMin, IntRange damageMax) {
+                    this.damageMin = damageMin;
+                    this.damageMax = damageMax;
+                }
+
+                @Override
+                public String toString() {
+                    return "WeaponValue{" +
+                            "damageMin=" + damageMin +
+                            ", damageMax=" + damageMax +
+                            '}';
+                }
+
+                public IntRange getDamageMin() {
+                    return damageMin;
+                }
+
+                public IntRange getDamageMax() {
+                    return damageMax;
+                }
+            }
+
+            public static class ArmorValue {
+                private IntRange hp;
+                private IntRange armorMin;
+                private IntRange armorMax;
+                private DoubleRange energy;
+                private IntRange dmgReductionMin;
+                private IntRange dmgReductionMax;
+
+
+                public ArmorValue(IntRange hp, IntRange armorMin, IntRange armorMax, DoubleRange energy, IntRange dmgReductionMin, IntRange dmgReductionMax) {
+                    this.hp = hp;
+                    this.armorMin = armorMin;
+                    this.armorMax = armorMax;
+                    this.energy = energy;
+                    this.dmgReductionMin = dmgReductionMin;
+                    this.dmgReductionMax = dmgReductionMax;
+                }
+            }
 
             public RarityValue(ItemRarity rarity) {
                 this.rarity = rarity;
@@ -101,12 +148,13 @@ public class StatKeyDatabase {
 
 
 
-
     }
 
     public static void main(String[] args) {
         StatKeyDatabase statKeyDatabase = new StatKeyDatabase();
         statKeyDatabase.loadDictionary();
+
+
 
     }
 
@@ -130,6 +178,7 @@ public class StatKeyDatabase {
                 }
                 JsonObject data = jsonObject.get("data").getAsJsonObject();
 
+                System.out.println(gson.toJson(data));
                 update(data);
                 completeDataUpdate();
             } catch (Exception e) {
@@ -166,11 +215,130 @@ public class StatKeyDatabase {
 
         updateMappings(data.getAsJsonArray("mappings.csv"));
         updateOrbValues(data.getAsJsonArray("orb_values.csv"));
+        updateArmorValues(data.getAsJsonArray("armor.csv"));
         System.out.println(tierValues);
         System.out.println(this.keyDictionary);
 
         System.out.println("RARE T5 VIT: " + getWeaponElementals(Tier.T5,ItemRarity.RARE));
+        TierValue.RarityValue.WeaponValue weaponValue = getWeaponValue(Tier.T5, ItemRarity.RARE);
+        System.out.println(weaponValue);
     }
+
+
+    private void updateArmorValues(JsonArray array) {
+        List<JsonArray> armorArray = new ArrayList<>();
+        List<JsonArray> weaponArray = new ArrayList<>();
+        boolean armor = true;
+        for (int i = 0; i < array.size(); i++) {
+            JsonArray entry = array.get(i).getAsJsonArray();
+            String stat = entry.get(0).getAsString();
+            boolean first = false;
+            if (stat.equals("Armor")) {
+                armor = true;
+                first=true;
+            }
+
+
+            if (stat.equals("Weapon")) {
+                armor = false;
+                first=true;
+            }
+
+            if (first) continue;
+            if (armor) {
+                armorArray.add(entry);
+            } else {
+                weaponArray.add(entry);
+            }
+        }
+
+
+        //Handle weapon values
+        for (JsonArray entry : weaponArray) {
+            if (entry.get(0).getAsString().equalsIgnoreCase("dmg-min"))continue;
+
+            System.out.println(entry);
+            IntRange min = IntRange.fromString(entry.get(0).getAsString());
+            IntRange max = IntRange.fromString(entry.get(1).getAsString());
+            Tier tier = Tier.getByNumber(Integer.parseInt(entry.get(2).getAsString()));
+            ItemRarity itemRarity = ItemRarity.getByName(entry.get(3).getAsString());
+            handleWeaponValue(itemRarity, tier, min,max);
+
+        }
+
+        //Handle armor values
+        for (JsonArray entry : armorArray) {
+            if (entry.get(0).getAsString().equalsIgnoreCase("Tier"))continue;
+
+            Tier tier = Tier.getByNumber(Integer.parseInt(entry.get(0).getAsString()));
+            IntRange hp = IntRange.fromString(entry.get(1).getAsString());
+            DoubleRange energy = DoubleRange.fromString(entry.get(2).getAsString());
+            IntRange armorMin = IntRange.fromString(entry.get(3).getAsString());
+            IntRange armorMax = IntRange.fromString(entry.get(4).getAsString());
+            IntRange dmgReductionMin = IntRange.fromString(entry.get(5).getAsString());
+            IntRange dmgReductionMax = IntRange.fromString(entry.get(6).getAsString());
+            ItemRarity itemRarity = ItemRarity.getByName(entry.get(8).getAsString());
+            handleArmorValue(tier,hp,energy,armorMin,armorMax, dmgReductionMin, dmgReductionMax, itemRarity);
+
+
+        }
+    }
+
+    private void handleArmorValue(Tier tier, IntRange hp, DoubleRange energy, IntRange armorMin, IntRange armorMax, IntRange dmgReductionMin, IntRange dmgReductionMax, ItemRarity itemRarity) {
+        if (tier==null)return;
+        if (itemRarity==null)return;
+        if (energy==null)return;
+        if (hp==null)return;
+        if (armorMin==null)return;
+        if (armorMax==null)return;
+        if (dmgReductionMin==null)return;
+        if (dmgReductionMax==null)return;
+
+
+        if (!tierValues.containsKey(tier)) {
+            TierValue tierValue = new TierValue(tier);
+            tierValues.put(tier,tierValue);
+        }
+
+        TierValue tierValue = tierValues.get(tier);
+        TierValue.RarityValue rarityValue = tierValue.editRarityValue(itemRarity);
+        if (rarityValue==null)return;
+        rarityValue.armorValue =new TierValue.RarityValue.ArmorValue(hp,armorMin,armorMax,energy, dmgReductionMin, dmgReductionMax);
+
+    }
+
+    private void handleWeaponValue(ItemRarity itemRarity, Tier tier, IntRange min, IntRange max) {
+
+        if (tier==null)return;
+        if (itemRarity==null)return;
+        if (min==null)return;
+        if (max==null)return;
+
+
+        if (!tierValues.containsKey(tier)) {
+            TierValue tierValue = new TierValue(tier);
+            tierValues.put(tier,tierValue);
+        }
+
+        TierValue tierValue = tierValues.get(tier);
+        TierValue.RarityValue rarityValue = tierValue.editRarityValue(itemRarity);
+        if (rarityValue==null)return;
+        rarityValue.weaponValue =new TierValue.RarityValue.WeaponValue(min,max);
+
+
+    }
+
+    public TierValue.RarityValue.WeaponValue getWeaponValue(Tier tier, ItemRarity rarity) {
+        if (tierValues.containsKey(tier)) {
+            TierValue tierValue = tierValues.get(tier);
+            if (tierValue.rarityValues.containsKey(rarity)) {
+                TierValue.RarityValue rarityValue = tierValue.rarityValues.get(rarity);
+                return rarityValue.weaponValue;
+            }
+        }
+        return null;
+    }
+
     private void updateOrbValues(JsonArray array) {
         for (int i = 1; i < array.size(); i++) {
             JsonArray entry = array.get(i).getAsJsonArray();
@@ -217,8 +385,8 @@ public class StatKeyDatabase {
         }
         return null;
     }
-    
-    
+
+
     public IntRange getWeaponElementals(Tier tier, ItemRarity rarity) {
         if (tierValues.containsKey(tier)) {
             TierValue tierValue = tierValues.get(tier);
@@ -231,6 +399,14 @@ public class StatKeyDatabase {
         if (tierValues.containsKey(tier)) {
             TierValue tierValue = tierValues.get(tier);
             return tierValue.orbValues.getOrDefault("ELEMENTALS", null);
+        }
+        return null;
+    }
+
+    public IntRange getRBLODGE(Tier tier, ItemRarity rarity) {
+        if (tierValues.containsKey(tier)) {
+            TierValue tierValue = tierValues.get(tier);
+            return tierValue.orbValues.getOrDefault("RBLODGE", null);
         }
         return null;
     }

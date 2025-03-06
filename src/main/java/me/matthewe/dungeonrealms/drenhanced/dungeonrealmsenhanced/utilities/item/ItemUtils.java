@@ -369,6 +369,83 @@ public class ItemUtils {
         return Tier.getByNumber(NbtTagUtils.getInt("tier", itemStack));
     }
 
+
+    public static int getLevel(ItemStack itemStack) {
+        if ((itemStack.getItem() != Items.AIR) && itemStack.hasDisplayName() && itemStack.hasTagCompound()) {
+            NBTTagCompound tagCompound = itemStack.getTagCompound();
+            if (tagCompound == null) {
+                return 0;
+            }
+
+            if (tagCompound.hasKey("level")) {
+                return tagCompound.getInteger("level");
+            }
+        }
+        return 0;
+    }
+    public static int getEnchant(ItemStack itemStack) {
+        if ((itemStack.getItem() != Items.AIR) && itemStack.hasDisplayName() && itemStack.hasTagCompound()) {
+            NBTTagCompound tagCompound = itemStack.getTagCompound();
+            if (tagCompound == null) {
+                return 0;
+            }
+
+            if (tagCompound.hasKey("enchant")) {
+                return tagCompound.getInteger("enchant");
+            }
+        }
+        return 0;
+    }
+
+    public static ItemType getType(ItemStack stack) {
+        // Helmets
+        if (stack.getItem() == Items.LEATHER_HELMET || stack.getItem() == Items.CHAINMAIL_HELMET ||
+                stack.getItem() == Items.IRON_HELMET || stack.getItem() == Items.DIAMOND_HELMET ||
+                stack.getItem() == Items.GOLDEN_HELMET) {
+            return ItemType.HELMET;
+        }
+        // Chestplate
+        if (stack.getItem() == Items.LEATHER_CHESTPLATE || stack.getItem() == Items.CHAINMAIL_CHESTPLATE ||
+                stack.getItem() == Items.IRON_CHESTPLATE || stack.getItem() == Items.DIAMOND_CHESTPLATE ||
+                stack.getItem() == Items.GOLDEN_CHESTPLATE) {
+            return ItemType.CHESTPLATE;
+        }
+        // Leggings
+        if (stack.getItem() == Items.LEATHER_LEGGINGS || stack.getItem() == Items.CHAINMAIL_LEGGINGS ||
+                stack.getItem() == Items.IRON_LEGGINGS || stack.getItem() == Items.DIAMOND_LEGGINGS ||
+                stack.getItem() == Items.GOLDEN_LEGGINGS) {
+            return ItemType.LEGGINGS;
+        }
+        // Boots
+        if (stack.getItem() == Items.LEATHER_BOOTS || stack.getItem() == Items.CHAINMAIL_BOOTS ||
+                stack.getItem() == Items.IRON_BOOTS || stack.getItem() == Items.DIAMOND_BOOTS ||
+                stack.getItem() == Items.GOLDEN_BOOTS) {
+            return ItemType.BOOTS;
+        }
+        if (isSword(stack.getItem())) return ItemType.SWORD;
+        if (isAxe(stack.getItem())) return ItemType.AXE;
+        if (isPickaxe(stack.getItem())) return ItemType.PICKAXE;
+        if (isClub(stack.getItem())) return ItemType.POLEARM;
+        if (isScythe(stack.getItem())) return ItemType.HOE;
+        if (stack.getItem()== Items.FISHING_ROD) return ItemType.FISHING_ROD;
+        return ItemType.NONE;
+    }
+
+    public enum ItemType {
+        NONE,
+        BOOTS,
+        LEGGINGS,
+        CHESTPLATE,
+        HELMET,
+        SWORD,
+        BOW,
+        FISHING_ROD,
+        PICKAXE,
+        AXE,
+        POLEARM,
+        HOE;
+    }
+
     public static boolean hasClueScrolls() {
         return getClueScrolls() != null;
     }
@@ -384,7 +461,7 @@ public class ItemUtils {
         for (Slot slot : player.inventoryContainer.inventorySlots) {
             ItemStack itemStack = slot.getStack();
 
-            if ((itemStack.getItem() == Items.AIR) || (itemStack.getCount() == 0) || (!ItemType.isClueScroll(itemStack))) {
+            if ((itemStack.getItem() == Items.AIR) || (itemStack.getCount() == 0) || (!me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemType.isClueScroll(itemStack))) {
                 continue;
             }
             ClueScroll clueScroll = ClueScroll.of(itemStack);

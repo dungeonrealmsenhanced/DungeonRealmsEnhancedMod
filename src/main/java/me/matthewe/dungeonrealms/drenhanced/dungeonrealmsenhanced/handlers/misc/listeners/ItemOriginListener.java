@@ -3,16 +3,15 @@ package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.misc
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DREnhanced;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.StatKeyDatabase;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setting.DRSettings;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.ArmorTooltipCompare;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.IntRange;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.Listener;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.StringUtils;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.*;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemRarity;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemUtils;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.Tier;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -259,6 +258,13 @@ public class ItemOriginListener implements Listener {
         Tier tier = ItemUtils.getTier(itemStack);
         ItemRarity rarity = ItemUtils.getRarity(itemStack);
 
+        int level = ItemUtils.getLevel(itemStack);
+        int enchant = ItemUtils.getEnchant(itemStack);
+
+        ItemUtils.ItemType type = ItemUtils.getType(itemStack);
+        if (type== ItemUtils.ItemType.NONE)return;
+
+        if (level==0)return;
         StringUtils.editStringList(newToolTip, s -> {
             String colorStripped = StringUtils.clearColor(s);
             if (colorStripped.contains("✘"))return s;
@@ -277,10 +283,20 @@ public class ItemOriginListener implements Listener {
                 }
                 IntRange intRange = null;
 
+                boolean dmg = false;
+
                 if (colorStripped.contains("ICE DMG") || colorStripped.contains("POISON DMG") || colorStripped.contains("FIRE DMG")) {
                     intRange = database.getWeaponElementals(tier, rarity);
                 } else if (colorStripped.contains("INT") || colorStripped.contains("VIT") || colorStripped.contains("DEX")|| colorStripped.contains("STR")) {
                     intRange = database.getElementals(tier, rarity);
+
+                }else if (colorStripped.contains("DODGE") || colorStripped.contains("REFLECT") || colorStripped.contains("BLOCK")) {
+                    intRange = database.getRBLODGE(tier, rarity);
+                } else if (colorStripped.startsWith("DMG: +")) {
+
+                    intRange = new IntRange(0,0);
+                    dmg = true;
+
                 } else {
                     intRange=database.getOrbStat(entry.getKey(), entry.getValue(), tier,rarity);
                 }
@@ -291,10 +307,37 @@ public class ItemOriginListener implements Listener {
                 int min = intRange.getMin();
                 int max = intRange.getMax();
                 int stat = (int) modifierMap.get(entry.getKey())[0];
-                double percentage = ((double) (stat - min) / (max - min)) * 100;
-                String per = (percentage>=100?"MAX":(int)percentage+"%");
+                boolean v = false;
 
-                return TextFormatting.GRAY +"["+per+"] " + s +" ["+min+"-"+max+"]";
+                double percentage = 0;
+
+                if (dmg) {
+                    stat = (int) (stat - (stat * (enchant*0.05)));
+                    int maxDMG =  (int) modifierMap.get(entry.getKey())[1];
+                    maxDMG = (int) (maxDMG - (maxDMG * (enchant*0.05)));
+                    Minecraft.getMinecraft().player.sendMessage(new TextComponentString(stat+"-"+maxDMG));
+
+
+                    StatKeyDatabase.TierValue.RarityValue.WeaponValue weaponValue = database.getWeaponValue(tier, rarity);
+                    if (weaponValue!=null){
+
+                        percentage=WeaponCalculator.calculateRollPercentage(level,type,weaponValue,stat,maxDMG);
+                        String per = (percentage>=100?"MAX":(int)percentage+"%");
+//                        return TextFormatting.GRAY +"("+ stat+"-"+maxDMG+") ["+per+"] " + s;
+                        return TextFormatting.GRAY +"["+per+"] " + s;
+                    }
+                } else {
+                    percentage=  ((double) (stat - min) / (max - min)) * 100;
+                }
+//                if (percentage < 0) {
+//
+//                    v =true;
+//                    percentage=0;
+//                }
+                String per = (percentage>=100?"MAX":(int)percentage+"%");
+                return TextFormatting.GRAY +"["+per+"] " + s;
+
+//                return TextFormatting.GRAY +"["+per+"] " + s +" ["+min+"-"+max+"]";
             }
 
             return s;

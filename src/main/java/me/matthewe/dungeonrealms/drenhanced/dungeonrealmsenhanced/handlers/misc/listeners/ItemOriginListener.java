@@ -284,6 +284,7 @@ public class ItemOriginListener implements Listener {
                 IntRange intRange = null;
 
                 boolean dmg = false;
+                boolean hp = false;
 
                 if (colorStripped.contains("ICE DMG") || colorStripped.contains("POISON DMG") || colorStripped.contains("FIRE DMG")) {
                     intRange = database.getWeaponElementals(tier, rarity);
@@ -296,7 +297,10 @@ public class ItemOriginListener implements Listener {
 
                     intRange = new IntRange(0,0);
                     dmg = true;
+                } else if (colorStripped.startsWith("HP: +")) {
 
+                    intRange = new IntRange(0,0);
+                    hp =  true;
                 } else {
                     intRange=database.getOrbStat(entry.getKey(), entry.getValue(), tier,rarity);
                 }
@@ -304,40 +308,32 @@ public class ItemOriginListener implements Listener {
                 if (intRange==null){
                     return s;
                 }
+
+
                 int min = intRange.getMin();
                 int max = intRange.getMax();
                 int stat = (int) modifierMap.get(entry.getKey())[0];
-                boolean v = false;
 
                 double percentage = 0;
 
                 if (dmg) {
-                    stat = (int) (stat - (stat * (enchant*0.05)));
+                    stat = (int) (stat - (stat * (enchant*0.05))); //undo enchants
                     int maxDMG =  (int) modifierMap.get(entry.getKey())[1];
-                    maxDMG = (int) (maxDMG - (maxDMG * (enchant*0.05)));
+                    maxDMG = (int) (maxDMG - (maxDMG * (enchant*0.05))); //undo enchants
                     Minecraft.getMinecraft().player.sendMessage(new TextComponentString(stat+"-"+maxDMG));
 
 
                     StatKeyDatabase.TierValue.RarityValue.WeaponValue weaponValue = database.getWeaponValue(tier, rarity);
                     if (weaponValue!=null){
 
-                        percentage=WeaponCalculator.calculateRollPercentage(level,type,weaponValue,stat,maxDMG);
-                        String per = (percentage>=100?"MAX":(int)percentage+"%");
-//                        return TextFormatting.GRAY +"("+ stat+"-"+maxDMG+") ["+per+"] " + s;
-                        return TextFormatting.GRAY +"["+per+"] " + s;
+                        return TextFormatting.GRAY +"["+(percentage>=100?
+                                "MAX":
+                                (int)WeaponCalculator.calculateRollPercentage(level,type,weaponValue,stat,maxDMG)+"%")+"] " + s;
                     }
                 } else {
                     percentage=  ((double) (stat - min) / (max - min)) * 100;
                 }
-//                if (percentage < 0) {
-//
-//                    v =true;
-//                    percentage=0;
-//                }
-                String per = (percentage>=100?"MAX":(int)percentage+"%");
-                return TextFormatting.GRAY +"["+per+"] " + s;
-
-//                return TextFormatting.GRAY +"["+per+"] " + s +" ["+min+"-"+max+"]";
+                return TextFormatting.GRAY +"["+(percentage>=100?"MAX":(int)percentage+"%")+"] " + s;
             }
 
             return s;

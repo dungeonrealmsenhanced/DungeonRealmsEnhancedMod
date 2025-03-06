@@ -234,6 +234,9 @@ public class ItemOriginListener implements Listener {
     }
 
     private void handleStatPercentages(ItemTooltipEvent event) {
+        if ( !DRSettings.SHOW_ORB_PERCENTAGE.get(boolean.class)) {
+            return;
+        }
         List<String> newToolTip = new ArrayList<>();
 
         for (String line : event.getToolTip()) {

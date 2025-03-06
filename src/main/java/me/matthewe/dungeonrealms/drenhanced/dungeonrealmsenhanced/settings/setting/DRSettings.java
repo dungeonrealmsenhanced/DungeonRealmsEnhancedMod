@@ -43,7 +43,8 @@ public enum DRSettings {
     DURABILITY_PERCENTAGE_FORMAT("Percent Format", new String[]{"Format of durability on an items display name."}, DRSettingCategory.ITEMS_MISC, "&8(%color%%percent%%&8)", String.class),
     MISC_DELAY("Update Delay", new String[]{"Update delay for modules"}, DRSettingCategory.MISC, 500L, long.class),
     SEND_DATA("Data Collection", new String[]{"This will allow data collection", "to help improve the mod.", " ", TextFormatting.RED + "Coming Soon"}, DRSettingCategory.MISC, true, boolean.class),
-    DISPLAY_DPS("Display Weapon DPS", new String[]{"This will display weapon dps.", "on all weapons."}, DRSettingCategory.ITEMS_MISC, true, boolean.class);
+    DISPLAY_DPS("Display Weapon DPS", new String[]{"This will display weapon dps.", "on all weapons."}, DRSettingCategory.ITEMS_MISC, true, boolean.class),
+    SHOW_ORB_PERCENTAGE("Show Stat Percentage", new String[]{"Show stat percentages", "shows orb % and dmg %."}, DRSettingCategory.ITEMS_MISC, true, boolean.class);
 
 
     private String name;

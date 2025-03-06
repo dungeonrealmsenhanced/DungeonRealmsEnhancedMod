@@ -7,17 +7,16 @@ import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.*;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemRarity;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemUtils;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.Tier;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -26,6 +25,7 @@ import java.util.*;
  */
 public class ItemOriginListener implements Listener {
     private static SimpleDateFormat DATE_FORMAT;
+    private DecimalFormat decimalFormat =new DecimalFormat("#.##");
 
     public ItemOriginListener() {
 
@@ -285,6 +285,7 @@ public class ItemOriginListener implements Listener {
 
                 boolean dmg = false;
                 boolean hp = false;
+                boolean energy = false;
 
                 if (colorStripped.contains("ICE DMG") || colorStripped.contains("POISON DMG") || colorStripped.contains("FIRE DMG")) {
                     intRange = database.getWeaponElementals(tier, rarity);
@@ -294,13 +295,25 @@ public class ItemOriginListener implements Listener {
                 }else if (colorStripped.contains("DODGE") || colorStripped.contains("REFLECT") || colorStripped.contains("BLOCK")) {
                     intRange = database.getRBLODGE(tier, rarity);
                 } else if (colorStripped.startsWith("DMG: +")) {
+                    if (rarity!=ItemRarity.MYTHIC) {
 
-                    intRange = new IntRange(0,0);
-                    dmg = true;
+                        intRange = new IntRange(0,0);
+                        dmg = true;
+                    }
                 } else if (colorStripped.startsWith("HP: +")) {
+                    if (rarity != ItemRarity.MYTHIC) {
 
-                    intRange = new IntRange(0,0);
-                    hp =  true;
+
+                        intRange = new IntRange(0, 0);
+                        hp = true;
+                    }
+                }else if (colorStripped.startsWith("ENERGY REGEN: +")) {
+                    if (rarity!=ItemRarity.MYTHIC) {
+
+
+                        intRange = new IntRange(0,0);
+                        energy =  true;
+                    }
                 } else {
                     intRange=database.getOrbStat(entry.getKey(), entry.getValue(), tier,rarity);
                 }
@@ -317,18 +330,46 @@ public class ItemOriginListener implements Listener {
                 double percentage = 0;
 
                 if (dmg) {
-                    stat = (int) (stat - (stat * (enchant*0.05))); //undo enchants
-                    int maxDMG =  (int) modifierMap.get(entry.getKey())[1];
-                    maxDMG = (int) (maxDMG - (maxDMG * (enchant*0.05))); //undo enchants
-                    Minecraft.getMinecraft().player.sendMessage(new TextComponentString(stat+"-"+maxDMG));
+                    stat = (int) (stat - (stat * (enchant * 0.05))); //undo enchants
+                    int maxDMG = (int) modifierMap.get(entry.getKey())[1];
+                    maxDMG = (int) (maxDMG - (maxDMG * (enchant * 0.05))); //undo enchants
 
 
                     StatKeyDatabase.TierValue.RarityValue.WeaponValue weaponValue = database.getWeaponValue(tier, rarity);
-                    if (weaponValue!=null){
+                    if (weaponValue != null) {
 
-                        return TextFormatting.GRAY +"["+(percentage>=100?
-                                "MAX":
-                                (int)WeaponCalculator.calculateRollPercentage(level,type,weaponValue,stat,maxDMG)+"%")+"] " + s;
+                        return TextFormatting.GRAY + "[" + (percentage >= 100 ?
+                                "MAX" :
+                                (int) WeaponCalculator.calculateRollPercentage(level, type, weaponValue, stat, maxDMG) + "%") + "] " + s;
+                    }
+                } else if (energy) {
+                    double eStat =  modifierMap.get(entry.getKey())[0];
+                    double en  = (eStat - (eStat * (enchant * 0.05))); //undo enchants
+
+                    StatKeyDatabase.TierValue.RarityValue.ArmorValue armorValue = database.getArmorValue(tier, rarity);
+                    if (armorValue != null) {
+                        double minE = armorValue.getEnergy().getMin();
+                        double maxE = armorValue.getEnergy().getMax();
+
+
+                        percentage=  ((double) (en - minE) / (maxE - minE)) * 100;
+
+                        return TextFormatting.GRAY + "[" + (percentage >= 100 ?
+                                "MAX" :
+                                (int)percentage + "%") + "] " + s;
+                    }
+                } else if (hp) {
+                    stat = (int) (stat - (stat * (enchant * 0.05))); //undo enchants
+
+                    StatKeyDatabase.TierValue.RarityValue.ArmorValue armorValue = database.getArmorValue(tier, rarity);
+
+                    if (armorValue != null) {
+
+                        percentage =  WeaponCalculator.calculateRollPercentageArmor(level, type, armorValue, stat);
+
+                        return TextFormatting.GRAY + "[" + (percentage >= 100 ?
+                                "MAX" :
+                                (int) WeaponCalculator.calculateRollPercentageArmor(level, type, armorValue, stat) + "%") + "] " + s;
                     }
                 } else {
                     percentage=  ((double) (stat - min) / (max - min)) * 100;

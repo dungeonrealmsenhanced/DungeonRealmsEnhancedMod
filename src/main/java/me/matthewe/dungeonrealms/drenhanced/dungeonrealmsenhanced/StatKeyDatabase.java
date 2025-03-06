@@ -118,6 +118,13 @@ public class StatKeyDatabase {
                 private IntRange dmgReductionMin;
                 private IntRange dmgReductionMax;
 
+                public DoubleRange getEnergy() {
+                    return energy;
+                }
+
+                public IntRange getHp() {
+                    return hp;
+                }
 
                 public ArmorValue(IntRange hp, IntRange armorMin, IntRange armorMax, DoubleRange energy, IntRange dmgReductionMin, IntRange dmgReductionMax) {
                     this.hp = hp;
@@ -334,6 +341,16 @@ public class StatKeyDatabase {
             if (tierValue.rarityValues.containsKey(rarity)) {
                 TierValue.RarityValue rarityValue = tierValue.rarityValues.get(rarity);
                 return rarityValue.weaponValue;
+            }
+        }
+        return null;
+    }
+    public TierValue.RarityValue.ArmorValue getArmorValue(Tier tier, ItemRarity rarity) {
+        if (tierValues.containsKey(tier)) {
+            TierValue tierValue = tierValues.get(tier);
+            if (tierValue.rarityValues.containsKey(rarity)) {
+                TierValue.RarityValue rarityValue = tierValue.rarityValues.get(rarity);
+                return rarityValue.armorValue;
             }
         }
         return null;

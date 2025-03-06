@@ -18,9 +18,22 @@ public class DREnhancedRestful {
     private DREnhancedInformation information;
 
     public DREnhancedRestful() {
-        information = new DREnhancedInformation("1.2", new DREnhancedInformation.Developer[]{new DREnhancedInformation.Developer("1d48bd80-4cd0-4874-ba65-94284bc24ecc", "MatthewEDev", true)},
+        information = new DREnhancedInformation("1.3", new DREnhancedInformation.Developer[]{new DREnhancedInformation.Developer("1d48bd80-4cd0-4874-ba65-94284bc24ecc", "MatthewEDev", true)},
                 "N/A", Changelog.builder()
                 .date(1740704964255L)
+                .changes(Change.builder()
+                        .title("Additions")
+                        .description("Orb & stat % added" +
+                                "DMG %" +
+                                "Energy %" +
+                                "Shard player count display" +
+                                "Weapon DPS" +
+                                "Restful API so values can be updated dynamically. ")
+                        .build(),
+                        Change.builder()
+                                .title("Fixes")
+                                .description("Debug spam issue.")
+                                .build())
                 .version("1.3")
                 .build()); //Hardcoded changelogs for now
 

@@ -4,22 +4,41 @@ import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.StatKeyDatabas
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemUtils;
 
 public class WeaponCalculator {
+    public static double calculateRollPercentageArmor(int level, ItemUtils.ItemType itemType, StatKeyDatabase.TierValue.RarityValue.ArmorValue armorValue, int currentHp) {
+        // Get base HP from armor value
+        int baseHp =currentHp;
+
+        // Apply level-based scaling
+        if (level < 90) {
+            double reductionFactor = 1 - ((90 - level) * 0.01); // 1% reduction per level below 90
+            baseHp *= reductionFactor;
+        } else if (level > 90) {
+            double increaseFactor = 1 + ((level - 90) * 0.01); // 1% increase per level above 90
+            baseHp *= increaseFactor;
+        }
+
+        // Apply item type multiplier
+        double typeMultiplier = getItemTypeMultiplier(itemType);
+        baseHp *= typeMultiplier;
+
+        // Return percentage comparison (direct HP scaling, not averaged)
+        return (currentHp / (double) baseHp) * 100;
+    }
 
     public static double calculateRollPercentage(int level, ItemUtils.ItemType itemType, StatKeyDatabase.TierValue.RarityValue.WeaponValue baseWeapon, int currentMin, int currentMax) {
-        double baseMin = (baseWeapon.getDamageMin().getMin() + baseWeapon.getDamageMax().getMax()) / 2.0;
-        double baseMax = (baseWeapon.getDamageMin().getMin() + baseWeapon.getDamageMax().getMax()) / 2.0;
+        // Get base min and max directly
+        double baseMin = baseWeapon.getDamageMin().getMin();
+        double baseMax = baseWeapon.getDamageMax().getMax();
 
-        // Calculate level-based scaling
-        int medianLevel = getMedianLevel(getTier(level));
-        double levelScaling = (level - medianLevel) * 0.01;
-
-        baseMin *= (1 + levelScaling);
-        baseMax *= (1 + levelScaling);
-
-        // If level > 100, apply minimum roll adjustment
-        if (level > 100) {
-            double minRollIncrease = (level - 100) * 0.05;
-            baseMin += (baseMax - baseMin) * minRollIncrease;
+        // Apply level-based scaling
+        if (level < 90) {
+            double reductionFactor = 1 - ((90 - level) * 0.01); // 1% reduction per level below 90
+            baseMin *= reductionFactor;
+            baseMax *= reductionFactor;
+        } else if (level > 90) {
+            double increaseFactor = 1 + ((level - 90) * 0.01); // 1% increase per level above 90
+            baseMin *= increaseFactor;
+            baseMax *= increaseFactor;
         }
 
         // Apply item type multiplier

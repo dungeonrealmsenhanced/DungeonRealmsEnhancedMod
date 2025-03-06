@@ -2,10 +2,8 @@ package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners;
 
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DREnhanced;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.events.DungeonRealmsJoinEvent;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners.buff.BuffListener;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.DRPlayer;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.StatisticTracker;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setting.DRSettings;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.world.Location;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -49,7 +47,7 @@ public class StatisticListener {
             this.delay2 = System.currentTimeMillis() + 3000L;
             EntityPlayerSP player = Minecraft.getMinecraft().player;
             if (player != null) {
-                BuffListener.requestActiveBuffs();
+//                BuffListener.requestActiveBuffs();
             }
         }
 

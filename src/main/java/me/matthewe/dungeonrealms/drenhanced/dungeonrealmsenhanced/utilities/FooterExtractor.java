@@ -1,69 +1,40 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities;
-import java.lang.reflect.Field;
-import java.util.regex.*;
 
+import java.util.regex.Pattern;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.ShardCountModule;
-import net.minecraft.client.gui.GuiPlayerTabOverlay;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.components.PlayerTabOverlay;
 
-public class FooterExtractor {
-    private static final Pattern ONLINE_PLAYER_PATTERN = Pattern.compile("(\\d+) here");
-    private static final Pattern SHARD_PATTERN = Pattern.compile("^(\\S+) \\d+ms \\* play\\.dungeonrealms\\.net");
+public final class FooterExtractor {
+  private static final Pattern ONLINE = Pattern.compile("([\\d,]+) here");
+  private static final Pattern SHARD =
+      Pattern.compile("(?m)^(\\S+) \\d+ms \\* play\\.dungeonrealms\\.net");
 
-    public static void extractFooterInfo(GuiPlayerTabOverlay tabList) {
-        if (tabList == null) return;
+  public static void extractFooterInfo(PlayerTabOverlay tab) {
+    parse(getFooterText(tab));
+  }
 
-        String footerText = getFooterText(tabList);
-        if (footerText == null) return;
+  public record ShardData(String shard, int players) {}
 
-        // Remove color codes and trim
-        footerText = footerText.replaceAll("§.", "").trim();
-//        System.out.println("Extracted Footer: " + footerText);
-
-        // Extract player count
-        Matcher playerMatcher = ONLINE_PLAYER_PATTERN.matcher(footerText);
-        if (playerMatcher.find()) {
-            int number = Integer.parseInt(playerMatcher.group(1));
-            ShardCountModule.setCount(number);
-//            System.out.println("Extracted Player Count: " + number);
-        } else {
-            ShardCountModule.setCount(0);
-//            System.out.println("Player count not found.");
-        }
-
-        // Extract shard name
-        Matcher shardMatcher = SHARD_PATTERN.matcher(footerText);
-        if (shardMatcher.find()) {
-            String shardName = shardMatcher.group(1);
-            ShardCountModule.setShard(shardName);
-//            System.out.println("Extracted Shard: " + shardName);
-        } else {
-            ShardCountModule.setShard(null);
-//            System.out.println("Shard name not found.");
-        }
+  public static ShardData parseFooter(String text) {
+    text = text == null ? "" : ChatFormatting.stripFormatting(text);
+    var online = ONLINE.matcher(text);
+    var shard = SHARD.matcher(text.trim());
+    int count = 0;
+    try {
+      count = online.find() ? Integer.parseInt(online.group(1).replace(",", "")) : 0;
+    } catch (NumberFormatException ignored) {
     }
+    return new ShardData(shard.find() ? shard.group(1) : null, count);
+  }
 
-    public static String getFooterText( GuiPlayerTabOverlay tabList) {
+  public static void parse(String text) {
+    var data = parseFooter(text);
+    ShardCountModule.setCount(data.players());
+    ShardCountModule.setShard(data.shard());
+  }
 
-        try {
-            // Access the footer field using reflection
-            Field footerField = GuiPlayerTabOverlay.class.getDeclaredField("field_175255_h");
-            footerField.setAccessible(true);
-            ITextComponent footerComponent = (ITextComponent) footerField.get(tabList);
-
-            return footerComponent != null ? footerComponent.getUnformattedText() : null;
-        } catch (NoSuchFieldException e) {
-            System.err.println("Error: Could not find the 'footer' field. Listing all fields:");
-
-            // Print all available field names
-            for (Field field : GuiPlayerTabOverlay.class.getDeclaredFields()) {
-                System.out.println("Field: " + field.getName() + " | Type: " + field.getType().getName());
-            }
-        } catch (IllegalAccessException e) {
-            System.err.println("Error: Could not access the 'footer' field.");
-        }
-        return null;
-    }
+  public static String getFooterText(PlayerTabOverlay tab) {
+    return tab == null || tab.footer == null ? "" : tab.footer.getString();
+  }
 }
-

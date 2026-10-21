@@ -1,0 +1,17 @@
+PASS production classes loaded from packaged JAR
+PASS five active HUD modules initialized
+PASS bundled stat tables loaded without REST
+PASS legacy enable state uses third value
+PASS modern save reload keeps disabled module at x=1 disabled
+PASS legacy settings file remains unchanged
+PASS rendered DREnhanced Settings
+PASS rendered Misc
+PASS rendered Chat Fishing
+PASS rendered Chat Mining
+PASS rendered Debug
+PASS rendered Bossbar
+PASS rendered Items Misc
+PASS rendered Items Overlay
+PASS rendered Development
+PASS rendered DREnhanced HUD Editor
+PASS rendered DREnhanced 2.0.0 - Minecraft 26.3

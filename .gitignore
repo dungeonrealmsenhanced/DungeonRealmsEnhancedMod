@@ -3,8 +3,8 @@
 build/
 .gradle/
 run/
-gradle/
+run-smoke/
 out/
-gradlew.bat
-gradlew
 src/main/resources/assets/dungeonrealmsenhanced/textures/gui/40678677-2dacda0e-634f-11e8-9fd6-3b5e56767159.png
+*-port.log
+client-smoke.log

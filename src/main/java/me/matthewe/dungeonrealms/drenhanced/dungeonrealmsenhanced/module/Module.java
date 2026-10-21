@@ -1,155 +1,147 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module;
 
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.Listener;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.render.RenderUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ScaledResolution;
-import net.minecraftforge.common.MinecraftForge;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import static me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.GuiSettings.settingsOpened;
 
 import java.util.ArrayList;
 import java.util.List;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.Listener;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.render.RenderUtils;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.render.ScreenSize;
+import net.minecraft.client.Minecraft;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-import static me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.GuiSettings.settingsOpened;
-
-/**
- * Created by Matthew E on 12/31/2018 at 3:27 PM for the project DungeonRealmsDREnhanced
- */
+/** Created by Matthew E on 12/31/2018 at 3:27 PM for the project DungeonRealmsDREnhanced */
 public abstract class Module {
-    private static final Log log = LogFactory.getLog(Module.class);
-    protected String name;
-    public int posX;
-    public int posY;
-    private boolean enabled;
-    private boolean loaded;
-    public int width;
-    public int height;
-    public int defaultPosX;
-    public int defaultPosY;
-    private boolean editing = false;
-    protected List<Listener> listeners;
-    protected Minecraft mc;
+  private static final Log log = LogFactory.getLog(Module.class);
+  protected String name;
+  public int posX;
+  public int posY;
+  private boolean enabled;
+  private boolean loaded;
+  public int width;
+  public int height;
+  public int defaultPosX;
+  public int defaultPosY;
+  private boolean editing = false;
+  protected List<Listener> listeners;
+  protected Minecraft mc;
 
-    public Module(String name) {
-        this.name = name;
-        this.enabled = false;
-        this.posX = 0;
-        this.posY = 0;
-        this.width = 0;
-        this.height = 0;
-        this.mc = Minecraft.getMinecraft();
-        this.listeners = new ArrayList<>();
+  public Module(String name) {
+    this.name = name;
+    this.enabled = false;
+    this.posX = 0;
+    this.posY = 0;
+    this.width = 0;
+    this.height = 0;
+    this.mc = Minecraft.getInstance();
+    this.listeners = new ArrayList<>();
+  }
+
+  public boolean isMouseWithin(int mouseX, int mouseY) {
+    return RenderUtils.isMouseWithin(mouseX, mouseY, posX, posY, width, height);
+  }
+
+  public void onRender(ScreenSize scaledResolution, float particleTicks) {
+    update(scaledResolution, particleTicks);
+
+    if (settingsOpened) {
+      renderOutline(scaledResolution, particleTicks);
+      if (editing) {
+
+        renderEditing(scaledResolution, particleTicks);
+      } else {
+        render(scaledResolution, particleTicks);
+      }
+    } else {
+      if (isEnabled()) {
+        render(scaledResolution, particleTicks);
+      }
     }
-    public boolean isMouseWithin(int mouseX, int mouseY) {
-        return RenderUtils.isMouseWithin(mouseX, mouseY, posX, posY, width, height);
-    }
+  }
 
-    public void onRender(ScaledResolution scaledResolution, float particleTicks) {
-        update(scaledResolution, particleTicks);
+  public void registerListener(Listener listener) {
+    this.listeners.add(listener);
+  }
 
-        if (settingsOpened) {
-            renderOutline(scaledResolution, particleTicks);
-            if (editing) {
+  public abstract void renderEditing(ScreenSize resolution, float partialTicks);
 
-                renderEditing(scaledResolution, particleTicks);
-            } else {
-                render(scaledResolution, particleTicks);
-            }
-        } else {
-            if (isEnabled()) {
-                render(scaledResolution, particleTicks);
-            }
-        }
-    }
+  public abstract void update(ScreenSize resolution, float partialTicks);
 
-    public void registerListener(Listener listener) {
-        this.listeners.add(listener);
-    }
+  public String getName() {
+    return name;
+  }
 
-    public abstract void renderEditing(ScaledResolution resolution, float partialTicks);
+  public int getWidth() {
+    return width;
+  }
 
-    public abstract void update(ScaledResolution resolution, float partialTicks);
+  public List<Listener> getListeners() {
+    return listeners;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public void setWidth(int width) {
+    this.width = width;
+  }
 
-    public int getWidth() {
-        return width;
-    }
+  public int getHeight() {
+    return height;
+  }
 
-    public List<Listener> getListeners() {
-        return listeners;
-    }
+  public void setHeight(int height) {
+    this.height = height;
+  }
 
-    public void setWidth(int width) {
-        this.width = width;
-    }
+  public abstract void renderOutline(ScreenSize scaledResolution, float particleTicks);
 
-    public int getHeight() {
-        return height;
-    }
+  public abstract void render(ScreenSize scaledResolution, float particleTicks);
 
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public abstract void renderOutline(ScaledResolution scaledResolution, float particleTicks);
-
-    public abstract void render(ScaledResolution scaledResolution, float particleTicks);
-
-
-    public void load() {
-        if (this.loaded) {
-            return;
-        }
-
-        MinecraftForge.EVENT_BUS.register(this);
-        this.onLoad();
-        log.info("[" + name + "] Enabled.");
-
-        this.loaded = true;
-        defaultPosX = new Integer(this.posX).intValue();
-        defaultPosY = new Integer(this.posY).intValue();
+  public void load() {
+    if (this.loaded) {
+      return;
     }
 
-    public void unload() {
-        if (!this.loaded) {
-            return;
-        }
-        MinecraftForge.EVENT_BUS.unregister(this);
-        this.onUnload();
-        log.info("[" + name + "] Disabled.");
+    this.onLoad();
+    log.info("[" + name + "] Enabled.");
 
-        this.loaded = false;
+    this.loaded = true;
+    defaultPosX = this.posX;
+    defaultPosY = this.posY;
+  }
+
+  public void unload() {
+    if (!this.loaded) {
+      return;
     }
+    this.onUnload();
+    log.info("[" + name + "] Disabled.");
 
-    public abstract void onLoad();
+    this.loaded = false;
+  }
 
-    public abstract void onUnload();
+  public abstract void onLoad();
 
-    public boolean isLoaded() {
-        return loaded;
-    }
+  public abstract void onUnload();
 
-    public boolean isEnabled() {
-        return enabled;
-    }
+  public boolean isLoaded() {
+    return loaded;
+  }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
+  public boolean isEnabled() {
+    return enabled;
+  }
 
-    public void loadSettings() {
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+  }
 
-    }
+  public void loadSettings() {}
 
-    public boolean isEditing() {
-        return editing;
-    }
+  public boolean isEditing() {
+    return editing;
+  }
 
-    public void setEditing(boolean editing) {
-        this.editing = editing;
-    }
+  public void setEditing(boolean editing) {
+    this.editing = editing;
+  }
 }

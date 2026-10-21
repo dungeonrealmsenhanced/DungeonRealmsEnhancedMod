@@ -1,34 +1,39 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.misc.listeners;
 
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DREnhanced;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.Listener;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-
 import java.util.ArrayList;
 import java.util.List;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.DREnhanced;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.Listener;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemData;
+import net.minecraft.client.Minecraft;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
-/**
- * Created by Matthew E on 12/31/2018 at 1:30 PM for the project DungeonRealmsDREnhanced
- */
+/** Created by Matthew E on 12/31/2018 at 1:30 PM for the project DungeonRealmsDREnhanced */
 public class NBTListener implements Listener {
-    @SubscribeEvent(priority = EventPriority.LOW)
-    public void onItemTooltip(ItemTooltipEvent event) {
-        ItemStack itemStack = event.getItemStack();
-        if (itemStack.hasTagCompound() && GuiScreen.isAltKeyDown() && DREnhanced.isDeveloper()) {
+  @SubscribeEvent(priority = EventPriority.LOW)
+  public void onItemTooltip(ItemTooltipEvent event) {
+    if (!me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners.ServerContext
+        .active()) return;
+    me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.TooltipText.edit(
+        event,
+        tooltip -> {
+          ItemStack itemStack = event.getItemStack();
+          if (ItemData.hasData(itemStack)
+              && Minecraft.getInstance().hasAltDown()
+              && DREnhanced.isDeveloper()) {
             List<String> toolTip = new ArrayList<>();
             toolTip.add(" ");
-            NBTTagCompound tagCompound = itemStack.getTagCompound();
+            CompoundTag tagCompound = ItemData.tag(itemStack);
 
-
-            for (String s : tagCompound.getKeySet()) {
-                toolTip.add(s + ":" + tagCompound.getTag(s).toString());
+            for (String s : tagCompound.keySet()) {
+              toolTip.add(s + ":" + tagCompound.get(s).toString());
             }
-            event.getToolTip().addAll(toolTip);
-        }
-    }
+            tooltip.addAll(toolTip);
+          }
+        });
+  }
 }

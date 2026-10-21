@@ -1,232 +1,135 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced;
 
 import com.google.gson.GsonBuilder;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.Handlers;
+import java.io.*;
+import java.nio.file.*;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.Module;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.Modules;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.DRPlayer;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.proxy.IProxy;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.proxy.ClientProxy;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.DREnhancedConfig;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setting.Settings;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.LocationJsonAdapter;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.json.SettingsJsonAdapter;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.restful.change.Changelog;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.restful.change.ChangelogJsonDeserializer;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.restful.change.ChangelogJsonSerializer;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.texture.ImageUtils;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.restful.change.*;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.world.Location;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.lwjgl.opengl.Display;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.loading.FMLPaths;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-import java.util.Date;
-
-
-@Mod(
-        modid = DREnhanced.MOD_ID,
-        name = DREnhanced.MOD_NAME,
-        version = DREnhanced.VERSION,
-        clientSideOnly = true
-)
+@Mod(value = DREnhanced.MOD_ID, dist = Dist.CLIENT)
 public class DREnhanced {
-    private static final Log log = LogFactory.getLog(DREnhanced.class);
-    @SidedProxy(
-            clientSide = "me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.proxy.ClientProxy",
-            serverSide = "me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.proxy.ServerProxy"
-    )
-    public static IProxy proxy;
-    public static final String MOD_ID = "dungeonrealmsenhanced";
-    public static final String MOD_NAME = "DREnhanced";
-    public static final String VERSION = "1.1";
-    public static GsonBuilder gsonBuilder = new GsonBuilder().setPrettyPrinting()
-            .disableHtmlEscaping()
-            .registerTypeAdapter(Changelog.class, new ChangelogJsonSerializer())
-            .registerTypeAdapter(Location.class, new LocationJsonAdapter())
-            .registerTypeAdapter(Settings.class, new SettingsJsonAdapter())
-            .registerTypeAdapter(Changelog.class, new ChangelogJsonDeserializer());
+  public static final String MOD_ID = "dungeonrealmsenhanced";
+  public static final String MOD_NAME = "DREnhanced";
+  public static final String VERSION = "2.0.0+mc26.3";
+  public static DREnhanced INSTANCE;
+  public String folderLocation;
+  public static final GsonBuilder gsonBuilder =
+      new GsonBuilder()
+          .setPrettyPrinting()
+          .disableHtmlEscaping()
+          .registerTypeAdapter(Changelog.class, new ChangelogJsonSerializer())
+          .registerTypeAdapter(Changelog.class, new ChangelogJsonDeserializer())
+          .registerTypeAdapter(Location.class, new LocationJsonAdapter())
+          .registerTypeAdapter(Settings.class, new SettingsJsonAdapter());
+  public static final StatKeyDatabase statKeyDatabase = new StatKeyDatabase();
+  public static final String[] DEVELOPERS = {
+    "1d48bd80-4cd0-4874-ba65-94284bc24ecc", "56a838cd-afd8-4e30-a34f-822e936eb949"
+  };
+  private static boolean initialized;
 
-    public static StatKeyDatabase statKeyDatabase = new StatKeyDatabase();
+  public DREnhanced(IEventBus bus) {
+    INSTANCE = this;
+    folderLocation = FMLPaths.GAMEDIR.get().resolve(MOD_ID).toString() + File.separator;
+    bus.addListener(this::setup);
+    ClientProxy.registerModEvents(bus);
+  }
 
-    public static StatKeyDatabase getStatKeyDatabase() {
-        return statKeyDatabase;
-    }
+  private void setup(FMLClientSetupEvent event) {
+    event.enqueueWork(
+        () -> {
+          try {
+            Files.createDirectories(Path.of(folderLocation));
+          } catch (IOException e) {
+            throw new UncheckedIOException(e);
+          }
+          ClientProxy.initialize();
+          initialized = true;
+          log("Loaded %s for Minecraft 26.3 / NeoForge", VERSION);
+        });
+  }
 
-    public static final String[] DEVELOPERS = new String[]{
-            "1d48bd80-4cd0-4874-ba65-94284bc24ecc",
-            "56a838cd-afd8-4e30-a34f-822e936eb949"
-    };
+  public static StatKeyDatabase getStatKeyDatabase() {
+    return statKeyDatabase;
+  }
 
+  public static boolean isDeveloper() {
+    var player = Minecraft.getInstance().player;
+    if (player == null) return false;
+    for (String id : DEVELOPERS) if (id.equalsIgnoreCase(player.getUUID().toString())) return true;
+    return false;
+  }
 
-    public static boolean isDeveloper() {
-        for (String developer : DEVELOPERS) {
-            if (Minecraft.getMinecraft().player != null && Minecraft.getMinecraft().player.getUniqueID().toString().equalsIgnoreCase(developer)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * This is the instance of your mod as created by Forge. It will never be null.
-     */
-    @Mod.Instance(MOD_ID)
-    public static DREnhanced INSTANCE;
-
-    public String folderLocation = "";
-
-
-    /**
-     * This is the first initialization event. Register tile entities here.
-     * The registry events below will have fired prior to entry to this method.
-     */
-    @Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
-
-        log("DREnhanced Version %s found!", VERSION);
-        log("Pre-Loading initialized...");
-        this.folderLocation = event.getSuggestedConfigurationFile().getParentFile().getParent() + "\\dungeonrealmsenhanced\\";
-        if (!new File(folderLocation).exists()) {
-            new File(folderLocation).mkdirs();
-        }
-
-        log(folderLocation);
-        if (FMLCommonHandler.instance().getSide().isClient()) {
-
-            Display.setTitle("DREnhanced");
-
-            if (Util.getOSType() != Util.EnumOS.OSX) {
-
-                try {
-                    Display.setIcon(new ByteBuffer[]{
-                            ImageUtils.readImage(Minecraft.getMinecraft().getResourceManager()
-                                    .getResource(new ResourceLocation(
-                                            MOD_ID + ":textures/gui/icon_16x16.png"))
-                                    .getInputStream()),
-                            ImageUtils.readImage(Minecraft.getMinecraft().getResourceManager()
-                                    .getResource(new ResourceLocation(
-                                            MOD_ID + ":textures/gui/icon_32x32.png"))
-                                    .getInputStream())});
-                } catch (IOException ioexception) {
-                    ioexception.printStackTrace();
-                }
-            }
-        }
-        proxy.preInit(event);
-
-    }
-
-
-    private void shutdown() {
-        saveModuleSettings();
-        Modules.unloadModules();
-        Handlers.disableHandlers();
-    }
-
-    @Mod.EventHandler
-    public void onFMLServerStarting(FMLServerStartingEvent event) {
-
-        proxy.serverStarting(event);
-
-    }
-
-    public static void loadModuleSettings() {
-        File file = new File(DREnhanced.INSTANCE.folderLocation + "module_save.json");
-        if (file.exists()) {
-            try {
-                String readFileToString = FileUtils.readFileToString(file, Charset.forName("UTF-8"));
-                DREnhancedConfig drEnhancedConfig = gsonBuilder.create().fromJson(readFileToString, DREnhancedConfig.class);
-                for (Module module : Modules.getModules()) {
-                    Integer[] coords = drEnhancedConfig.getCoords(module.getName());
-                    if (coords != null) {
-                        module.posX = coords[0];
-                        module.posY = coords[1];
-                        module.setEnabled(coords[0] == 1);
-                        log("[" + module.getName() + "] set posX to " + coords[0]);
-                        log("[" + module.getName() + "] set posY to " + coords[1]);
-                        log("[" + module.getName() + "] set status to " + module.isEnabled());
-                    }
-                }
-                DRPlayer.drPlayer = drEnhancedConfig.drPlayer;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            saveModuleSettings();
-            loadModuleSettings();
-        }
-
-    }
-
-    public static void saveModuleSettings() {
-        if (DRPlayer.drPlayer!=null) {
-            DRPlayer.drPlayer.clearToSave();
-        }
-        File file = new File(DREnhanced.INSTANCE.folderLocation + "module_save.json");
-        if (file.exists()) {
-            try {
-                FileUtils.forceDelete(file);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return;
-            }
-        }
-        file = new File(DREnhanced.INSTANCE.folderLocation + "module_save.json");
-
-        try {
-            file.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        DREnhancedConfig drEnhancedConfig = new DREnhancedConfig();
+  public static void loadModuleSettings() {
+    Path current = Path.of(INSTANCE.folderLocation, "module_save-26.3.json");
+    Path legacy = Path.of(INSTANCE.folderLocation, "module_save.json");
+    Path source = Files.exists(current) ? current : legacy;
+    if (!Files.exists(source)) return;
+    try (Reader reader = Files.newBufferedReader(source)) {
+      DREnhancedConfig config = gsonBuilder.create().fromJson(reader, DREnhancedConfig.class);
+      if (config == null) return;
+      if (config.modules != null)
         for (Module module : Modules.getModules()) {
-            drEnhancedConfig.setCoords(module.getName(), module.posX, module.posY, module.isEnabled());
+          var placement =
+              me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.ModulePlacement
+                  .decode(config.getCoords(module.getName()));
+          if (placement == null) continue;
+          module.posX = placement.x();
+          module.posY = placement.y();
+          module.setEnabled(placement.enabled());
         }
+      if (config.drPlayer != null) DRPlayer.drPlayer = config.drPlayer;
+      DRPlayer.get().setLoaded(false);
+    } catch (Exception e) {
+      log("Could not read %s: %s", source, e.toString());
+      if (source.equals(current)) {
         try {
-            FileUtils.writeStringToFile(file, gsonBuilder.create().toJson(drEnhancedConfig), Charset.forName("UTF-8"));
-        } catch (IOException e) {
-            e.printStackTrace();
+          Files.copy(
+              source,
+              source.resolveSibling(
+                  "module_save-26.3.invalid-" + System.currentTimeMillis() + ".json"));
+        } catch (IOException backupError) {
+          throw new UncheckedIOException(backupError);
         }
-
+      }
     }
+  }
 
-
-    public static void log(String par1, Object... par2) {
-        String var1 = String.format(par1, par2);
-        log.info(("[" + new Date().toLocaleString() + "] [DREnhanced] " + var1)); //gross
+  public static void saveModuleSettings() {
+    if (!initialized) return;
+    Path target = Path.of(INSTANCE.folderLocation, "module_save-26.3.json");
+    Path temp = target.resolveSibling("module_save-26.3.json.tmp");
+    DREnhancedConfig config = new DREnhancedConfig();
+    for (Module module : Modules.getModules())
+      config.setCoords(module.getName(), module.posX, module.posY, module.isEnabled());
+    try {
+      Files.createDirectories(target.getParent());
+      Files.writeString(temp, gsonBuilder.create().toJson(config));
+      try {
+        Files.move(
+            temp, target, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+      } catch (AtomicMoveNotSupportedException e) {
+        Files.move(temp, target, StandardCopyOption.REPLACE_EXISTING);
+      }
+    } catch (IOException e) {
+      log("Could not save settings: %s", e.toString());
     }
+  }
 
-    /**
-     * This is the second initialization event. Register custom recipes
-     */
-    @Mod.EventHandler
-    public void init(FMLInitializationEvent event) {
-        proxy.init(event);
-        Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
-
-    }
-
-    /**
-     * This is the final initialization event. Register actions from other mods here
-     */
-    @Mod.EventHandler
-    public void postInit(FMLPostInitializationEvent event) {
-        proxy.postInit(event);
-    }
+  public static void log(String format, Object... args) {
+    org.slf4j.LoggerFactory.getLogger(MOD_NAME).info(String.format(format, args));
+  }
 }

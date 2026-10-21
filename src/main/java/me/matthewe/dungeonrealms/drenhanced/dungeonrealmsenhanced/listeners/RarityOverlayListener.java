@@ -1,158 +1,67 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners;
 
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.events.inventory.GuiOverlapEvent;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.settings.setting.DRSettings;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.color.RGBAColor;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemRarity;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemType;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemUtils;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.render.ScreenRenderer;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.texture.DRTextures;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.*;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemData;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.init.Items;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.world.item.Items;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.ScreenEvent;
 
-import java.text.DecimalFormat;
-import java.util.List;
+public final class RarityOverlayListener {
+  public static long inventoryGems;
 
-/**
- * Created by Matthew E on 3/11/2019 at 8:59 AM for the project DungeonRealmsDREnhanced
- */
-public class RarityOverlayListener {
-
-    public static int inventoryGems = 0;
-
-    @SubscribeEvent
-    public void onPlayerInventory(GuiOverlapEvent.InventoryOverlap.DrawGuiContainerForegroundLayer event) {
-        drawOverlay(event.getGuiInventory().inventorySlots.inventorySlots);
-        drawGems();
+  public static void updateGems() {
+    inventoryGems = 0;
+    var player = Minecraft.getInstance().player;
+    if (player == null) return;
+    for (var stack : player.getInventory().getNonEquipmentItems()) {
+      if (stack.is(Items.EMERALD)) inventoryGems += stack.getCount();
+      if (ItemData.tag(stack).contains("gemValue"))
+        inventoryGems += Math.max(0, ItemData.tag(stack).getLongOr("gemValue", 0L));
     }
+  }
 
-    @SubscribeEvent
-    public void onChestInventory(GuiOverlapEvent.ChestOverlap.DrawGuiContainerForegroundLayer event) {
-        drawOverlay(event.getGuiInventory().inventorySlots.inventorySlots);
-    }
-
-    private int getGems() {
-        int gems = 0;
-        for (ItemStack itemStack : Minecraft.getMinecraft().player.inventory.mainInventory) {
-            if (itemStack == null || itemStack.getCount() == 0) {
-                continue;
-            }
-            if (itemStack.getItem() == Items.EMERALD) {
-                gems += itemStack.getCount();
-            }
-            if (itemStack.hasTagCompound() && (itemStack.getTagCompound() != null) && itemStack.getTagCompound().hasKey("gemValue")) {
-                gems += itemStack.getTagCompound().getInteger("gemValue");
-            }
+  @SubscribeEvent
+  public void draw(ScreenEvent.Render.Foreground e) {
+    if (!ServerContext.active() || !(e.getScreen() instanceof AbstractContainerScreen<?> screen))
+      return;
+    var g = e.getGuiGraphics();
+    for (var slot : screen.getMenu().slots) {
+      var stack = slot.getItem();
+      if (stack.isEmpty()) continue;
+      ItemRarity rarity = ItemUtils.getRarity(stack);
+      int color = 0;
+      if (ItemType.isClueScroll(stack) && DRSettings.GLOWING_CLUE_SCROLL.get(boolean.class))
+        color = 0xffff5555;
+      else if (rarity != null) {
+        DRSettings setting =
+            switch (rarity) {
+              case COMMON -> DRSettings.GLOWING_RARITIES_COMMON;
+              case UNCOMMON -> DRSettings.GLOWING_RARITIES_UNCOMMON;
+              case RARE -> DRSettings.GLOWING_RARITIES_RARE;
+              case EPIC -> DRSettings.GLOWING_RARITIES_EPIC;
+              case LEGENDARY -> DRSettings.GLOWING_RARITIES_LEGENDARY;
+              case MYTHIC -> DRSettings.GLOWING_RARITIES_MYTHIC;
+            };
+        if (setting.get(boolean.class)) {
+          var c = rarity.getRgbaColor();
+          color =
+              0xff000000 | ((int) (c.r * 255) << 16) | ((int) (c.g * 255) << 8) | (int) (c.b * 255);
         }
-        inventoryGems= gems;
-        return gems;
+      }
+      if (color != 0)
+        g.outline(screen.leftPos + slot.x - 1, screen.topPos + slot.y - 1, 18, 18, color);
     }
-
-    private void drawGems() {
-        if (!DRSettings.GEM_COUNT_INVENTORY_OVERLAY.get(boolean.class)) {
-            return;
-        }
-        GlStateManager.disableLighting();
-        DecimalFormat decimalFormat = new DecimalFormat("#,###");
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1F);
-        int x = 145;
-        int gems = getGems();
-        int y = (int) ((Minecraft.getMinecraft().player.inventory.mainInventory.size() / 9) * 19.7) - 3;
-        ScreenRenderer.beginGL(0, 0);
-        {
-            ScreenRenderer.scale(0.9f);
-            Minecraft.getMinecraft().fontRenderer.drawString(decimalFormat.format(gems) + TextFormatting.BOLD + "g", x, y, 4210752, false);
-        }
-        ScreenRenderer.endGL();
-        GlStateManager.enableLighting();
+    if (DRSettings.GEM_COUNT_INVENTORY_OVERLAY.get(boolean.class)) {
+      updateGems();
+      g.text(
+          Minecraft.getInstance().font,
+          String.format("%,dg", inventoryGems),
+          screen.leftPos + 8,
+          screen.topPos - 12,
+          0xff55ff55);
     }
-
-
-    private void drawOverlay(List<Slot> slots) {
-        for (Slot slot : slots) {
-            ItemStack itemStack = slot.getStack();
-            float r;
-            float g;
-            float b;
-            if ((itemStack.getItem() == Items.AIR) || (itemStack.getCount() == 0)) {
-                continue;
-            }
-            if (ItemType.isClueScroll(itemStack) && DRSettings.GLOWING_CLUE_SCROLL.get(boolean.class)) {
-                RGBAColor rgbaColor = new RGBAColor(1.0f, 0.0f, 0.0f);
-                r = rgbaColor.r;
-                g = rgbaColor.g;
-                b = rgbaColor.b;
-                renderItemOverlay(r, g, b, slot.xPos, slot.yPos);
-                continue;
-            }
-            ItemRarity itemRarity = ItemRarity.getByItemStack(itemStack);
-            boolean mythic = ItemUtils.isMythic(itemStack);
-
-            if (itemRarity != null || mythic) {
-                if (itemRarity != null) {
-                    switch (itemRarity) {
-                        case COMMON:
-                            if (!DRSettings.GLOWING_RARITIES_COMMON.get(boolean.class)) {
-                                continue;
-                            }
-                            break;
-                        case UNCOMMON:
-                            if (!DRSettings.GLOWING_RARITIES_UNCOMMON.get(boolean.class)) {
-                                continue;
-                            }
-                            break;
-                        case RARE:
-                            if (!DRSettings.GLOWING_RARITIES_RARE.get(boolean.class)) {
-                                continue;
-                            }
-                            break;
-                        case EPIC:
-                            if (!DRSettings.GLOWING_RARITIES_EPIC.get(boolean.class)) {
-                                continue;
-                            }
-                            break;
-                        case LEGENDARY:
-                            if (!DRSettings.GLOWING_RARITIES_LEGENDARY.get(boolean.class)) {
-                                continue;
-                            }
-                            break;
-                    }
-                }
-
-                if (mythic) {
-                    if (!DRSettings.GLOWING_RARITIES_MYTHIC.get(boolean.class)) {
-                        itemRarity = null;
-                    } else {
-                        itemRarity = ItemRarity.MYTHIC;
-                    }
-                }
-                if (itemRarity != null) {
-                    r = itemRarity.getRgbaColor().r;
-                    g = itemRarity.getRgbaColor().g;
-                    b = itemRarity.getRgbaColor().b;
-                    renderItemOverlay(r, g, b, slot.xPos, slot.yPos);
-                }
-            }
-        }
-    }
-
-    private void renderItemOverlay(float r, float g, float b, int xPos, int yPos) {
-        ScreenRenderer.beginGL(0, 0);
-        ScreenRenderer renderer = new ScreenRenderer();
-        RenderHelper.disableStandardItemLighting();
-        GlStateManager.color(r, g, b, 1.0f);
-        GlStateManager.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_BLEND);
-        renderer.drawRect(DRTextures.RARITY_OVERLAY.get(), xPos - 1, yPos - 1, 0, 0, 18, 18);
-        GlStateManager.glTexEnvi(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE);
-        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
-        ScreenRenderer.endGL();
-    }
+  }
 }

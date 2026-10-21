@@ -4,35 +4,32 @@ import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handler.Handle
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.mining.listeners.MiningListener;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.profession.mining.MiningThread;
 
-/**
- * Created by Matthew E on 3/13/2019 at 9:52 AM for the project DungeonRealmsDREnhanced
- */
+/** Created by Matthew E on 3/13/2019 at 9:52 AM for the project DungeonRealmsDREnhanced */
 public class MiningHandler extends Handler {
-    private static MiningThread miningThread;
+  private static MiningThread miningThread;
 
-    public MiningHandler() {
-        super(true);
-    }
+  public MiningHandler() {
+    super(true);
+  }
 
-    @Override
-    public void onEnable() {
-        miningThread = new MiningThread();
-        miningThread.start();
-        miningThread.setRunning(true);
-        registerListener(new MiningListener());
-    }
+  @Override
+  public void onEnable() {
+    miningThread = new MiningThread();
 
-    public  static MiningThread getMiningThread() {
-        return miningThread;
-    }
+    registerListener(new MiningListener());
+  }
 
-    @Override
-    public void onDisable() {
-        miningThread.setRunning(false);
-        try {
-            miningThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+  public static MiningThread getMiningThread() {
+    return miningThread;
+  }
+
+  @Override
+  public void onDisable() {
+    miningThread.setRunning(false);
+    try {
+      miningThread.join(1000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
     }
+  }
 }

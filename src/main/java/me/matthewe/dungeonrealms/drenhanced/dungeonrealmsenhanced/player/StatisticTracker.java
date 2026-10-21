@@ -1,235 +1,58 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player;
 
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.module.modules.ShardCountModule;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.FooterExtractor;
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.Tier;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiPlayerTabOverlay;
-import net.minecraft.client.network.NetworkPlayerInfo;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.FooterExtractor;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 
-/**
- * Created by Matthew E on 12/31/2018 at 2:42 PM for the project DungeonRealmsDREnhanced
- */
-public class StatisticTracker extends Thread {
-    private static final Log log = LogFactory.getLog(StatisticTracker.class);
-    private long times = 0;
-    private boolean running = false;
+public final class StatisticTracker {
+  private static final Pattern DURATION = Pattern.compile("(\\d+)([wdhms])");
 
-    @Override
-    public synchronized void start() {
-        super.start();
-        running = true;
+  public void updateStatistics() {
+    var mc = Minecraft.getInstance();
+    if (mc.player == null || mc.getConnection() == null) return;
+    var tab = mc.gui.hud.getTabList();
+    FooterExtractor.extractFooterInfo(tab);
+    for (var info : mc.getConnection().getOnlinePlayers()) {
+      String name = ChatFormatting.stripFormatting(tab.getNameForDisplay(info).getString());
+      if (name == null) continue;
+      for (String line : name.split("\n")) parseLine(line.trim());
     }
+    DRPlayer.get().setUuid(mc.player.getUUID());
+  }
 
-    public void setRunning(boolean running) {
-        this.running = running;
+  public static void parseLine(String line) {
+    try {
+      var stats = DRPlayer.get().getStatistics();
+      String value =
+          line.contains(":") ? line.substring(line.indexOf(':') + 1).trim().replace(",", "") : "";
+      if (line.startsWith("Ore Mined:")) stats.setOreMined(Integer.parseInt(value));
+      else if (line.startsWith("Bank Gems:")) stats.setBankGems(Long.parseLong(value));
+      else if (line.startsWith("Fish Caught:")) stats.setFishCaught(Integer.parseInt(value));
+      else if (line.startsWith("Loot Opened:")) stats.setLootOpened(Integer.parseInt(value));
+      else if (line.startsWith("Player Kills:")) {
+        var m = Pattern.compile("(\\d+)\\D+(\\d+)").matcher(value);
+        if (m.find()) {
+          stats.setPlayerKills(Integer.parseInt(m.group(1)));
+          stats.setDeaths(Integer.parseInt(m.group(2)));
+        }
+      } else if (line.startsWith("Playtime:")) {
+        long millis = 0;
+        var m = DURATION.matcher(value);
+        while (m.find())
+          millis +=
+              Long.parseLong(m.group(1))
+                  * switch (m.group(2)) {
+                    case "w" -> 604800000L;
+                    case "d" -> 86400000L;
+                    case "h" -> 3600000L;
+                    case "m" -> 60000L;
+                    default -> 1000L;
+                  };
+        stats.setPlayTime(millis);
+      }
+    } catch (NumberFormatException ignored) {
+      /* Partial tab updates are normal during shard changes. */
     }
-
-    @Override
-    public void run() {
-        while (running) {
-            times++;
-//            System.out.println("[StatisticTracker] Running (" + times + ")");
-            this.updateStatistics();
-            try {
-                sleep(1000L);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private void updateStatistics() {
-
-        if (Minecraft.getMinecraft().ingameGUI == null) {
-            return;
-        }
-        GuiPlayerTabOverlay tabList = Minecraft.getMinecraft().ingameGUI.getTabList();
-
-        if (Minecraft.getMinecraft().getConnection() == null) {
-            return;
-        }
-
-//        log.info("Updating statistics.");
-        if (tabList==null)return;
-       FooterExtractor.extractFooterInfo(tabList);
-
-
-        List<NetworkPlayerInfo> playersC = new ArrayList<>(Minecraft.getMinecraft().getConnection().getPlayerInfoMap());
-
-        for (NetworkPlayerInfo loadedPlayer : playersC) {
-            String playerName = tabList.getPlayerName(loadedPlayer).trim();
-            if (playerName.isEmpty()) {
-                continue;
-            }
-            playerName = playerName.replaceAll("\n", "");
-            boolean print = false;
-            String tempPlayerName = TextFormatting.getTextWithoutFormattingCodes(playerName);
-            if ((tempPlayerName == null) || tempPlayerName.isEmpty()) {
-                continue;
-            }
-            for (int i = 0; i < tempPlayerName.length(); i++) {
-                if (tempPlayerName.charAt(i) != ' ') {
-                    print = true;
-                }
-            }
-            if (!print) {
-                continue;
-            }
-
-            playerName = TextFormatting.getTextWithoutFormattingCodes(playerName);
-            if ((playerName == null) || playerName.isEmpty()) {
-                continue;
-            }
-
-            playerName = playerName.trim();
-            boolean guild = true;
-            if (playerName.startsWith("Ore Mined: ")){
-                int oreMined = Integer.parseInt(playerName.split("Ore Mined: ")[1].trim());
-                DRPlayer.drPlayer.getStatistics().setOreMined(oreMined);
-            }
-            if (playerName.startsWith("Bank Gems: ")) {
-//                System.out.println(playerName);
-                DRPlayer.drPlayer.getStatistics().setBankGems((long) Integer.parseInt(playerName.split("Bank Gems: ")[1].trim()));
-            }
-            if (playerName.startsWith("Player Kills: ")) {
-                String[] playerKillsAndDeaths = playerName.split("Player Kills: ")[1].trim().split(" ");
-                int playerKills = Integer.parseInt(playerKillsAndDeaths[0].trim());
-                int deaths = Integer.parseInt(playerKillsAndDeaths[2].trim());
-                DRPlayer.drPlayer.getStatistics().setDeaths(deaths);
-                DRPlayer.drPlayer.getStatistics().setPlayerKills(playerKills);
-            }
-
-            if (playerName.startsWith("Playtime: ")) {
-
-                long time = 0L;
-                String playtime = playerName.split("Playtime: ")[1].trim();
-                if (playtime.contains(" ")) {
-                    for (String s : playtime.split(" ")) {
-                        if (s.contains("w")) {
-                            time += TimeUnit.DAYS.toMillis(Long.parseLong(s.split("w")[0].trim()) * 7);
-                        } else if (s.contains("d")) {
-                            time += TimeUnit.DAYS.toMillis(Long.parseLong(s.split("d")[0].trim()));
-
-                        } else if (s.contains("h")) {
-                            time += TimeUnit.HOURS.toMillis(Long.parseLong(s.split("h")[0].trim()));
-                        } else if (s.contains("m")) {
-                            time += TimeUnit.MINUTES.toMillis(Long.parseLong(s.split("m")[0].trim()));
-                        } else if (s.contains("s")) {
-                            time += TimeUnit.SECONDS.toMillis(Long.parseLong(s.split("s")[0].trim()));
-                        }
-                    }
-                } else {
-                    String s = playtime.trim();
-                    if (s.contains("w")) {
-                        time += TimeUnit.DAYS.toMillis(Long.parseLong(s.split("w")[0].trim()) * 7);
-                    } else if (s.contains("d")) {
-                        time += TimeUnit.DAYS.toMillis(Long.parseLong(s.split("d")[0].trim()));
-
-                    } else if (s.contains("h")) {
-                        time += TimeUnit.HOURS.toMillis(Long.parseLong(s.split("h")[0].trim()));
-                    } else if (s.contains("m")) {
-                        time += TimeUnit.MINUTES.toMillis(Long.parseLong(s.split("m")[0].trim()));
-                    } else if (s.contains("s")) {
-                        time += TimeUnit.SECONDS.toMillis(Long.parseLong(s.split("s")[0].trim()));
-                    }
-                }
-                DRPlayer.get().getStatistics().setPlayTime(time);
-            }
-//            if (playerName.startsWith("Player Kills: ")) {
-//                DRPlayer.drPlayer.getStatistics().setPlayerKills(Integer.parseInt(playerName.split("Player Kills: ")[1].trim()));
-//            }
-//            if (playerName.startsWith("Deaths: ")) {
-//                DRPlayer.drPlayer.getStatistics().setDeaths(Integer.parseInt(playerName.split("Deaths: ")[1].trim()));
-//            }
-            if (playerName.startsWith("Fish Caught: ")) {
-                DRPlayer.drPlayer.getStatistics().setFishCaught(Integer.parseInt(playerName.split("Fish Caught: ")[1].trim()));
-            }
-            if (playerName.startsWith("Loot Opened: ")) {
-                DRPlayer.drPlayer.getStatistics().setLootOpened(Integer.parseInt(playerName.split("Loot Opened: ")[1].trim()));
-            }
-
-
-//            if (playerName.startsWith("Ore Mined: ")) {
-//                DRPlayer.drPlayer.getStatistics().setOreMined(Integer.parseInt(playerName.split("Ore Mined: ")[1].trim()));
-//            }
-//            if (playerName.startsWith("T1 Kills: ")) {
-//                int kills = Integer.parseInt(playerName.split("T1 Kills: ")[1].trim().split(" Dry:")[0].trim());
-//                int dry = Integer.parseInt(playerName.split("T1 Kills: ")[1].trim().split(" Dry:")[1].trim());
-//                DRPlayer.drPlayer.getStatistics().setDryStreak(Tier.T1, dry);
-//                DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T1, kills);
-//            }
-//            if (playerName.startsWith("2 Kills: ")) {
-//                int kills = Integer.parseInt(playerName.split("T2 Kills: ")[1].trim().split(" Dry:")[0].trim());
-//                int dry = Integer.parseInt(playerName.split("T2 Kills: ")[1].trim().split(" Dry:")[1].trim());
-//                DRPlayer.drPlayer.getStatistics().setDryStreak(Tier.T2, dry);
-//                DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T2, kills);
-//            }
-//            if (playerName.startsWith("T3 Kills: ")) {
-//                int kills = Integer.parseInt(playerName.split("T3 Kills: ")[1].trim().split(" Dry:")[0].trim());
-//                int dry = Integer.parseInt(playerName.split("T3 Kills: ")[1].trim().split(" Dry:")[1].trim());
-//                DRPlayer.drPlayer.getStatistics().setDryStreak(Tier.T3, dry);
-//                DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T3, kills);
-//            }
-//            if (playerName.startsWith("T4 Kills: ")) {
-//                int kills = Integer.parseInt(playerName.split("T4 Kills: ")[1].trim().split(" Dry:")[0].trim());
-//                int dry = Integer.parseInt(playerName.split("T4 Kills: ")[1].trim().split(" Dry:")[1].trim());
-//                DRPlayer.drPlayer.getStatistics().setDryStreak(Tier.T4, dry);
-//                DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T4, kills);
-//            }
-//            if (playerName.startsWith("T5 Kills: ")) {
-//                int kills = Integer.parseInt(playerName.split("T5 Kills: ")[1].trim().split(" Dry:")[0].trim());
-//                int dry = Integer.parseInt(playerName.split("T5 Kills: ")[1].trim().split(" Dry:")[1].trim());
-//                DRPlayer.drPlayer.getStatistics().setDryStreak(Tier.T5, dry);
-//                DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T5, kills);
-//            }
-//            if (playerName.startsWith("T2 Mob Kills: ")) {
-//                if (playerName.toLowerCase().contains("dry:")) {
-//                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T2, (long) Integer.parseInt(playerName.split("T2 Mob Kills: ")[1].trim().split(" Dry:")[0].trim()));
-//                } else {
-//                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T2, (long) Integer.parseInt(playerName.split("T2 Mob Kills: ")[1].trim()));
-//                }
-//            }
-//            if (playerName.startsWith("T3 Mob Kills: ")) {
-//                if (playerName.toLowerCase().contains("dry:")) {
-//                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T3, (long) Integer.parseInt(playerName.split("T3 Mob Kills: ")[1].trim().split(" Dry:")[0].trim()));
-//                } else {
-//                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T3, (long) Integer.parseInt(playerName.split("T3 Mob Kills: ")[1].trim()));
-//                }
-//            }
-//            if (playerName.startsWith("T4 Mob Kills: ")) {
-//                if (playerName.toLowerCase().contains("dry:")) {
-//                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T4, (long) Integer.parseInt(playerName.split("T4 Mob Kills: ")[1].trim().split(" Dry:")[0].trim()));
-//                } else {
-//                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T4, (long) Integer.parseInt(playerName.split("T4 Mob Kills: ")[1].trim()));
-//                }
-//            }
-//            if (playerName.startsWith("T5 Mob Kills: ")) {
-//                if (playerName.toLowerCase().contains("dry:")) {
-//                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T5, (long) Integer.parseInt(playerName.split("T5 Mob Kills: ")[1].trim().split(" Dry:")[0].trim()));
-//                } else {
-//                    DRPlayer.drPlayer.getStatistics().setMobKillCount(Tier.T5, (long) Integer.parseInt(playerName.split("T5 Mob Kills: ")[1].trim()));
-//                }
-//            }
-//            if (playerName.startsWith("Level ➜")) {
-//                DRPlayer.drPlayer.getStatistics().setLevel(Integer.parseInt(playerName.split("Level ➜")[1].trim()));
-//            }
-//            if (playerName.toLowerCase().contains("please visit the guild")) {
-//                guild = false;
-//            }
-
-        }
-        DRPlayer.drPlayer.setUuid(Minecraft.getMinecraft().player.getUniqueID());
-    }
-
+  }
 }

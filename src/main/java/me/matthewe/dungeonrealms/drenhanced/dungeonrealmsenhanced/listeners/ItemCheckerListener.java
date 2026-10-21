@@ -1,208 +1,176 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners;
 
 import com.google.gson.Gson;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.player.DRPlayer;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.Drop;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemChecker;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemData;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemRarity;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.ItemUtils;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.item.Tier;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.mob.MobChecker;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.mob.MobTracker;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.monster.EntityIronGolem;
-import net.minecraft.entity.monster.EntitySkeleton;
-import net.minecraft.entity.monster.EntityZombie;
-import net.minecraft.entity.passive.EntityWolf;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.event.entity.player.PlayerDropsEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.animal.golem.IronGolem;
+import net.minecraft.world.entity.animal.wolf.Wolf;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.skeleton.Skeleton;
+import net.minecraft.world.entity.monster.zombie.Zombie;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
+import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 
-import java.util.EventListener;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
-/**
- * Created by Matthew E on 12/31/2018 at 7:39 PM for the project DungeonRealmsDREnhanced
- */
+/** Created by Matthew E on 12/31/2018 at 7:39 PM for the project DungeonRealmsDREnhanced */
 public class ItemCheckerListener {
-    private ItemChecker itemChecker;
-    private MobChecker<EntityZombie> zombieMobChecker;
-    private MobChecker<EntitySkeleton> skeletonMobChecker;
-    private MobChecker<EntityIronGolem> ironGolemMobChecker;
-    private MobChecker<EntityWolf> wolfMobChecker;
-    private Map<UUID, MobTracker> mobTrackerMap;
+  private ItemChecker itemChecker;
+  private MobChecker<Zombie> zombieMobChecker;
+  private MobChecker<Skeleton> skeletonMobChecker;
+  private MobChecker<IronGolem> ironGolemMobChecker;
+  private MobChecker<Wolf> wolfMobChecker;
+  private Map<UUID, MobTracker> mobTrackerMap;
 
-    public ItemCheckerListener() {
-        this.itemChecker = new ItemChecker(this::onItemFind);
-        mobTrackerMap = new ConcurrentHashMap<>();
+  public ItemCheckerListener() {
+    this.itemChecker = new ItemChecker(this::onItemFind);
+    mobTrackerMap = new ConcurrentHashMap<>();
 
-        this.zombieMobChecker = new MobChecker<>(entityZombie -> {
-            MobTracker mobTracker = new MobTracker();
-            mobTracker.update(entityZombie);
+    this.zombieMobChecker =
+        new MobChecker<>(
+            entityZombie -> {
+              MobTracker mobTracker = new MobTracker();
+              mobTracker.update(entityZombie);
 
-            mobTrackerMap.put(entityZombie.getUniqueID(), mobTracker);
-        }, EntityZombie.class);
-        this.ironGolemMobChecker = new MobChecker<>(entityIronGolem -> {
-            MobTracker mobTracker = new MobTracker();
-            mobTracker.update(entityIronGolem);
+              mobTrackerMap.put(entityZombie.getUUID(), mobTracker);
+            },
+            Zombie.class);
+    this.ironGolemMobChecker =
+        new MobChecker<>(
+            entityIronGolem -> {
+              MobTracker mobTracker = new MobTracker();
+              mobTracker.update(entityIronGolem);
 
-            mobTrackerMap.put(entityIronGolem.getUniqueID(), mobTracker);
-        }, EntityIronGolem.class);
+              mobTrackerMap.put(entityIronGolem.getUUID(), mobTracker);
+            },
+            IronGolem.class);
 
-        this.wolfMobChecker = new MobChecker<>(entityIronGolem -> {
-            MobTracker mobTracker = new MobTracker();
-            mobTracker.update(entityIronGolem);
+    this.wolfMobChecker =
+        new MobChecker<>(
+            entityIronGolem -> {
+              MobTracker mobTracker = new MobTracker();
+              mobTracker.update(entityIronGolem);
 
-            mobTrackerMap.put(entityIronGolem.getUniqueID(), mobTracker);
-        }, EntityWolf.class);
-        this.skeletonMobChecker = new MobChecker<>(entityZombie -> {
-//            ItemRarity best = null;
-//
-////            message((int) entityZombie.getHealth() + "/" + (int) entityZombie.getMaxHealth());
-//            for (ItemStack itemStack : entityZombie.getEquipmentAndArmor()) {
-//                ItemRarity rarity = ItemUtils.getRarity(itemStack);
-//                if (rarity != null) {
-////                    message(entityZombie.getCustomNameTag() + " " + rarity.getTextFormatting() + rarity.getName());
-//                    if (rarity.isBetter(best)) {
-//                        best = rarity;
-//                    }
-//                }
-//            }
-            MobTracker mobTracker = new MobTracker();
-            mobTracker.update(entityZombie);
+              mobTrackerMap.put(entityIronGolem.getUUID(), mobTracker);
+            },
+            Wolf.class);
+    this.skeletonMobChecker =
+        new MobChecker<>(
+            entityZombie -> {
+              MobTracker mobTracker = new MobTracker();
+              mobTracker.update(entityZombie);
 
-            mobTrackerMap.put(entityZombie.getUniqueID(), mobTracker);
-//            if (best != null) {
-//                if (best.ordinal() > ItemRarity.COMMON.ordinal()) {
-////                    message(entityZombie.getCustomNameTag() + " has " + best.getTextFormatting() + best.getName() + " Item.");
-//                    entityZombie.setGlowing(true);
-//
-//                }
-//            }
-        }, EntitySkeleton.class);
+              mobTrackerMap.put(entityZombie.getUUID(), mobTracker);
+            },
+            Skeleton.class);
+  }
+
+  @SubscribeEvent
+  public void onPlayerDrops(LivingDropsEvent event) {
+    if (!me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners.ServerContext
+        .active()) return;
+    if (!(event.getEntity() instanceof Player)) return;
+    for (ItemEntity entityItem : event.getDrops()) {
+      entityItem.addTag("M_CHECKED");
     }
+  }
 
-    @SubscribeEvent
-    public void onPlayerDrops(PlayerDropsEvent event) {
-        for (EntityItem entityItem : event.getDrops()) {
-            entityItem.addTag("M_CHECKED");
+  @SubscribeEvent
+  public void onRenderGameOverlayText(ClientTickEvent.Post event) {
+    if (!me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners.ServerContext
+        .active()) return;
+    if (!ServerContext.active()) return;
+    if (net.minecraft.client.Minecraft.getInstance().player.tickCount % 5 != 0) return;
+    if (mobTrackerMap.size() > 2000) mobTrackerMap.clear();
+    this.zombieMobChecker.update();
+    this.skeletonMobChecker.update();
+    this.wolfMobChecker.update();
+    this.ironGolemMobChecker.update();
+  }
+
+  private void onItemFind(ItemEntity entityItem) {
+    ItemStack itemStack = entityItem.getItem();
+
+    if (ItemUtils.isWeapon(itemStack.getItem())) {
+      ItemRarity itemRarity = ItemUtils.getRarity(itemStack);
+      if (itemRarity == null) {
+        return;
+      }
+      findItem(itemStack);
+
+    } else if (ItemUtils.isArmor(itemStack.getItem())) {
+      ItemRarity itemRarity = ItemUtils.getRarity(itemStack);
+      if (itemRarity == null) {
+        return;
+      }
+      findItem(itemStack);
+    }
+  }
+
+  @SubscribeEvent
+  public void onLivingDeath(LivingDeathEvent event) {
+    if (!me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners.ServerContext
+        .active()) return;
+    if (this.mobTrackerMap.containsKey(event.getEntity().getUUID())) {
+      Entity target = event.getEntity();
+      itemChecker.update();
+      MobTracker mobTracker = this.mobTrackerMap.get(target.getUUID());
+      mobTracker.death(target);
+      mobTrackerMap.remove(target.getUUID());
+      mobTrackerMap.put(target.getUUID(), mobTracker);
+    }
+  }
+
+  @SubscribeEvent
+  public void onAttackEntity(AttackEntityEvent event) {
+    if (!me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners.ServerContext
+        .active()) return;
+
+    if (event.getEntity() instanceof Player) {
+      Player player = (Player) event.getEntity();
+      Entity target = event.getTarget();
+      if (target instanceof Player) {
+        return;
+      }
+      if (this.mobTrackerMap.containsKey(target.getUUID())) {
+        MobTracker mobTracker = this.mobTrackerMap.get(target.getUUID());
+        mobTracker.update(target);
+        if (mobTracker.getTier() > -1) {
+          DRPlayer.drPlayer.setLastTier(Tier.getByNumber(mobTracker.getTier()));
         }
+        mobTrackerMap.remove(target.getUUID());
+        mobTrackerMap.put(target.getUUID(), mobTracker);
+      }
     }
+  }
 
+  private void findItem(ItemStack itemStack) {
+    Tier tier = ItemUtils.getTier(itemStack);
+    if (tier.getNumber() > 0) {
 
-    @SubscribeEvent
-    public void onRenderGameOverlayText(RenderGameOverlayEvent.Text event) {
-        this.zombieMobChecker.update();
-        this.skeletonMobChecker.update();
-        this.wolfMobChecker.update();
-        this.ironGolemMobChecker.update();
-
+      Drop drop =
+          new Drop(
+              tier,
+              ItemUtils.getRarity(itemStack),
+              (int) DRPlayer.drPlayer.getStatistics().getMobKillCount(tier),
+              DRPlayer.drPlayer.getStatistics().getDryStreak(tier),
+              new Gson().toJson(ItemData.tag(itemStack)));
+      DRPlayer.drPlayer.addDrop(drop);
+      DRPlayer.drPlayer.getStatistics().setDryStreak(tier, -1);
     }
-
-    private void onItemFind(EntityItem entityItem) {
-        ItemStack itemStack = entityItem.getItem();
-//        if (itemStack.getItem() == Items.EMERALD) {
-//            entityItem.setCustomNameTag(TextFormatting.GREEN.toString() + itemStack.getCount() + "x Gems");
-//            entityItem.setAlwaysRenderNameTag(true);
-//
-//        }
-        if (ItemUtils.isWeapon(itemStack.getItem())) {
-            ItemRarity itemRarity = ItemUtils.getRarity(itemStack);
-            if (itemRarity == null) {
-                return;
-            }
-            findItem(itemStack);
-
-        } else if (ItemUtils.isArmor(itemStack.getItem())) {
-            ItemRarity itemRarity = ItemUtils.getRarity(itemStack);
-            if (itemRarity == null) {
-                return;
-            }
-            findItem(itemStack);
-//            entityItem.setCustomNameTag(itemRarity.getName());
-//            entityItem.setAlwaysRenderNameTag(true);
-//            sendMessage(new ScreenMessage("Found " + itemRarity.getName() + " Item", itemRarity.getColor(), 0, 0) {
-//                @Override
-//                public void render(ScaledResolution scaledResolution) {
-//
-//                    RenderUtils.drawCenteredStringPlain(this.minecraft.fontRenderer, this.text, (int) scaledResolution.getScaledWidth() / 2, (int) scaledResolution.getScaledHeight() / 2, 2F, itemRarity.getColor());
-//                }
-//            }, 2000);
-        }
-    }
-
-    @SubscribeEvent
-    public void onLivingDeath(LivingDeathEvent event) {
-        if (this.mobTrackerMap.containsKey(event.getEntityLiving().getUniqueID())) {
-            Entity target = event.getEntity();
-            itemChecker.update();
-            MobTracker mobTracker = this.mobTrackerMap.get(target.getUniqueID());
-            mobTracker.death(target);
-            mobTrackerMap.remove(target.getUniqueID());
-            mobTrackerMap.put(target.getUniqueID(), mobTracker);
-
-        }
-    }
-
-    @SubscribeEvent
-    public void onAttackEntity(AttackEntityEvent event) {
-
-        if (event.getEntity() instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) event.getEntity();
-            Entity target = event.getTarget();
-            if (target instanceof EntityPlayer) {
-                return;
-            }
-            if (this.mobTrackerMap.containsKey(target.getUniqueID())) {
-                MobTracker mobTracker = this.mobTrackerMap.get(target.getUniqueID());
-                mobTracker.update(target);
-                if (mobTracker.getTier() > -1) {
-                    DRPlayer.drPlayer.setLastTier(Tier.getByNumber(mobTracker.getTier()));
-                }
-                mobTrackerMap.remove(target.getUniqueID());
-                mobTrackerMap.put(target.getUniqueID(), mobTracker);
-            }
-        }
-    }
-
-    private void findItem(ItemStack itemStack) {
-        Tier tier = ItemUtils.getTier(itemStack);
-        if (tier.getNumber() > 0) {
-
-            Drop drop = new Drop(tier, ItemUtils.getRarity(itemStack), (int) DRPlayer.drPlayer.getStatistics().getMobKillCount(tier), DRPlayer.drPlayer.getStatistics().getDryStreak(tier), new Gson().toJson(itemStack.getTagCompound()));
-            DRPlayer.drPlayer.addDrop(drop);
-            DRPlayer.drPlayer.getStatistics().setDryStreak(tier, -1);
-        }
-
-    }
-
-//    @SubscribeEvent
-//    public static void onEntity( PlayerInteractEvent.EntityInteract event) {
-//
-//        ItemStack itemStack = event.getEntityPlayer().getHeldItem(EnumHand.MAIN_HAND);
-//        if ((itemStack.getItem() == Items.AIR) || (itemStack.getCount() == 0)) {
-//            return;
-//        }
-//        event.getEntityPlayer().sendMessage(new TextComponentString("LOW "));
-//        if (event.getEntityPlayer().experience <= 0.3){
-//            event.getEntityPlayer().sendMessage(new TextComponentString("LOW EXP"));
-//            event.setCanceled(true);
-//
-//        }
-//
-
-//    }
+  }
 }

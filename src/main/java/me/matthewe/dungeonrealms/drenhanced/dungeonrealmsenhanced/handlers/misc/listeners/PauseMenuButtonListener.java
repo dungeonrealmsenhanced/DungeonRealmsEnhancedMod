@@ -1,51 +1,34 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.misc.listeners;
 
-import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.events.inventory.GuiOverlapEvent;
+import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.listeners.ServerContext;
 import me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.Listener;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.PauseScreen;
+import net.minecraft.network.chat.Component;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.ScreenEvent;
 
-import java.util.ArrayList;
-import java.util.List;
+public final class PauseMenuButtonListener implements Listener {
+  @SubscribeEvent
+  public void init(ScreenEvent.Init.Post e) {
+    if (!(e.getScreen() instanceof PauseScreen) || !ServerContext.active()) return;
+    int x = e.getScreen().width - 110;
+    e.addListener(
+        Button.builder(Component.literal("DR Logout"), b -> send("logout"))
+            .bounds(x, 8, 102, 20)
+            .build());
+    e.addListener(
+        Button.builder(Component.literal("DR Hub"), b -> send("hub"))
+            .bounds(x, 32, 102, 20)
+            .build());
+  }
 
-public class PauseMenuButtonListener implements Listener {
-
-    @SubscribeEvent
-    public void initGui(GuiOverlapEvent.IngameMenuOverlap.InitGui event) {
-        List<GuiButton> toRemoveList = new ArrayList<>();
-        List<GuiButton> buttonList = event.getButtonList();
-
-        for (GuiButton guiButton : buttonList) {
-            if (guiButton.id >= 5 && guiButton.id <= 7) {
-                toRemoveList.add(guiButton);
-            } else if (guiButton.id == 1) {
-                guiButton.displayString = TextFormatting.RED.toString() + guiButton.displayString;
-            } else if (guiButton.id == 12 || guiButton.id == 0) {
-                guiButton.displayString = TextFormatting.GRAY + guiButton.displayString.replaceAll("\\.", "");
-            }
-        }
-
-        buttonList.removeAll(toRemoveList);
-        buttonList.add(new GuiButton(753, event.getGui().width / 2 - 100, event.getGui().height / 4 + 48 + -16, TextFormatting.GREEN + "Logout"));
-        buttonList.add(new GuiButton(754, event.getGui().width / 2 - 100, event.getGui().height / 4 + 72 + -16, TextFormatting.GREEN + "Back to Hub"));
+  private void send(String command) {
+    var mc = Minecraft.getInstance();
+    if (mc.getConnection() != null && ServerContext.active()) {
+      mc.getConnection().sendCommand(command);
+      mc.gui.setScreen(null);
     }
-
-    @SubscribeEvent
-    public void actionPerformed(GuiOverlapEvent.IngameMenuOverlap.ActionPerformed event) {
-        switch (event.getButton().id) {
-            case 753:
-                Minecraft.getMinecraft().player.sendChatMessage("/logout");
-                event.setCanceled(true);
-                break;
-            case 754:
-                event.setCanceled(true);
-                Minecraft.getMinecraft().player.sendChatMessage("/hub");
-                break;
-            default:
-                break;
-
-        }
-    }
+  }
 }

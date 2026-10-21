@@ -1,31 +1,21 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.handlers.keybinds;
 
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
-import org.lwjgl.input.Keyboard;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.resources.Identifier;
+import org.lwjgl.sdl.SDLKeycode;
 
-public class KeyBinds {
+public final class KeyBinds {
+  private static final KeyMapping.Category CATEGORY =
+      KeyMapping.Category.register(
+          Identifier.fromNamespaceAndPath("dungeonrealmsenhanced", "keys"));
+  public static final KeyMapping OPEN_DR_SETTINGS =
+      new KeyMapping("key.drenhanced.settings", SDLKeycode.SDLK_H, CATEGORY);
+  public static final KeyMapping OPEN_DR_OVERLAY_SETTINGS =
+      new KeyMapping("key.drenhanced.overlay", SDLKeycode.SDLK_KP_5, CATEGORY);
+  public static final KeyMapping CHANGE_LOGS =
+      new KeyMapping("key.drenhanced.changelog", SDLKeycode.SDLK_G, CATEGORY);
 
-    public  KeyBinding OPEN_DR_OVERLAY_SETTINGS;
-    public  KeyBinding OPEN_DR_SETTINGS;
-    public  KeyBinding CHANGE_LOGS;
-    private KeyBindHandler keyBindHandler;
+  public KeyBinds(KeyBindHandler handler) {}
 
-    public KeyBinds(KeyBindHandler keyBindHandler) {
-        this.keyBindHandler = keyBindHandler;
-    }
-
-    public void init() {
-        OPEN_DR_OVERLAY_SETTINGS = new KeyBinding("Open Overlay Settings", Keyboard.KEY_NUMPAD5, "DungeonRealms Enhanced");
-        OPEN_DR_SETTINGS = new KeyBinding("Open Settings", Keyboard.KEY_H, "DungeonRealms Enhanced");
-        CHANGE_LOGS = new KeyBinding("Open Changelogs", Keyboard.KEY_G, "DungeonRealms Enhanced");
-
-        ClientRegistry.registerKeyBinding(OPEN_DR_OVERLAY_SETTINGS);
-        ClientRegistry.registerKeyBinding(OPEN_DR_SETTINGS);
-        ClientRegistry.registerKeyBinding(CHANGE_LOGS);
-
-        keyBindHandler.logger.info("Registered key bind " + OPEN_DR_OVERLAY_SETTINGS.getDisplayName());
-        keyBindHandler.logger.info("Registered key bind " + OPEN_DR_SETTINGS.getDisplayName());
-        keyBindHandler.logger.info("Registered key bind " + CHANGE_LOGS.getDisplayName());
-    }
+  public void init() {}
 }

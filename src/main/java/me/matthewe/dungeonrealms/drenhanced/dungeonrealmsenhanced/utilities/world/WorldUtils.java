@@ -1,28 +1,39 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.utilities.world;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.util.math.AxisAlignedBB;
-
 import java.util.List;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.phys.AABB;
 
-/**
- * Created by Matthew E on 5/28/2018 at 11:49 AM for the project DungeonRealmsEnhanced
- */
+/** Created by Matthew E on 5/28/2018 at 11:49 AM for the project DungeonRealmsEnhanced */
 public class WorldUtils {
-    public static List<EntityItem> getItemsAroundPlayer(int radius) {
-        EntityPlayerSP player = Minecraft.getMinecraft().player;
-        double v = radius / 2;
-        AxisAlignedBB scanAround = new AxisAlignedBB(player.posX-v, player.posY-v, player.posZ-v, player.posX+v, player.posY+v, player.posZ+v);
-       return Minecraft.getMinecraft().world.getEntitiesWithinAABB(EntityItem.class, scanAround);
-    }
+  public static List<ItemEntity> getItemsAroundPlayer(int radius) {
+    LocalPlayer player = Minecraft.getInstance().player;
+    double v = radius / 2;
+    AABB scanAround =
+        new AABB(
+            player.getX() - v,
+            player.getY() - v,
+            player.getZ() - v,
+            player.getX() + v,
+            player.getY() + v,
+            player.getZ() + v);
+    return Minecraft.getInstance().level.getEntitiesOfClass(ItemEntity.class, scanAround);
+  }
 
-    public static <T extends Entity> List<T> getEntitiesAroundPlayer(int radius, Class<T> tClass) {
-        EntityPlayerSP player = Minecraft.getMinecraft().player;
-        double v = radius / 2;
-        AxisAlignedBB scanAround = new AxisAlignedBB(player.posX-v, player.posY-v, player.posZ-v, player.posX+v, player.posY+v, player.posZ+v);
-       return Minecraft.getMinecraft().world.getEntitiesWithinAABB(tClass, scanAround);
-    }
+  public static <T extends Entity> List<T> getEntitiesAroundPlayer(int radius, Class<T> tClass) {
+    LocalPlayer player = Minecraft.getInstance().player;
+    double v = radius / 2;
+    AABB scanAround =
+        new AABB(
+            player.getX() - v,
+            player.getY() - v,
+            player.getZ() - v,
+            player.getX() + v,
+            player.getY() + v,
+            player.getZ() + v);
+    return Minecraft.getInstance().level.getEntitiesOfClass(tClass, scanAround);
+  }
 }

@@ -1,0 +1,21 @@
+license="All Rights Reserved"
+issueTrackerURL="https://github.com/dungeonrealmsenhanced/DungeonRealmsEnhancedMod/issues"
+
+[[mods]]
+modId="dungeonrealmsenhanced"
+version="${version}"
+displayName="DREnhanced"
+authors="MatthewEDev"
+description='''DungeonRealms client enhancements for Minecraft 26.3.'''
+
+[[dependencies.dungeonrealmsenhanced]]
+modId="neoforge"
+type="required"
+versionRange="[26.3.0.95,26.4)"
+side="CLIENT"
+
+[[dependencies.dungeonrealmsenhanced]]
+modId="minecraft"
+type="required"
+versionRange="[26.3]"
+side="CLIENT"

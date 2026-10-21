@@ -1,57 +1,83 @@
-buildscript {
-	repositories {
-		mavenCentral()
-		maven { url = "https://maven.minecraftforge.net/" }
-	}
-	
-	dependencies {
-		classpath group: "net.minecraftforge.gradle", name: "ForgeGradle", version: "5.1.+"
-	}
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.148'
 }
 
-apply plugin: "java"
-apply plugin: "net.minecraftforge.gradle"
+version = mod_version
+group = 'me.matthewe.dungeonrealms.drenhanced'
+base.archivesName = 'drenhanced'
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+java.withSourcesJar()
+repositories { mavenCentral() }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(8)
-compileJava {
-	sourceCompatibility = "8"
-	targetCompatibility = "8"
-}
-
-repositories {
-	maven {
-		url = "https://maven.minecraftforge.net/"
-	}
+neoForge {
+    version = neo_version
+    runs { client { client() } }
+    mods { dungeonrealmsenhanced { sourceSet sourceSets.main } }
+    unitTest {
+        enable()
+        testedMod = mods.dungeonrealmsenhanced
+    }
 }
 
 dependencies {
-	minecraft "net.minecraftforge:forge:1.12.2-14.23.5.2860"
+    jarJar(implementation('commons-logging:commons-logging:1.3.5'))
+    testImplementation platform('org.junit:junit-bom:5.13.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testImplementation "net.neoforged:testframework:${neo_version}"
 }
 
-minecraft {
-	mappings channel: "stable", version: "39-1.12"
-	
-	runs {
-		"client" {
-			workingDirectory file("./run")
-			mods { "${project.name}" { source sourceSets.main } }
-		}
-		
-		"server" {
-			workingDirectory file("./run/server")
-			mods { "${project.name}" { source sourceSets.main } }
-		}
-	}
-}
-
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+tasks.named('test', Test) { useJUnitPlatform() }
 processResources {
-	inputs.property "version", project.version
-	
-	filesMatching("mcmod.info") {
-		expand "version": project.version
-	}
+    inputs.property 'version', project.version
+    filesMatching('META-INF/neoforge.mods.toml') { expand version: project.version }
+    exclude 'minecraft/**', 'mcmod.info', '**/t.txt', '**/temp.txt'
 }
 
-//When Forge 1.12 loads mods from a directory that's been put on the classpath, it expects to find resources in the same directory.
-//Default Gradle behavior puts resources in ./build/resources/main instead of ./build/classes/main/java. Let's change that.
-sourceSets.all { it.output.resourcesDir = it.output.classesDirs.getFiles().iterator().next() }
+tasks.register('verifyJar') {
+    dependsOn tasks.named('jar')
+    inputs.file(tasks.named('jar').flatMap { it.archiveFile })
+    doLast {
+        def archive = tasks.named('jar').get().archiveFile.get().asFile
+        new java.util.zip.ZipFile(archive).withCloseable { zip ->
+            def metadata = zip.getEntry('META-INF/neoforge.mods.toml')
+            assert metadata != null
+            assert zip.getInputStream(metadata).getText('UTF-8').contains(project.version.toString())
+            assert zip.getEntry('META-INF/jarjar/metadata.json') != null
+            assert zip.getEntry('assets/dungeonrealmsenhanced/stat-data.json') != null
+            assert zip.getEntry('mcmod.info') == null
+            assert !zip.entries().toList().any { it.name.contains('drenhanced/smoke') || it.name.startsWith('minecraft/') }
+        }
+    }
+}
+tasks.named('check') { dependsOn tasks.named('verifyJar') }
+
+// Optional client-only test mod. It is never included in the distributable JAR.
+if (providers.gradleProperty('clientSmokeTest').isPresent()) {
+    sourceSets {
+        clientSmokeTest {
+            compileClasspath += sourceSets.main.output
+        }
+    }
+    configurations.clientSmokeTestImplementation.extendsFrom configurations.implementation
+    neoForge.addModdingDependenciesTo(sourceSets.clientSmokeTest)
+    neoForge.mods {
+        drenhanced_smoke { sourceSet sourceSets.clientSmokeTest }
+    }
+    neoForge.runs.client {
+        sourceSet = sourceSets.clientSmokeTest
+        loadedMods = [neoForge.mods.drenhanced_smoke]
+        gameDirectory = file('run-smoke')
+    }
+    tasks.named('runClient') {
+        dependsOn tasks.named('jar')
+        doFirst {
+            copy {
+                from tasks.named('jar').flatMap { it.archiveFile }
+                into layout.projectDirectory.dir('run-smoke/mods')
+            }
+        }
+    }
+}

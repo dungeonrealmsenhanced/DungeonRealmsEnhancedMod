@@ -1,0 +1,5 @@
+license="All Rights Reserved"
+[[mods]]
+modId="drenhanced_smoke"
+version="1.0.0"
+displayName="DREnhanced development smoke tests"

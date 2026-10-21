@@ -1,9 +1,6 @@
 package me.matthewe.dungeonrealms.drenhanced.dungeonrealmsenhanced.events;
 
-import net.minecraftforge.fml.common.eventhandler.Cancelable;
-import net.minecraftforge.fml.common.eventhandler.Event;
+import net.neoforged.bus.api.Event;
+import net.neoforged.bus.api.ICancellableEvent;
 
-@Cancelable
-public class DungeonRealmsJoinEvent extends Event  {
-
-}
+public class DungeonRealmsJoinEvent extends Event implements ICancellableEvent {}
